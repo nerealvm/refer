@@ -11,8 +11,6 @@ const ROOT = __dirname;
 const OUT = path.join(ROOT, 'out');
 const LOCAL_CHROME = '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
 const CHROME = process.env.CHROME || (fs.existsSync(LOCAL_CHROME) ? LOCAL_CHROME : undefined);
-const FONTS_CSS = fs.readFileSync(path.join(ROOT, 'fonts.css'), 'utf8')
-  .replace(/url\((fonts\/[^)]+)\)/g, (_, f) => `url(file://${path.join(ROOT, f)})`);
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'invite-'));
 const NAME = 'priglashenie-misha';
 
@@ -20,6 +18,7 @@ const NAME = 'priglashenie-misha';
 const W = 1480, H = 2100, M = 50, CX = W / 2;
 const FR = { x: M, y: M, w: W - 2 * M, h: H - 2 * M, rx: 64 };
 const G = 1985; // линия земли в городе
+const AGE = '8'; // сколько исполняется Мише
 
 const PAL = {
   color: {
@@ -47,7 +46,6 @@ const TXT = {
   pill: { t: 'ПРИГЛАШЕНИЕ', f: 'Rubik', w: 700, s: 40 },
   hero1: { t: 'ДЕНЬ', f: 'Rubik', w: 900, s: 100 },
   hero2: { t: 'РОЖДЕНИЯ', f: 'Rubik', w: 900, s: 100 },
-  capH: { t: 'Н', f: 'Rubik', w: 900, s: 100 },
   hi: { t: 'Привет,', f: 'Rubik', w: 800, s: 70 },
   excl: { t: '!', f: 'Rubik', w: 800, s: 70 },
   wait: { t: 'Жду тебя!', f: 'Rubik', w: 800, s: 54 },
@@ -71,6 +69,56 @@ function rng(seed) {
 const sparkle = (r) =>
   `M0 ${-r} Q${r * 0.16} ${-r * 0.16} ${r} 0 Q${r * 0.16} ${r * 0.16} 0 ${r} Q${-r * 0.16} ${r * 0.16} ${-r} 0 Q${-r * 0.16} ${-r * 0.16} 0 ${-r}Z`;
 
+// ---------- текст в кривых ----------
+// Весь текст переводится в контуры через HarfBuzz (тот же движок, что в Chrome),
+// поэтому в PDF не остаётся шрифтов и он одинаково выглядит в любом просмотрщике.
+const FONT_FILES = { Rubik: 'fonts/Rubik-wght.ttf', Pacifico: 'fonts/Pacifico-Regular.ttf' };
+let hb = null; // harfbuzzjs (ES-модуль), загружается в main()
+const faces = {};
+const hbFonts = {};
+const glyphs = new Map();
+function hbFont(family, weight) {
+  const key = `${family}:${weight}`;
+  if (!hbFonts[key]) {
+    if (!faces[family]) faces[family] = new hb.Face(new hb.Blob(fs.readFileSync(path.join(ROOT, FONT_FILES[family]))));
+    const font = new hb.Font(faces[family]);
+    if (faces[family].getAxisInfos().wght) font.setVariations([new hb.Variation('wght', weight)]);
+    hbFonts[key] = font;
+  }
+  return hbFonts[key];
+}
+function shapeRun(family, weight, str) {
+  const buf = new hb.Buffer();
+  buf.addText(str);
+  buf.guessSegmentProperties();
+  hb.shape(hbFont(family, weight), buf);
+  return buf.getGlyphInfosAndPositions();
+}
+// ширина строки; ls — межбуквенный интервал (как letter-spacing), после последней буквы не считается
+function runWidth(family, weight, size, str, ls = 0) {
+  const run = shapeRun(family, weight, str);
+  return (run.reduce((sum, gl) => sum + gl.xAdvance, 0) * size) / faces[family].upem + ls * (run.length - 1);
+}
+// контур строки для <path>: начало базовой линии в (x, y)
+function outline(family, weight, size, str, x, y, ls = 0) {
+  const font = hbFont(family, weight);
+  const k = size / faces[family].upem;
+  const d = [];
+  let pen = x;
+  for (const gl of shapeRun(family, weight, str)) {
+    const key = `${family}:${weight}:${gl.codepoint}`;
+    if (!glyphs.has(key)) glyphs.set(key, font.glyphToJson(gl.codepoint));
+    const ox = pen + gl.xOffset * k, oy = y - gl.yOffset * k;
+    for (const c of glyphs.get(key)) {
+      const v = [];
+      for (let i = 0; i < c.values.length; i += 2) v.push(r1(ox + c.values[i] * k), r1(oy - c.values[i + 1] * k));
+      d.push(c.type + v.join(' '));
+    }
+    pen += gl.xAdvance * k + ls;
+  }
+  return { d: d.join(''), width: pen - x };
+}
+
 // ---------- сборка SVG ----------
 function buildSVG(mode, m, idp = '') {
   const P = PAL[mode];
@@ -81,7 +129,20 @@ function buildSVG(mode, m, idp = '') {
   const out = [];
   const SW = 6; // основная обводка
   const AV = []; // прямоугольники [x1, y1, x2, y2], свободные от конфетти
-  const text = (o, s) => el('text', o, s);
+  // Текст сразу в кривых. s — строка или список сегментов [строка, цвет].
+  const text = (o, s) => {
+    const { x = 0, y = 0, 'font-family': fam, 'font-weight': wt = 400, 'font-size': size, 'letter-spacing': ls = 0, 'text-anchor': anchor, ...style } = o;
+    const segs = Array.isArray(s) ? s : [[s, style.fill]];
+    const total = segs.reduce((sum, [str]) => sum + runWidth(fam, wt, size, str, ls) + ls, 0) - ls;
+    let pen = anchor === 'middle' ? x - total / 2 : x;
+    const runs = segs.map(([str, fill]) => {
+      const o2 = outline(fam, wt, size, str, pen, y, ls);
+      pen += o2.width;
+      return { d: o2.d, fill };
+    });
+    if (runs.length === 1) return el('path', { ...style, d: runs[0].d });
+    return g(style, runs.map((r) => el('path', r)));
+  };
 
   // --- градиенты ---
   if (!BW) {
@@ -91,6 +152,7 @@ function buildSVG(mode, m, idp = '') {
     defs.push(el('linearGradient', { id: id('pillGrad'), x1: 0, y1: 0, x2: 1, y2: 1 }, stops(['#9333EA', '#3B82F6'])));
     defs.push(el('linearGradient', { id: id('skyGrad'), x1: 0, y1: 0, x2: 0, y2: 1 }, stops(['#FFFFFF', P.sky])));
     defs.push(el('linearGradient', { id: id('signGrad'), x1: 0, y1: 0, x2: 1, y2: 0 }, stops(['#D6246E', '#8E44AD'])));
+    defs.push(el('linearGradient', { id: id('ageGrad'), x1: 0, y1: 0, x2: 1, y2: 0 }, stops(['#2F80ED', '#8E44AD', '#D6246E'])));
   }
   defs.push(el('clipPath', { id: id('frameClip') }, el('rect', { x: FR.x, y: FR.y, width: FR.w, height: FR.h, rx: FR.rx })));
 
@@ -174,15 +236,15 @@ function buildSVG(mode, m, idp = '') {
   });
   const heroBottom = heroLines[1].y;
 
-  // колпак слева и кекс справа от «ДЕНЬ»
+  // колпак слева и наклейка «8 лет» справа от «ДЕНЬ»
   {
     const w1 = (m.hero1.w * S) / 100 + hls * 3;
     const yMid = heroLines[0].y - cap / 2;
-    const hx = CX - w1 / 2 - 150, kx = CX + w1 / 2 + 150;
+    const hx = CX - w1 / 2 - 150, sx = CX + w1 / 2 + 160, sy = yMid - 14;
     out.push(partyHat(hx, yMid + 64, -16));
-    out.push(cupcake(kx, yMid + 72, 12));
+    out.push(ageSticker(sx, sy, 10));
     AV.push([hx - 100, yMid - 150, hx + 90, yMid + 96]);
-    AV.push([kx - 100, yMid - 206, kx + 110, yMid + 96]);
+    AV.push([sx - 108, sy - 108, sx + 116, sy + 116]);
   }
 
   // --- конфетти (заполняется в конце, когда известны все зоны) ---
@@ -208,7 +270,7 @@ function buildSVG(mode, m, idp = '') {
   // --- основной текст ---
   const bodyY = nameY + 128 + 82;
   out.push(text({ x: CX, y: bodyY, 'text-anchor': 'middle', 'font-family': 'Rubik', 'font-weight': 700, 'font-size': 46, fill: P.ink },
-    `Приходи ко мне на праздник в <tspan fill="${BW ? P.ink : P.magenta}">КидБург</tspan>!`));
+    [['Приходи ко мне на праздник в ', P.ink], ['КидБург', BW ? P.ink : P.magenta], ['!', P.ink]]));
   out.push(text({ x: CX, y: bodyY + 55, 'text-anchor': 'middle', 'font-family': 'Rubik', 'font-weight': 400, 'font-size': 40, fill: P.ink },
     'Будем играть, пробовать себя в разных профессиях'));
   out.push(text({ x: CX, y: bodyY + 103, 'text-anchor': 'middle', 'font-family': 'Rubik', 'font-weight': 400, 'font-size': 40, fill: P.ink },
@@ -314,22 +376,35 @@ function buildSVG(mode, m, idp = '') {
     ]);
   }
 
-  function cupcake(x, y, rot) {
-    const wrap = 'M-48 0 L48 0 L64 -78 L-64 -78 Z';
-    const cream = 'M-72 -76 C-86 -80 -86 -112 -62 -114 C-66 -140 -34 -150 -20 -132 C-16 -160 22 -162 26 -134 C40 -152 72 -140 64 -112 C88 -110 86 -78 72 -76 Z';
-    const sprinkles = [[-40, -98, 30], [-12, -118, -40], [20, -100, 60], [44, -96, -20], [-2, -90, 10], [34, -124, 35], [-46, -118, -60]];
-    const cols = BW ? [P.ink] : [P.yellow, P.blue, P.lime, P.paper, P.purple, P.teal, P.orange];
-    return g({ transform: `translate(${x} ${y}) rotate(${rot})` }, [
-      g({ transform: 'translate(7 9)', fill: P.shadow, stroke: P.shadow, 'stroke-width': SW, 'stroke-linejoin': 'round' }, [el('path', { d: wrap }), el('path', { d: cream })]),
-      el('path', { d: wrap, fill: BW ? P.paper : P.orange, stroke: P.ink, 'stroke-width': SW, 'stroke-linejoin': 'round' }),
-      ...[-30, -10, 10, 30].map((k) => el('line', { x1: k * 0.8, y1: -4, x2: k * 1.06, y2: -74, stroke: P.ink, 'stroke-width': 4, 'stroke-linecap': 'round' })),
-      el('path', { d: cream, fill: BW ? '#E4E4E4' : P.pink, stroke: P.ink, 'stroke-width': SW, 'stroke-linejoin': 'round' }),
-      ...sprinkles.map(([sx, sy, a], i) => el('rect', { x: -9, y: -3.5, width: 18, height: 7, rx: 3.5, fill: cols[i % cols.length], stroke: BW ? 'none' : P.ink, 'stroke-width': 2, transform: `translate(${sx} ${sy}) rotate(${a})` })),
-      // свечка
-      el('rect', { x: -9, y: -212, width: 18, height: 64, rx: 5, fill: BW ? P.paper : P.teal, stroke: P.ink, 'stroke-width': 5 }),
-      el('path', { d: 'M-9 -196 L9 -206 M-9 -178 L9 -188 M-9 -160 L9 -170', stroke: P.ink, 'stroke-width': 3 }),
-      el('path', { d: 'M0 -262 C12 -246 16 -236 12 -228 C9 -220 -9 -220 -12 -228 C-15 -238 -6 -246 0 -262 Z', fill: BW ? P.paper : P.yellow, stroke: P.ink, 'stroke-width': 5, 'stroke-linejoin': 'round' }),
-      el('path', { d: 'M0 -246 C5 -238 6 -234 4 -230 C2 -226 -3 -226 -4 -230 C-5 -234 -3 -240 0 -246 Z', fill: BW ? P.ink : P.orange }),
+  // наклейка-звёздочка с возрастом: цифра в стиле заголовка + «ЛЕТ»
+  function ageSticker(cx, cy, rot) {
+    const R = 98, r = 86, n = 18;
+    let star = '';
+    for (let i = 0; i < 2 * n; i++) {
+      const a = (Math.PI * i) / n - Math.PI / 2;
+      const rr = i % 2 ? r : R;
+      star += `${i ? 'L' : 'M'}${r1(Math.cos(a) * rr)} ${r1(Math.sin(a) * rr)}`;
+    }
+    star += 'Z';
+    const S8 = 142, y8 = 30;
+    const w8 = runWidth('Rubik', 900, S8, AGE);
+    const h8 = S8 * capRatio;
+    const t8 = { x: -w8 / 2, y: y8, 'font-family': 'Rubik', 'font-weight': 900, 'font-size': S8 };
+    defs.push(el('clipPath', { id: id('age') }, text(t8, AGE)));
+    const top = y8 - h8, wy = top + h8 * 0.52, amp = h8 * 0.1;
+    const wave = `M${r1(-w8)} ${r1(wy)} C${r1(-w8 * 0.55)} ${r1(wy - amp)} ${r1(-w8 * 0.2)} ${r1(wy - amp)} 0 ${r1(wy)} C${r1(w8 * 0.2)} ${r1(wy + amp)} ${r1(w8 * 0.55)} ${r1(wy + amp)} ${r1(w8)} ${r1(wy)}`;
+    const fill = [
+      el('rect', { x: -w8, y: top - 30, width: 2 * w8, height: h8 + 70, fill: P.paper }),
+      el('path', { d: `${wave} L${r1(w8)} ${y8 + 40} L${r1(-w8)} ${y8 + 40} Z`, fill: BW ? '#C8C8C8' : url('ageGrad') }),
+    ];
+    if (BW) fill.push(el('path', { d: wave, fill: 'none', stroke: P.ink, 'stroke-width': 4 }));
+    return g({ transform: `translate(${r1(cx)} ${r1(cy)}) rotate(${rot})` }, [
+      el('path', { d: star, fill: P.shadow, stroke: P.shadow, 'stroke-width': SW, 'stroke-linejoin': 'round', transform: 'translate(7 9)' }),
+      el('path', { d: star, fill: BW ? '#E6E6E6' : P.yellow, stroke: P.ink, 'stroke-width': SW, 'stroke-linejoin': 'round' }),
+      text({ ...t8, fill: P.shadow, stroke: P.shadow, 'stroke-width': 16, 'stroke-linejoin': 'round', transform: 'translate(5 6)' }, AGE),
+      text({ ...t8, fill: P.ink, stroke: P.ink, 'stroke-width': 16, 'stroke-linejoin': 'round' }, AGE),
+      g({ 'clip-path': url('age') }, fill),
+      text({ x: 0, y: 70, 'text-anchor': 'middle', 'font-family': 'Rubik', 'font-weight': 800, 'font-size': 30, 'letter-spacing': 5, fill: P.ink }, 'ЛЕТ'),
     ]);
   }
 
@@ -538,28 +613,18 @@ function buildSVG(mode, m, idp = '') {
   }
 }
 
-// ---------- измерение текстов в браузере ----------
-async function measure(page) {
-  const f = path.join(TMP, 'measure.html');
-  fs.writeFileSync(f, `<!doctype html><html><head><meta charset="utf-8"><style>${FONTS_CSS}</style></head><body></body></html>`);
-  await page.goto('file://' + f);
-  await page.evaluate(async (items) => {
-    await Promise.all(items.map((it) => document.fonts.load(`${it.w} ${it.s}px "${it.f}"`, it.t)));
-  }, Object.values(TXT));
-  return page.evaluate((txt) => {
-    const c = document.createElement('canvas').getContext('2d');
-    const res = {};
-    for (const [k, it] of Object.entries(txt)) {
-      c.font = `${it.w} ${it.s}px "${it.f}"`;
-      const mm = c.measureText(it.t);
-      res[k] = { w: mm.width, ascent: mm.actualBoundingBoxAscent, descent: mm.actualBoundingBoxDescent, left: mm.actualBoundingBoxLeft, right: mm.actualBoundingBoxRight };
-    }
-    return res;
-  }, TXT);
+// ---------- измерение текстов ----------
+function measure() {
+  const res = {};
+  for (const [key, it] of Object.entries(TXT)) res[key] = { w: runWidth(it.f, it.w, it.s, it.t) };
+  const font = hbFont('Rubik', 900);
+  const ext = font.glyphExtents(font.glyph('Н'.codePointAt(0)));
+  res.capH = { ascent: (ext.yBearing * 100) / faces.Rubik.upem }; // высота прописной на кегль 100
+  return res;
 }
 
 const page = (body, css = '') => `<!doctype html><html><head><meta charset="utf-8">
-<title>Приглашение на день рождения Миши</title><style>${FONTS_CSS}
+<title>Приглашение на день рождения Миши</title><style>
 html,body{margin:0;padding:0;background:#fff}${css}</style></head><body>${body}</body></html>`;
 
 // PNG: дописать чанк pHYs = 300 dpi, чтобы файл печатался в формате A5
@@ -587,7 +652,8 @@ const CUT = `<svg style="position:absolute;left:0;top:0" width="297mm" height="2
   const browser = await chromium.launch({ executablePath: CHROME });
   const ctx = await browser.newContext();
   const pg = await ctx.newPage();
-  const m = await measure(pg);
+  hb = await import('harfbuzzjs');
+  const m = measure();
 
   for (const mode of ['color', 'bw']) {
     // PNG A5 @ 300 dpi = 1748 × 2480
@@ -597,7 +663,6 @@ const CUT = `<svg style="position:absolute;left:0;top:0" width="297mm" height="2
     fs.writeFileSync(f1, page(`<div style="width:1748px;height:2480px">${svg}</div>`));
     await pg.setViewportSize({ width: 1748, height: 2480 });
     await pg.goto('file://' + f1);
-    await pg.evaluate(() => document.fonts.ready);
     await pg.screenshot({ path: png, clip: { x: 0, y: 0, width: 1748, height: 2480 } });
     setDpi(png, 300);
 
@@ -607,7 +672,6 @@ const CUT = `<svg style="position:absolute;left:0;top:0" width="297mm" height="2
     const f2 = path.join(TMP, `pdf-${mode}.html`);
     fs.writeFileSync(f2, page(`<div style="position:relative;width:297mm;height:209.9mm;overflow:hidden">${card(0)}${card(1)}${CUT}</div>`, '@page{size:297mm 210mm;margin:0}'));
     await pg.goto('file://' + f2);
-    await pg.evaluate(() => document.fonts.ready);
     await pg.pdf({ path: path.join(OUT, `${NAME}-${mode}-A4.pdf`), width: '297mm', height: '210mm', printBackground: true, margin: { top: 0, right: 0, bottom: 0, left: 0 } });
   }
   await browser.close();

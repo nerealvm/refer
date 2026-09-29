@@ -1,11 +1,12 @@
 {
   "name": "priglashenie-misha",
   "private": true,
-  "description": "Приглашение на день рождения Миши в КидБург: цветная и ч/б версии (PNG A5 300 dpi, PDF A4 на 2 открытки)",
+  "description": "Приглашение на день рождения Миши (8 лет) в КидБург: цветная и ч/б версии (PNG A5 300 dpi, PDF A4 на 2 открытки)",
   "scripts": {
     "build": "node build.js"
   },
   "dependencies": {
+    "harfbuzzjs": "1.6.2",
     "playwright-core": "1.56.1"
   }
 }
