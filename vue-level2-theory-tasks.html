@@ -56,7 +56,8 @@
   .meta li{background:var(--chip); border:1px solid var(--line); border-radius:999px; padding:3px 12px; font-size:13px; margin:0 8px 6px 0}
   .rules{margin:10px 0 0; padding-left:20px; font-size:14.5px}
   .rules li{margin:4px 0}
-  .legend{display:flex; flex-wrap:wrap; font-size:13.5px; color:var(--muted); margin-top:12px}
+  .legend-note{margin:12px 0 0; font-size:13.5px; color:var(--muted)}
+  .legend{display:flex; flex-wrap:wrap; font-size:13.5px; color:var(--muted); margin-top:4px}
   .legend > span{margin:4px 16px 0 0}
   .block h2{margin:0 0 10px; font-size:19px}
   .block > p:first-of-type{margin-top:0}
@@ -129,6 +130,7 @@
   .sol-body > .label:first-child{margin-top:4px}
   .explain ul{margin:0; padding-left:20px}
   .explain li{margin:5px 0}
+  .removed{margin:8px 0 0; font-size:13.5px; color:var(--muted)}
   .say{margin-top:12px; background:var(--say-bg); border:1px solid var(--say-line); border-radius:8px; padding:10px 12px; font-size:14.5px}
 
   .task-foot{display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; margin-top:12px; padding-top:10px; border-top:1px dashed var(--line); font-size:14px}
@@ -141,6 +143,7 @@
   .total{position:fixed; left:0; right:0; bottom:0; background:var(--card); border-top:1px solid var(--line); box-shadow:0 -2px 12px rgba(0,0,0,.06); padding:8px 16px; z-index:10}
   .total-inner{max-width:900px; margin:0 auto; display:flex; flex-wrap:wrap; align-items:center; gap:6px 10px}
   .progress{font-weight:700; margin-right:auto}
+  .progress .short-l{display:none}
   .bar{height:6px; width:120px; background:var(--line); border-radius:99px; overflow:hidden; display:inline-block; vertical-align:middle; margin-left:8px}
   .bar > i{display:block; height:100%; width:0; background:var(--ok); transition:width .2s}
   .btn{border:1px solid var(--accent); color:var(--accent); background:var(--card); border-radius:8px; padding:5px 12px; font-size:13px; cursor:pointer}
@@ -152,6 +155,11 @@
     ol.toc{grid-template-columns:1fr}
     pre{font-size:12.5px; padding:12px}
     .bar{display:none}
+    .progress .long{display:none}
+    .progress .short-l{display:inline}
+    .total{padding:6px 12px}
+    .btn{padding:4px 9px; font-size:12.5px}
+    #toTop{display:none}
   }
   @media print{
     body{background:#fff; padding:0; font-size:12px}
@@ -182,10 +190,11 @@
       <li>Весь код прогнан на Vue 2.7.16. Строки <code>// нужно:</code> и блоки «Вывод» совпадают с реальным выводом.</li>
       <li>Отметка «Решил сам» сохраняется в этом браузере — видно, что осталось повторить.</li>
     </ul>
+    <p class="legend-note">Все задачи — уровень «сложность 1». Цвет — сложность внутри уровня, как в листах куратора:</p>
     <div class="legend">
-      <span><span class="badge lvl-1"><span class="dot">🟢</span> базовый</span> применить механизм</span>
-      <span><span class="badge lvl-2"><span class="dot">🟡</span> средний</span> найти причину или предсказать вывод</span>
-      <span><span class="badge lvl-3"><span class="dot">🔴</span> сложный</span> неочевидное поведение</span>
+      <span><span class="badge lvl-1"><span class="dot">🟢</span> базовый</span> одно действие, 3–4 мин</span>
+      <span><span class="badge lvl-2"><span class="dot">🟡</span> средний</span> найти причину или предсказать вывод и исправить, 4–5 мин</span>
+      <span><span class="badge lvl-3"><span class="dot">🔴</span> сложный</span> неочевидное поведение, до 6 мин</span>
     </div>
   </header>
 
@@ -223,7 +232,7 @@
       </div>
     </div>
     <div class="block theory">
-      <div class="short"><b>Ответ в двух фразах.</b> <code>$parent</code> и <code>$root</code> дают прямой доступ к чужому компоненту в обход props и событий. Это скрытая связь: компонент ломается при переносе в другое место дерева, а изменения данных трудно отследить. Поэтому вместо них используют props и <code>$emit</code>, provide/inject или Vuex.</div>
+      <div class="short"><b>Суть.</b> <code>$parent</code> и <code>$root</code> дают прямой доступ к чужому компоненту в обход props и событий. Это скрытая связь: компонент ломается при переносе в другое место дерева, а изменения данных трудно отследить. Поэтому вместо них используют props и <code>$emit</code>, provide/inject или Vuex.</div>
       
 <p><code>this.$parent</code> — экземпляр родительского компонента. <code>this.$root</code> — корневой экземпляр <code>new Vue()</code>. Через них можно читать и менять чужие данные и вызывать чужие методы в обход props и событий.</p>
 <p><b>Почему это опасно</b></p>
@@ -231,7 +240,7 @@
   <li><b>Скрытая связь.</b> Ребёнок знает внутреннее устройство родителя: имена полей и методов. Переименовали поле в родителе — ребёнок сломался молча, без ошибки.</li>
   <li><b><code>$parent</code> зависит от места в дереве.</b> Обернули компонент в другой компонент или передали в слот — <code>$parent</code> стал другим. Абстрактные <code>&lt;keep-alive&gt;</code> и <code>&lt;transition&gt;</code> в цепочку не попадают.</li>
   <li><b>Ломается однонаправленный поток данных.</b> Данные меняются откуда угодно — трудно найти, кто их поменял.</li>
-  <li><b><code>$root</code> как глобальное хранилище не масштабируется.</b> Поля, которых нет в <code>data</code> корня, не реактивны, и добавить их потом нельзя.</li>
+  <li><b><code>$root</code> как глобальное хранилище ненадёжен.</b> Поля, которых не было в <code>data</code> корня при создании, не реактивны, и добавить их потом нельзя.</li>
   <li><b>Компонент нельзя переиспользовать и тестировать отдельно</b>: в другом месте у него другой родитель и другой корень.</li>
 </ul>
 <p><b>Чем заменить.</b> Данные вниз — через props, наверх — через <code>$emit</code> (сюда же <code>v-model</code> и <code>.sync</code>). Для глубокой вложенности — <code>provide/inject</code>. Для общего состояния приложения — Vuex.</p>
@@ -317,7 +326,7 @@ vm.$nextTick(() =&gt; console.log(vm.$el.querySelector(<span class="str">'span'<
       <span class="badge lvl-1"><span class="dot">🟢</span> базовый</span>
       <span class="time">~4 мин</span>
     </h3>
-    <p class="statement">Компонент <code>Title</code> берёт текст из <code>$parent.title</code>. Запиши, что выведет код, и объясни, почему во втором месте заголовок пустой. Затем исправь <code>Title</code> так, чтобы он работал в любом месте.</p>
+    <p class="statement">Компонент <code>Title</code> берёт текст из <code>$parent.title</code>. Запиши, что выведет код, и объясни, почему во втором месте заголовок пустой. Затем исправь: <code>Title</code> получает текст пропом — без <code>$parent</code> и <code>$root</code>. Card и корневой компонент тоже можно менять.</p>
     <div class="label">Стартовый код</div>
     <div class="codewrap"><pre><code><span class="kw">const</span> Title = {
   template: <span class="str">'&lt;h2&gt;{{ text }}&lt;/h2&gt;'</span>,
@@ -325,9 +334,6 @@ vm.$nextTick(() =&gt; console.log(vm.$el.querySelector(<span class="str">'span'<
     text() {
       <span class="kw">return</span> <span class="kw">this</span>.$parent.title;
     },
-  },
-  mounted() {
-    console.log(<span class="kw">this</span>.$parent.$options.name, <span class="str">'→'</span>, <span class="kw">this</span>.$el.textContent || <span class="str">'(пусто)'</span>);
   },
 };
 
@@ -337,7 +343,7 @@ vm.$nextTick(() =&gt; console.log(vm.$el.querySelector(<span class="str">'span'<
   template: <span class="str">'&lt;section&gt;&lt;Title /&gt;&lt;/section&gt;'</span>,
 };
 
-<span class="kw">new</span> Vue({
+<span class="kw">const</span> vm = <span class="kw">new</span> Vue({
   name: <span class="str">'Page'</span>,
   el: <span class="str">'#app'</span>,
   components: { Title, Card },
@@ -345,18 +351,15 @@ vm.$nextTick(() =&gt; console.log(vm.$el.querySelector(<span class="str">'span'<
   template: <span class="str">'&lt;div&gt;&lt;Title /&gt;&lt;Card /&gt;&lt;/div&gt;'</span>,
 });
 
+console.log([...vm.$el.querySelectorAll(<span class="str">'h2'</span>)].map((h) =&gt; h.textContent || <span class="str">'(пусто)'</span>).join(<span class="str">' | '</span>));
 <span class="com">// 1) что выведет?</span>
-<span class="com todo">// 2) пиши здесь: исправь Title, чтобы он работал в любом месте</span>
-<span class="com need">// нужно: оба заголовка — «Отчёт за сентябрь»</span></code></pre></div>
+<span class="com todo">// 2) пиши здесь: Title получает текст пропом — без $parent и $root</span>
+<span class="com need">// нужно: Отчёт за сентябрь | Отчёт за сентябрь</span></code></pre></div>
     <details class="solution">
       <summary>Решение и объяснение</summary>
-      <div class="sol-body"><div class="label">Что выведет исходный код</div><div class="codewrap out"><pre><code>Page → Отчёт за сентябрь
-Card → (пусто)</code></pre></div><div class="label"><span class="plain">Исправление</span> <span class="hint">изменённые строки подсвечены</span></div><div class="codewrap"><pre><code><span class="kw">const</span> Title = {
+      <div class="sol-body"><div class="label">Что выведет исходный код</div><div class="codewrap out"><pre><code>Отчёт за сентябрь | (пусто)</code></pre></div><div class="label"><span class="plain">Исправление</span> <span class="hint">изменённые строки подсвечены</span></div><div class="codewrap"><pre><code><span class="kw">const</span> Title = {
 <span class="hl">  props: { text: String },</span>
   template: <span class="str">'&lt;h2&gt;{{ text }}&lt;/h2&gt;'</span>,
-  mounted() {
-<span class="hl">    console.log(<span class="kw">this</span>.$el.textContent);</span>
-  },
 };
 
 <span class="kw">const</span> Card = {
@@ -366,21 +369,24 @@ Card → (пусто)</code></pre></div><div class="label"><span class="plain">�
 <span class="hl">  template: <span class="str">'&lt;section&gt;&lt;Title :text="title" /&gt;&lt;/section&gt;'</span>,</span>
 };
 
-<span class="kw">new</span> Vue({
+<span class="kw">const</span> vm = <span class="kw">new</span> Vue({
   name: <span class="str">'Page'</span>,
   el: <span class="str">'#app'</span>,
   components: { Title, Card },
   data: { title: <span class="str">'Отчёт за сентябрь'</span> },
 <span class="hl">  template: <span class="str">'&lt;div&gt;&lt;Title :text="title" /&gt;&lt;Card :title="title" /&gt;&lt;/div&gt;'</span>,</span>
 });
-<span class="com">// Отчёт за сентябрь</span>
-<span class="com">// Отчёт за сентябрь</span></code></pre></div><div class="label">Почему так</div><div class="explain">
+
+console.log([...vm.$el.querySelectorAll(<span class="str">'h2'</span>)].map((h) =&gt; h.textContent || <span class="str">'(пусто)'</span>).join(<span class="str">' | '</span>));
+<span class="com">// Отчёт за сентябрь | Отчёт за сентябрь</span></code></pre></div><p class="removed">Удалено из стартового кода: computed <code>text</code> с <code>$parent</code> в Title.</p><div class="label">Почему так</div><div class="explain">
 <ul>
-  <li><code>$parent</code> — компонент, в шаблоне которого отрисован <code>Title</code>. Первый <code>Title</code> стоит в шаблоне Page — берёт <code>Page.title</code>. Второй — внутри Card: <code>$parent</code> = Card, у Card нет <code>title</code> → <code>undefined</code> → пустой заголовок.</li>
+  <li><code>$parent</code> — ближайший компонент, внутри которого экземпляр создан при рендере. Обычно это тот, в чьём шаблоне стоит тег.</li>
+  <li>Первый <code>Title</code> стоит в шаблоне Page — берёт <code>Page.title</code>. Второй — в шаблоне Card: <code>$parent</code> = Card, у Card нет <code>title</code> → <code>undefined</code> → пустой заголовок.</li>
   <li>Ошибки нет — баг тихий. Так код на <code>$parent</code> ломается после безобидного рефакторинга «обернул в карточку».</li>
-  <li>То же будет, если передать <code>Title</code> в слот Card: родителем станет Card — тот, кто рендерит слот.</li>
-  <li>Фикс: текст приходит пропсом. Зависимость явная и не зависит от места. Card пробрасывает проп дальше. Если уровней много — provide/inject или Vuex.</li>
-</ul></div><div class="say"><b>Коротко вслух:</b> $parent — это тот, кто отрисовал компонент, и он меняется вместе со структурой шаблона. Props делают зависимость явной и не зависят от места.</div></div>
+  <li>Со слотом то же самое: родителем становится тот, кто рендерит <code>&lt;slot&gt;</code>. Title, переданный в слот Card, тоже получит <code>$parent</code> = Card.</li>
+  <li>Замена на <code>$root.title</code> «заработает», но это тот же антипаттерн — скрытая зависимость, только от корня.</li>
+  <li>Исправление: текст приходит пропом. Зависимость явная и не зависит от места. Card пробрасывает проп дальше. Если уровней много — provide/inject или Vuex.</li>
+</ul></div><div class="say"><b>Коротко вслух:</b> $parent — это тот, кто отрисовал компонент, и он меняется вместе со структурой шаблона. Проп делает зависимость явной и не зависит от места.</div></div>
     </details>
     <div class="task-foot">
       <label class="done"><input type="checkbox" data-id="1.2"> Решил сам</label>
@@ -394,7 +400,7 @@ Card → (пусто)</code></pre></div><div class="label"><span class="plain">�
       <span class="badge lvl-2"><span class="dot">🟡</span> средний</span>
       <span class="time">~5 мин</span>
     </h3>
-    <p class="statement">Кнопка <code>LangSwitch</code> меняет язык через <code>$root</code>, а <code>Greeting</code> его показывает. После клика <code>Greeting</code> не обновляется. 1) Объясни почему. 2) Исправь одной строкой. 3) Объясни, почему даже после исправления так лучше не делать, и перепиши правильно.</p>
+    <p class="statement">Кнопка <code>LangSwitch</code> меняет язык через <code>$root</code>, а <code>Greeting</code> его показывает. После клика <code>Greeting</code> не обновляется. 1) Объясни почему. 2) Исправь одной строкой. 3) Скажи словами, почему даже после исправления так лучше не делать и как сделать правильно.</p>
     <div class="label">Стартовый код</div>
     <div class="codewrap"><pre><code><span class="kw">const</span> LangSwitch = {
   template: <span class="str">`&lt;button @click="$root.lang = 'en'"&gt;EN&lt;/button&gt;`</span>,
@@ -407,17 +413,18 @@ Card → (пусто)</code></pre></div><div class="label"><span class="plain">�
 <span class="kw">const</span> vm = <span class="kw">new</span> Vue({
   el: <span class="str">'#app'</span>,
   components: { LangSwitch, Greeting },
-  data: {}, <span class="com todo">// пиши здесь</span>
+  data: {},
   template: <span class="str">'&lt;div&gt;&lt;LangSwitch /&gt;&lt;Greeting /&gt;&lt;/div&gt;'</span>,
 });
 
 vm.$el.querySelector(<span class="str">'button'</span>).click();
 vm.$nextTick(() =&gt; console.log(vm.$el.querySelector(<span class="str">'p'</span>).textContent));
+<span class="com todo">// пиши здесь</span>
 <span class="com now">// сейчас: Привет</span>
 <span class="com need">// нужно: Hello</span></code></pre></div>
     <details class="solution">
       <summary>Решение и объяснение</summary>
-      <div class="sol-body"><div class="label"><span class="plain">Минимальный фикс — одна строка</span> <span class="hint">изменённые строки подсвечены</span></div><div class="codewrap"><pre><code><span class="kw">const</span> LangSwitch = {
+      <div class="sol-body"><div class="label"><span class="plain">Пункт 2: исправление одной строкой</span> <span class="hint">изменённые строки подсвечены</span></div><div class="codewrap"><pre><code><span class="kw">const</span> LangSwitch = {
   template: <span class="str">`&lt;button @click="$root.lang = 'en'"&gt;EN&lt;/button&gt;`</span>,
 };
 
@@ -434,7 +441,7 @@ vm.$nextTick(() =&gt; console.log(vm.$el.querySelector(<span class="str">'p'</sp
 
 vm.$el.querySelector(<span class="str">'button'</span>).click();
 vm.$nextTick(() =&gt; console.log(vm.$el.querySelector(<span class="str">'p'</span>).textContent));
-<span class="com">// Hello</span></code></pre></div><div class="label"><span class="plain">Правильно — без $root</span> <span class="hint">изменённые строки подсвечены</span></div><div class="codewrap"><pre><code><span class="kw">const</span> LangSwitch = {
+<span class="com">// Hello</span></code></pre></div><div class="label"><span class="plain">Пункт 3: как правильно — без $root</span> <span class="hint">изменённые строки подсвечены</span></div><div class="codewrap"><pre><code><span class="kw">const</span> LangSwitch = {
 <span class="hl">  template: <span class="str">`&lt;button @click="$emit('change', 'en')"&gt;EN&lt;/button&gt;`</span>,</span>
 };
 
@@ -454,9 +461,10 @@ vm.$el.querySelector(<span class="str">'button'</span>).click();
 vm.$nextTick(() =&gt; console.log(vm.$el.querySelector(<span class="str">'p'</span>).textContent));
 <span class="com">// Hello</span></code></pre></div><div class="label">Почему так</div><div class="explain">
 <ul>
-  <li>Vue 2 делает реактивными только поля, которые есть в <code>data</code> в момент создания. В корне <code>lang</code> не объявлен. <code>$root.lang = 'en'</code> создаёт обычное свойство без геттера и сеттера. Greeting на него не подписан — перерисовки нет.</li>
-  <li>Добавить реактивное поле в корень позже нельзя. Даже <code>Vue.set(this.$root, 'lang', 'en')</code> выдаст предупреждение «Avoid adding reactive properties to a Vue instance or its root $data at runtime».</li>
-  <li>Минимальный фикс работает, но проблемы остаются: любой компонент может поменять <code>$root.lang</code>, и не найти, кто это сделал; компоненты не работают вне этого корня — в тесте или в другом приложении.</li>
+  <li>Vue 2 делает реактивными только поля, которые есть в <code>data</code> в момент создания. В корне <code>lang</code> не объявлен.</li>
+  <li><code>$root.lang = 'en'</code> создаёт обычное свойство без геттера и сеттера. Greeting на него не подписан — перерисовки нет.</li>
+  <li>Добавить реактивное поле в корень позже нельзя. <code>Vue.set(this.$root, 'lang', 'en')</code> выдаст предупреждение «Avoid adding reactive properties to a Vue instance or its root $data at runtime» и значение вообще не запишет.</li>
+  <li>Исправление одной строкой работает, но проблемы остаются. Любой компонент может поменять <code>$root.lang</code> — не найти, кто это сделал. Компоненты не работают вне этого корня — в тесте или в другом приложении.</li>
   <li>Правильно: состояние у общего родителя, вниз — проп, вверх — событие. В большом приложении — Vuex.</li>
 </ul></div><div class="say"><b>Коротко вслух:</b> В корне не было поля lang в data, поэтому оно не реактивно. Но даже реактивный $root — это глобальная переменная без контроля: правильно передавать данные пропсами и событиями или хранить в Vuex.</div></div>
     </details>
@@ -475,7 +483,7 @@ vm.$nextTick(() =&gt; console.log(vm.$el.querySelector(<span class="str">'p'</sp
       </div>
     </div>
     <div class="block theory">
-      <div class="short"><b>Ответ в двух фразах.</b> Глобальная шина — пустой экземпляр Vue с методами <code>$emit</code>/<code>$on</code>/<code>$off</code>. Через неё обмениваются событиями компоненты из любых мест дерева. Подходит для редких сообщений. Но от неё обязательно отписываются в <code>beforeDestroy</code>, событие в ней не хранится, связи становятся неявными, а во Vue 3 этот API удалён.</div>
+      <div class="short"><b>Суть.</b> Глобальная шина — пустой экземпляр Vue с методами <code>$emit</code>/<code>$on</code>/<code>$off</code>. Через неё обмениваются событиями компоненты из любых мест дерева. Подходит для редких сообщений. От неё обязательно отписываются в <code>beforeDestroy</code>, событие в ней не хранится, связи становятся неявными. Во Vue 3 <code>$on</code>/<code>$off</code>/<code>$once</code> удалены — шину делают на библиотеке mitt.</div>
       
 <p>Шина событий — отдельный пустой экземпляр Vue. Через него общаются компоненты, которые не связаны как родитель и ребёнок. Паттерн «издатель — подписчик» (publish/subscribe): один компонент отправляет событие, другие на него подписаны.</p>
 <ul>
@@ -489,8 +497,9 @@ vm.$nextTick(() =&gt; console.log(vm.$el.querySelector(<span class="str">'p'</sp
   <li><b><code>$off('имя')</code> без функции снимает обработчики всех компонентов</b> на это событие. Нужна ссылка на ту же функцию. Поэтому обработчик делают методом, а не анонимной стрелкой.</li>
   <li><b>Событие не хранится.</b> Если <code>$emit</code> случился до <code>$on</code> — событие потеряно. Шина передаёт сообщения, а не состояние.</li>
   <li><b>Неявные связи.</b> Не видно, кто отправляет и кто слушает. Имя события — строка: опечатка = тишина без ошибок.</li>
-  <li><b>Во Vue 3 <code>$on</code>/<code>$off</code>/<code>$once</code> удалены.</b> Шину делают на библиотеке: mitt, tiny-emitter.</li>
+  <li><b>Во Vue 3 <code>$on</code>/<code>$off</code>/<code>$once</code> удалены</b> (<code>$emit</code> остался). Шину делают на библиотеке: mitt, tiny-emitter.</li>
 </ul>
+<p><b>Порядок хуков при первом рендере</b> — важно, когда подписываться и когда отправлять: <code>created</code> родителя → <code>created</code> детей → <code>mounted</code> детей → <code>mounted</code> родителя. Событие из <code>created</code> родителя дети ещё не слышат: они не подписаны.</p>
 <p><b>Когда уместна.</b> Редкие глобальные уведомления в небольшом приложении: показать тост, закрыть все модалки. Для общих данных — Vuex. Для родителя и ребёнка — props и <code>$emit</code>.</p>
       <div class="label">Пример</div>
       <div class="codewrap"><pre><code><span class="com">// bus.js — шина: пустой экземпляр Vue</span>
@@ -616,7 +625,7 @@ vm.$nextTick(() =&gt; console.log(vm.$el.querySelector(<span class="str">'header
       <span class="badge lvl-2"><span class="dot">🟡</span> средний</span>
       <span class="time">~5 мин</span>
     </h3>
-    <p class="statement">Панель <code>Notices</code> скрывается и показывается через <code>v-if</code>. После двух переключений одно событие <code>notify</code> вызывает обработчик три раза. Объясни, откуда дубли, и исправь.</p>
+    <p class="statement">Панель <code>Notices</code> скрывается и показывается через <code>v-if</code>. После того как её дважды скрыли и снова показали, одно событие <code>notify</code> вызывает обработчик три раза. Объясни, откуда дубли, и исправь.</p>
     <div class="label">Стартовый код</div>
     <div class="codewrap"><pre><code><span class="kw">const</span> bus = <span class="kw">new</span> Vue();
 
@@ -631,7 +640,6 @@ vm.$nextTick(() =&gt; console.log(vm.$el.querySelector(<span class="str">'header
       console.log(<span class="str">'обработчик сработал'</span>);
     });
   },
-  <span class="com todo">// пиши здесь</span>
 };
 
 <span class="kw">const</span> vm = <span class="kw">new</span> Vue({
@@ -649,6 +657,7 @@ vm.$nextTick(() =&gt; console.log(vm.$el.querySelector(<span class="str">'header
   }
   bus.$emit(<span class="str">'notify'</span>);
 })();
+<span class="com todo">// пиши здесь</span>
 <span class="com now">// сейчас: «обработчик сработал» ×3</span>
 <span class="com need">// нужно: «обработчик сработал» ×1</span></code></pre></div>
     <details class="solution">
@@ -689,11 +698,11 @@ vm.$nextTick(() =&gt; console.log(vm.$el.querySelector(<span class="str">'header
   }
   bus.$emit(<span class="str">'notify'</span>);
 })();
-<span class="com">// обработчик сработал ×1</span></code></pre></div><div class="label">Почему так</div><div class="explain">
+<span class="com">// обработчик сработал ×1</span></code></pre></div><p class="removed">Удалено из стартового кода: анонимная стрелка в <code>bus.$on</code> — её нельзя снять.</p><div class="label">Почему так</div><div class="explain">
 <ul>
   <li><code>v-if</code> уничтожает компонент и создаёт новый. Каждый новый экземпляр в <code>created</code> добавляет подписку. Старые подписки никто не снял: 1 при старте + 2 после повторных показов = 3.</li>
   <li>Два из трёх обработчиков принадлежат уже уничтоженным компонентам. Они держат ссылку на свой <code>this</code>, поэтому эти компоненты не удаляются из памяти — утечка.</li>
-  <li>Фикс — отписка в <code>beforeDestroy</code> той же функцией. Анонимную стрелку снять нельзя — на неё нет ссылки. Поэтому обработчик вынесен в метод.</li>
+  <li>Исправление — отписка в <code>beforeDestroy</code> той же функцией. Анонимную стрелку снять нельзя — на неё нет ссылки. Поэтому обработчик вынесен в метод.</li>
   <li>Ловушка: <code>bus.$off('notify')</code> без второго аргумента снимет обработчики <b>всех</b> компонентов на это событие, а не только свой.</li>
   <li>Вариант из документации — подписка и отписка рядом: <code>this.$once('hook:beforeDestroy', () =&gt; bus.$off('notify', this.onNotify))</code>.</li>
 </ul></div><div class="say"><b>Коротко вслух:</b> Шина живёт дольше компонента. Если не отписаться в beforeDestroy, обработчики мёртвых экземпляров копятся и срабатывают. Отписываюсь той же ссылкой на метод.</div></div>
@@ -710,7 +719,7 @@ vm.$nextTick(() =&gt; console.log(vm.$el.querySelector(<span class="str">'header
       <span class="badge lvl-2"><span class="dot">🟡</span> средний</span>
       <span class="time">~5 мин</span>
     </h3>
-    <p class="statement">Корневой компонент при создании отправляет через шину имя пользователя, <code>Profile</code> должен его показать. Но на экране остаётся «гость». Запиши порядок строк в консоли, объясни, почему событие потерялось, и исправь <code>App</code>, не меняя <code>Profile</code>.</p>
+    <p class="statement">Корневой компонент при создании отправляет через шину имя пользователя, <code>Profile</code> должен его показать. Но на экране остаётся «гость». Запиши порядок строк в консоли и объясни, почему событие потерялось. Исправь корневой экземпляр (в логах — App), не меняя <code>Profile</code>.</p>
     <div class="label">Стартовый код</div>
     <div class="codewrap"><pre><code><span class="kw">const</span> bus = <span class="kw">new</span> Vue();
 
@@ -741,12 +750,11 @@ vm.$nextTick(() =&gt; console.log(vm.$el.querySelector(<span class="str">'header
     console.log(<span class="str">'App: отправил'</span>);
     bus.$emit(<span class="str">'user'</span>, <span class="str">'Аня'</span>);
   },
-  <span class="com todo">// пиши здесь</span>
 });
 
 setTimeout(() =&gt; console.log(<span class="str">'на экране:'</span>, vm.$el.textContent), 100);
 <span class="com">// 1) запиши порядок строк в консоли</span>
-<span class="com">// 2) исправь App, не меняя Profile</span>
+<span class="com todo">// 2) пиши здесь: исправь корневой экземпляр (в логах — App), не меняя Profile</span>
 <span class="com need">// нужно: на экране: Аня</span></code></pre></div>
     <details class="solution">
       <summary>Решение и объяснение</summary>
@@ -791,7 +799,8 @@ setTimeout(() =&gt; console.log(<span class="str">'на экране:'</span>, v
   <li>Порядок хуков при первом рендере: родитель <code>created</code> → родитель <code>beforeMount</code> → дети <code>created</code> → дети <code>mounted</code> → родитель <code>mounted</code>.</li>
   <li><code>$emit</code> вызывает только тех, кто подписан в этот момент. В <code>created</code> родителя Profile ещё не создан — подписчиков нет, событие ушло в никуда. Шина событие не запоминает.</li>
   <li>В <code>mounted</code> родителя все дети уже созданы и подписаны — событие доходит.</li>
-  <li>Ещё лучше совсем без шины: родитель передаёт имя пропсом <code>&lt;Profile :user="name" /&gt;</code>. Шина — для сообщений между далёкими компонентами, а не для передачи состояния.</li>
+  <li>Также верно: оставить <code>created</code>, но отправить событие внутри <code>this.$nextTick(...)</code>. Колбэк выполнится после того, как дерево смонтировано.</li>
+  <li>Ещё лучше совсем без шины: родитель передаёт имя пропом <code>&lt;Profile :user="name" /&gt;</code>. Шина — для сообщений между далёкими компонентами, а не для передачи состояния.</li>
 </ul></div><div class="say"><b>Коротко вслух:</b> Шина не хранит события: если emit раньше подписки, событие теряется. Дети подписываются в своём created, а он идёт после created родителя, поэтому отправляю в mounted родителя.</div></div>
     </details>
     <div class="task-foot">
@@ -809,7 +818,7 @@ setTimeout(() =&gt; console.log(<span class="str">'на экране:'</span>, v
       </div>
     </div>
     <div class="block theory">
-      <div class="short"><b>Ответ в двух фразах.</b> <code>&lt;keep-alive&gt;</code> при переключении не уничтожает компонент, а кэширует его. Сохраняется состояние, и не тратится время на повторное создание. Вместо <code>destroyed</code>/<code>created</code> у такого компонента вызываются <code>deactivated</code>/<code>activated</code>. Кэшем управляют через <code>include</code>, <code>exclude</code> и <code>max</code>.</div>
+      <div class="short"><b>Суть.</b> <code>&lt;keep-alive&gt;</code> при переключении не уничтожает компонент, а кэширует его. Сохраняется состояние, и не тратится время на повторное создание. При уходе вместо <code>beforeDestroy</code>/<code>destroyed</code> вызывается <code>deactivated</code>, при возврате вместо <code>created</code>/<code>mounted</code> — <code>activated</code>. Кэшем управляют через <code>include</code>, <code>exclude</code> и <code>max</code>.</div>
       
 <p><code>&lt;keep-alive&gt;</code> — встроенный абстрактный компонент. Он кэширует неактивные экземпляры вложенного компонента вместо того, чтобы их уничтожать. Сам в DOM ничего не рендерит.</p>
 <p><b>Где:</b> вокруг <code>&lt;component :is&gt;</code>, переключения <code>v-if</code>/<code>v-else</code>, <code>&lt;router-view&gt;</code>.</p>
@@ -818,14 +827,21 @@ setTimeout(() =&gt; console.log(<span class="str">'на экране:'</span>, v
 <ul>
   <li>первый показ: <code>created → mounted → activated</code>;</li>
   <li>уход: <code>deactivated</code> — вместо <code>beforeDestroy</code>/<code>destroyed</code>;</li>
-  <li>возврат: <code>activated</code> — без <code>created</code>/<code>mounted</code>.</li>
+  <li>возврат: <code>activated</code> — без <code>created</code>/<code>mounted</code>;</li>
+  <li>при переключении новый компонент создаётся раньше, чем уходит старый: <code>B created → A deactivated → B mounted → B activated</code>.</li>
 </ul>
 <p><b>Пропсы</b></p>
 <ul>
-  <li><code>include</code> / <code>exclude</code> — кого кэшировать / не кэшировать: строка через запятую, RegExp или массив. Сравнивается с опцией <code>name</code> компонента, а если её нет — с именем регистрации в <code>components</code>. Регистр важен.</li>
+  <li><code>include</code> / <code>exclude</code> — кого кэшировать / не кэшировать: строка через запятую, RegExp или массив. Сравнивается с опцией <code>name</code> компонента, а если её нет — с тегом, как он записан в шаблоне. Регистр важен, имена через запятую пишут без пробелов.</li>
   <li><code>max</code> — сколько экземпляров хранить. При переполнении уничтожается тот, к которому дольше всего не обращались.</li>
 </ul>
-<p><b>Подводные камни:</b> внутри один прямой дочерний компонент, с <code>v-for</code> не работает; кэш занимает память; данные могут устареть — их обновляют в <code>activated</code>; таймеры и глобальные слушатели останавливают в <code>deactivated</code>.</p>
+<p><b>Подводные камни</b></p>
+<ul>
+  <li>Внутри один прямой дочерний компонент, с <code>v-for</code> не работает.</li>
+  <li>Кэш занимает память.</li>
+  <li>Данные могут устареть — их обновляют в <code>activated</code>.</li>
+  <li>Таймеры и глобальные слушатели останавливают в <code>deactivated</code>.</li>
+</ul>
       <div class="label">Пример</div>
       <div class="codewrap"><pre><code><span class="com">&lt;!-- кэшировать только EditForm, не больше 5 экземпляров --&gt;</span>
 <span class="tag">&lt;keep-alive</span> include="EditForm" :max="5"&gt;
@@ -945,7 +961,7 @@ setTimeout(() =&gt; console.log(<span class="str">'на экране:'</span>, v
   <li>Без keep-alive смена <code>is</code> уничтожает старый компонент и создаёт новый с чистым <code>data</code>: текст пропадает, <code>created</code> вызывается снова.</li>
   <li>keep-alive кладёт экземпляр EditForm в кэш вместе с его DOM. При возврате он вставляется обратно: <code>created</code> не вызывается, <code>text</code> на месте.</li>
   <li><code>include="EditForm"</code> сравнивается с опцией <code>name</code>. Preview в список не входит — создаётся заново при каждом показе.</li>
-  <li>Ловушки: <code>include="editForm"</code> не сработает — важен регистр. У анонимного компонента без <code>name</code> и без имени регистрации сопоставлять нечего.</li>
+  <li>Ловушки: <code>include="editForm"</code> не сработает — важен регистр. Без <code>name</code> сравнивается тег из шаблона: <code>&lt;edit-form&gt;</code> с <code>include="EditForm"</code> не совпадёт.</li>
 </ul></div><div class="say"><b>Коротко вслух:</b> keep-alive не уничтожает компонент при переключении, а кладёт экземпляр в кэш, поэтому состояние сохраняется. include ограничивает кэш компонентами с нужным name.</div></div>
     </details>
     <div class="task-foot">
@@ -956,11 +972,11 @@ setTimeout(() =&gt; console.log(<span class="str">'на экране:'</span>, v
   <section class="task" id="task-3-2">
     <h3>
       <span class="num">3.2</span>
-      <span class="tname">Порядок хуков</span>
+      <span class="tname">Хуки при переключении</span>
       <span class="badge lvl-2"><span class="dot">🟡</span> средний</span>
       <span class="time">~4 мин</span>
     </h3>
-    <p class="statement">Запиши, что появится в консоли после переключений A → B → A внутри keep-alive. Объясни, почему нет <code>destroyed</code> и повторного <code>created</code>. Что изменится, если убрать <code>&lt;keep-alive&gt;</code>?</p>
+    <p class="statement">Переключаем A → B → A внутри keep-alive. Какие хуки сработают у A и у B? Сколько раз выведется «A created»? Будет ли «A destroyed»? Что изменится, если убрать <code>&lt;keep-alive&gt;</code>? Полный вывод можно не записывать — важны ответы на вопросы.</p>
     <div class="label">Стартовый код</div>
     <div class="codewrap"><pre><code><span class="kw">const</span> make = (name) =&gt; ({
   name,
@@ -991,7 +1007,7 @@ setTimeout(() =&gt; console.log(<span class="str">'на экране:'</span>, v
 <span class="com">// 2) что изменится, если убрать &lt;keep-alive&gt;?</span></code></pre></div>
     <details class="solution">
       <summary>Решение и объяснение</summary>
-      <div class="sol-body"><div class="label">Вывод с keep-alive</div><div class="codewrap out"><pre><code>A created
+      <div class="sol-body"><div class="label">Полный вывод с keep-alive — для самопроверки</div><div class="codewrap out"><pre><code>A created
 A mounted
 A activated
 --- A → B
@@ -1012,11 +1028,11 @@ A created
 B destroyed
 A mounted</code></pre></div><div class="label">Почему так</div><div class="explain">
 <ul>
+  <li>«A created» — один раз. «A destroyed» — ни разу. При уходе A только деактивируется, при возврате — активируется.</li>
   <li>Первый показ компонента внутри keep-alive — обычные <code>created</code> и <code>mounted</code>, а следом <code>activated</code>.</li>
   <li>Уход: вместо уничтожения — <code>deactivated</code>. Экземпляр и его DOM лежат в кэше, поэтому <code>destroyed</code> нет.</li>
   <li>Возврат: только <code>activated</code>. Компонент не создаётся заново, поэтому нет второго <code>created</code>/<code>mounted</code>.</li>
-  <li>При смене новый компонент создаётся раньше, чем старый уходит: сначала <code>B created</code>, потом <code>A deactivated</code> (без keep-alive — <code>A destroyed</code>), потом <code>B mounted</code>.</li>
-  <li>Без keep-alive каждый показ — полный цикл: created → mounted, уход — destroyed. <code>activated</code>/<code>deactivated</code> не вызываются вовсе.</li>
+  <li>Без keep-alive каждый показ — полный цикл: created → mounted, уход — destroyed. <code>activated</code>/<code>deactivated</code> не вызываются вовсе. «A created» будет дважды.</li>
   <li>Практика: свежие данные для кэшируемой страницы загружают в <code>activated</code> — он срабатывает при каждом показе.</li>
 </ul></div><div class="say"><b>Коротко вслух:</b> В keep-alive компонент создаётся один раз, дальше только деактивируется и активируется. Поэтому код «при каждом показе» пишут в activated, а не в created или mounted.</div></div>
     </details>
@@ -1049,7 +1065,6 @@ A mounted</code></pre></div><div class="label">Почему так</div><div cla
   beforeDestroy() {
     clearInterval(<span class="kw">this</span>.timer);
   },
-  <span class="com todo">// пиши здесь</span>
 };
 
 <span class="kw">const</span> Other = { template: <span class="str">'&lt;p&gt;Другая вкладка&lt;/p&gt;'</span> };
@@ -1061,9 +1076,10 @@ A mounted</code></pre></div><div class="label">Почему так</div><div cla
   template: <span class="str">'&lt;div&gt;&lt;keep-alive&gt;&lt;component :is="tab" /&gt;&lt;/keep-alive&gt;&lt;/div&gt;'</span>,
 });
 
-setTimeout(() =&gt; { console.log(<span class="str">'--- ушли'</span>); vm.tab = <span class="str">'Other'</span>; }, 250);
-setTimeout(() =&gt; { console.log(<span class="str">'--- вернулись'</span>); vm.tab = <span class="str">'Clock'</span>; }, 650);
-setTimeout(() =&gt; { console.log(<span class="str">'--- ушли'</span>); vm.tab = <span class="str">'Other'</span>; }, 900);
+setTimeout(() =&gt; { console.log(<span class="str">'--- ушли'</span>); vm.tab = <span class="str">'Other'</span>; }, 280);
+setTimeout(() =&gt; { console.log(<span class="str">'--- вернулись'</span>); vm.tab = <span class="str">'Clock'</span>; }, 600);
+setTimeout(() =&gt; { console.log(<span class="str">'--- ушли'</span>); vm.tab = <span class="str">'Other'</span>; }, 880);
+<span class="com todo">// пиши здесь</span>
 <span class="com now">// сейчас: tick идут всё время, даже когда вкладка скрыта</span>
 <span class="com need">// нужно: пока вкладка скрыта — ни одного tick, после возврата счёт продолжается</span></code></pre></div>
     <details class="solution">
@@ -1105,10 +1121,10 @@ setTimeout(() =&gt; { console.log(<span class="str">'--- ушли'</span>); vm.t
   template: <span class="str">'&lt;div&gt;&lt;keep-alive&gt;&lt;component :is="tab" /&gt;&lt;/keep-alive&gt;&lt;/div&gt;'</span>,
 });
 
-setTimeout(() =&gt; { console.log(<span class="str">'--- ушли'</span>); vm.tab = <span class="str">'Other'</span>; }, 250);
-setTimeout(() =&gt; { console.log(<span class="str">'--- вернулись'</span>); vm.tab = <span class="str">'Clock'</span>; }, 650);
-setTimeout(() =&gt; { console.log(<span class="str">'--- ушли'</span>); vm.tab = <span class="str">'Other'</span>; }, 900);
-<span class="com">// tick 1, tick 2, --- ушли, --- вернулись, tick 3, tick 4, --- ушли</span></code></pre></div><div class="label">Вывод</div><div class="codewrap out"><pre><code>tick 1
+setTimeout(() =&gt; { console.log(<span class="str">'--- ушли'</span>); vm.tab = <span class="str">'Other'</span>; }, 280);
+setTimeout(() =&gt; { console.log(<span class="str">'--- вернулись'</span>); vm.tab = <span class="str">'Clock'</span>; }, 600);
+setTimeout(() =&gt; { console.log(<span class="str">'--- ушли'</span>); vm.tab = <span class="str">'Other'</span>; }, 880);
+<span class="com">// tick 1, tick 2, --- ушли, --- вернулись, tick 3, tick 4, --- ушли</span></code></pre></div><p class="removed">Удалено из стартового кода: запуск таймера в <code>mounted</code>.</p><div class="label">Вывод</div><div class="codewrap out"><pre><code>tick 1
 tick 2
 --- ушли
 --- вернулись
@@ -1119,7 +1135,8 @@ tick 4
   <li>В keep-alive при уходе компонент не уничтожается. <code>beforeDestroy</code> не вызывается, <code>clearInterval</code> не срабатывает. Таймер тикает в фоне и меняет данные невидимого компонента.</li>
   <li>Для паузы есть пара хуков: <code>deactivated</code> — остановить, <code>activated</code> — запустить снова.</li>
   <li><code>activated</code> вызывается и при первом показе, сразу после <code>mounted</code>. Поэтому запуск из <code>mounted</code> убран — иначе при первом показе будет два таймера.</li>
-  <li><code>beforeDestroy</code> оставлен: компонент всё же уничтожится, если его вытеснят по <code>max</code> или уберут сам keep-alive.</li>
+  <li><code>beforeDestroy</code> оставлен для надёжности: повторный <code>clearInterval</code> безопасен.</li>
+  <li>Учти: теперь Clock работает только внутри keep-alive — вне его <code>activated</code> не вызывается. Если компонент нужен и там и там, запускай таймер и в <code>mounted</code>, и в <code>activated</code> с проверкой <code>if (!this.timer)</code>, а в <code>stop()</code> обнуляй <code>timer</code>.</li>
   <li>Так же поступают с <code>window.addEventListener</code>, подписками на шину и WebSocket.</li>
 </ul></div><div class="say"><b>Коротко вслух:</b> Внутри keep-alive вместо destroyed вызывается deactivated, поэтому очистка в beforeDestroy не сработает. Таймер запускаю в activated и останавливаю в deactivated.</div></div>
     </details>
@@ -1138,9 +1155,9 @@ tick 4
       </div>
     </div>
     <div class="block theory">
-      <div class="short"><b>Ответ в двух фразах.</b> Для пропса типа <code>Boolean</code> Vue делает особое приведение. Не передан — <code>false</code>, а не <code>undefined</code>. Атрибут без значения или со значением, равным имени пропса, — <code>true</code>. Значение без двоеточия — всегда строка: <code>visible="false"</code> — это truthy-строка <code>"false"</code>. Логическое значение передают через <code>:visible="false"</code>.</div>
+      <div class="short"><b>Суть.</b> Для пропа типа <code>Boolean</code> Vue делает особое приведение. Не передан и нет <code>default</code> — <code>false</code>, а не <code>undefined</code>. Атрибут без значения или со значением, равным имени пропа в kebab-case (<code>is-open="is-open"</code>), — <code>true</code>. Без двоеточия значение — всегда строка: <code>visible="false"</code> — это truthy-строка <code>"false"</code>. Логическое значение передают через <code>:visible="false"</code>.</div>
       
-<p>У пропса с типом <code>Boolean</code> особое приведение значения — как у HTML-атрибутов вроде <code>&lt;input disabled&gt;</code>: есть атрибут — значит, true.</p>
+<p>У пропа с типом <code>Boolean</code> особое приведение значения — как у HTML-атрибутов вроде <code>&lt;input disabled&gt;</code>: есть атрибут — значит, true.</p>
 <table>
   <thead><tr><th>В шаблоне</th><th><code>disabled: Boolean</code></th><th><code>label: String</code></th></tr></thead>
   <tbody>
@@ -1153,7 +1170,8 @@ tick 4
 </table>
 <ul>
   <li><b>Главное правило.</b> Без <code>:</code> значение атрибута — всегда строка. Логическое значение передают через <code>v-bind</code>: <code>:disabled="false"</code>, <code>:disabled="isLoading"</code>.</li>
-  <li><b>Имя в kebab-case.</b> Для пропса <code>isOpen</code> в <code>true</code> превращается только <code>is-open="is-open"</code>. Запись <code>is-open="isOpen"</code> — просто строка.</li>
+  <li><b>Только для типа Boolean.</b> Проп без типа (<code>props: ['loading']</code>) приведения не получает: <code>&lt;X loading /&gt;</code> даст пустую строку, а она falsy.</li>
+  <li><b>Имя в kebab-case.</b> Из значений, совпадающих с именем, в <code>true</code> превращается только имя в kebab-case: <code>is-open="is-open"</code>. Запись <code>is-open="isOpen"</code> — просто строка.</li>
   <li><b>Несколько типов.</b> Приведение <code>'' → true</code> работает, только если <code>Boolean</code> стоит раньше <code>String</code>: при <code>[Boolean, String]</code> <code>&lt;Icon a /&gt;</code> даёт <code>true</code>, при <code>[String, Boolean]</code> — пустую строку.</li>
   <li><b>По умолчанию включено.</b> <code>{ type: Boolean, default: true }</code> — если проп не передан, будет <code>true</code>.</li>
 </ul>
@@ -1165,7 +1183,7 @@ tick 4
 },</code></pre></div><div class="codewrap"><pre><code><span class="tag">&lt;Btn</span> disabled /&gt;            <span class="com">&lt;!-- true --&gt;</span>
 <span class="tag">&lt;Btn</span> :disabled="false" /&gt;   <span class="com">&lt;!-- false: значение — выражение JS --&gt;</span>
 <span class="tag">&lt;Btn</span> disabled="false" /&gt;    <span class="com">&lt;!-- строка 'false' + предупреждение Vue --&gt;</span></code></pre></div>
-      <div class="sources"><b>Источники</b><ul><li><a href="https://habr.com/ru/company/constanta/blog/435700/" target="_blank" rel="noopener">Из списка: статья на Хабре, вопрос 2 «Неявное поведение props»</a></li><li><a href="https://v2.vuejs.org/v2/guide/components-props.html#Passing-a-Boolean" target="_blank" rel="noopener">Vue 2: передача Boolean-пропса</a></li><li><a href="https://vuejs.org/guide/components/props.html#boolean-casting" target="_blank" rel="noopener">Правила Boolean casting, в том числе порядок типов</a></li></ul></div>
+      <div class="sources"><b>Источники</b><ul><li><a href="https://habr.com/ru/company/constanta/blog/435700/" target="_blank" rel="noopener">Из списка: статья на Хабре, вопрос 2 «Неявное поведение props»</a></li><li><a href="https://v2.vuejs.org/v2/guide/components-props.html#Passing-a-Boolean" target="_blank" rel="noopener">Vue 2: передача Boolean-пропа</a></li><li><a href="https://vuejs.org/guide/components/props.html#boolean-casting" target="_blank" rel="noopener">Документация Vue 3: правила Boolean casting, включая порядок типов (в Vue 2.7 то же)</a></li></ul></div>
     </div>
     
   <section class="task" id="task-4-1">
@@ -1209,7 +1227,7 @@ false undefined</code></pre></div><div class="label">Почему так</div><d
 <ul>
   <li><code>&lt;Btn /&gt;</code>: Boolean не передан → <code>false</code> (особое правило). String не передан → <code>undefined</code>, как у любого другого типа.</li>
   <li><code>&lt;Btn disabled label /&gt;</code>: атрибут без значения — это пустая строка. Для Boolean <code>''</code> → <code>true</code>. Для String остаётся <code>''</code>.</li>
-  <li><code>disabled="disabled"</code>: значение совпадает с именем пропса — для Boolean это <code>true</code>. Для String <code>"disabled"</code> — обычная строка.</li>
+  <li><code>disabled="disabled"</code>: значение совпадает с именем пропа — для Boolean это <code>true</code>. Для String <code>"disabled"</code> — обычная строка.</li>
   <li><code>:disabled="false"</code>: с двоеточием значение — выражение JS, приходит настоящий <code>false</code>.</li>
 </ul></div><div class="say"><b>Коротко вслух:</b> Boolean-проп приводится как HTML-атрибут: нет атрибута — false, есть без значения — true. У остальных типов отсутствие даёт undefined, а пустой атрибут — пустую строку.</div></div>
     </details>
@@ -1237,10 +1255,11 @@ false undefined</code></pre></div><div class="label">Почему так</div><d
 <span class="kw">const</span> vm = <span class="kw">new</span> Vue({
   el: <span class="str">'#app'</span>,
   components: { Modal },
-  template: <span class="str">'&lt;div&gt;&lt;Modal visible="false" /&gt;&lt;/div&gt;'</span>, <span class="com todo">// пиши здесь</span>
+  template: <span class="str">'&lt;div&gt;&lt;Modal visible="false" /&gt;&lt;/div&gt;'</span>,
 });
 
 console.log(vm.$el.querySelector(<span class="str">'.modal'</span>) ? <span class="str">'показана'</span> : <span class="str">'скрыта'</span>);
+<span class="com todo">// пиши здесь</span>
 <span class="com now">// сейчас: показана + предупреждение Vue в консоли</span>
 <span class="com need">// нужно: скрыта, без предупреждений</span></code></pre></div>
     <details class="solution">
@@ -1264,7 +1283,7 @@ console.log(vm.$el.querySelector(<span class="str">'.modal'</span>) ? <span clas
   <li>Без <code>:</code> значение атрибута — строка <code>"false"</code>. Boolean-приведение срабатывает только для <code>''</code> и <code>'visible'</code>, поэтому <code>"false"</code> остаётся строкой.</li>
   <li>Vue пишет предупреждение «Invalid prop: type check failed for prop "visible". Expected Boolean, got String with value "false"», но значение всё равно передаёт.</li>
   <li>Непустая строка — truthy, <code>v-if</code> показывает окно.</li>
-  <li><code>:visible="false"</code> — выражение JS, приходит boolean <code>false</code>. Ещё проще — не передавать проп: Boolean по умолчанию <code>false</code>.</li>
+  <li>Исправление: <code>:visible="false"</code> — выражение JS, приходит boolean <code>false</code>. Ещё проще — не передавать проп: Boolean по умолчанию <code>false</code>.</li>
 </ul></div><div class="say"><b>Коротко вслух:</b> Без двоеточия в проп приходит строка "false", а непустая строка — truthy. Через v-bind передаётся настоящий boolean.</div></div>
     </details>
     <div class="task-foot">
@@ -1275,65 +1294,52 @@ console.log(vm.$el.querySelector(<span class="str">'.modal'</span>) ? <span clas
   <section class="task" id="task-4-3">
     <h3>
       <span class="num">4.3</span>
-      <span class="tname">Проп двух типов</span>
-      <span class="badge lvl-2"><span class="dot">🟡</span> средний</span>
-      <span class="time">~4 мин</span>
+      <span class="tname">Спиннер не показывается</span>
+      <span class="badge lvl-1"><span class="dot">🟢</span> базовый</span>
+      <span class="time">~3 мин</span>
     </h3>
-    <p class="statement">Проп <code>icon</code> принимает имя иконки или просто флаг «показать иконку по умолчанию». <code>&lt;AppButton icon /&gt;</code> должен показать иконку <code>star</code>, но иконки нет. Исправь одной правкой в <code>props</code> и объясни.</p>
+    <p class="statement"><code>&lt;AppButton loading /&gt;</code> должен показывать спиннер ⏳, но его нет. Исправь объявление пропа и объясни, что приходило в <code>loading</code> до исправления.</p>
     <div class="label">Стартовый код</div>
     <div class="codewrap"><pre><code><span class="kw">const</span> AppButton = {
-  props: {
-    icon: [String, Boolean], <span class="com todo">// пиши здесь</span>
-  },
-  computed: {
-    iconName() {
-      <span class="kw">if</span> (<span class="kw">this</span>.icon === <span class="kw">true</span>) <span class="kw">return</span> <span class="str">'star'</span>;
-      <span class="kw">return</span> <span class="kw">this</span>.icon || <span class="kw">null</span>;
-    },
-  },
-  template: <span class="str">'&lt;button&gt;&lt;i v-if="iconName"&gt;{{ iconName }}&lt;/i&gt; OK&lt;/button&gt;'</span>,
+  props: [<span class="str">'loading'</span>],
+  template: <span class="str">'&lt;button&gt;&lt;i v-if="loading"&gt;⏳&lt;/i&gt; OK&lt;/button&gt;'</span>,
 };
 
 <span class="kw">const</span> vm = <span class="kw">new</span> Vue({
   el: <span class="str">'#app'</span>,
   components: { AppButton },
-  template: <span class="str">'&lt;div&gt;&lt;AppButton icon /&gt;&lt;AppButton icon="heart" /&gt;&lt;AppButton /&gt;&lt;/div&gt;'</span>,
+  template: <span class="str">'&lt;div&gt;&lt;AppButton loading /&gt;&lt;AppButton :loading="false" /&gt;&lt;AppButton /&gt;&lt;/div&gt;'</span>,
 });
 
 <span class="kw">const</span> texts = [...vm.$el.querySelectorAll(<span class="str">'button'</span>)].map((b) =&gt; b.textContent.trim());
 console.log(texts.join(<span class="str">' | '</span>));
-<span class="com now">// сейчас: OK | heart OK | OK</span>
-<span class="com need">// нужно: star OK | heart OK | OK</span></code></pre></div>
+<span class="com todo">// пиши здесь</span>
+<span class="com now">// сейчас: OK | OK | OK</span>
+<span class="com need">// нужно: ⏳ OK | OK | OK</span></code></pre></div>
     <details class="solution">
       <summary>Решение и объяснение</summary>
       <div class="sol-body"><div class="label">Решение <span class="hint">изменённые строки подсвечены</span></div><div class="codewrap"><pre><code><span class="kw">const</span> AppButton = {
-  props: {
-<span class="hl">    icon: [Boolean, String],</span>
-  },
-  computed: {
-    iconName() {
-      <span class="kw">if</span> (<span class="kw">this</span>.icon === <span class="kw">true</span>) <span class="kw">return</span> <span class="str">'star'</span>;
-      <span class="kw">return</span> <span class="kw">this</span>.icon || <span class="kw">null</span>;
-    },
-  },
-  template: <span class="str">'&lt;button&gt;&lt;i v-if="iconName"&gt;{{ iconName }}&lt;/i&gt; OK&lt;/button&gt;'</span>,
+<span class="hl">  props: {</span>
+<span class="hl">    loading: Boolean,</span>
+<span class="hl">  },</span>
+  template: <span class="str">'&lt;button&gt;&lt;i v-if="loading"&gt;⏳&lt;/i&gt; OK&lt;/button&gt;'</span>,
 };
 
 <span class="kw">const</span> vm = <span class="kw">new</span> Vue({
   el: <span class="str">'#app'</span>,
   components: { AppButton },
-  template: <span class="str">'&lt;div&gt;&lt;AppButton icon /&gt;&lt;AppButton icon="heart" /&gt;&lt;AppButton /&gt;&lt;/div&gt;'</span>,
+  template: <span class="str">'&lt;div&gt;&lt;AppButton loading /&gt;&lt;AppButton :loading="false" /&gt;&lt;AppButton /&gt;&lt;/div&gt;'</span>,
 });
 
 <span class="kw">const</span> texts = [...vm.$el.querySelectorAll(<span class="str">'button'</span>)].map((b) =&gt; b.textContent.trim());
 console.log(texts.join(<span class="str">' | '</span>));
-<span class="com">// star OK | heart OK | OK</span></code></pre></div><div class="label">Почему так</div><div class="explain">
+<span class="com">// ⏳ OK | OK | OK</span></code></pre></div><div class="label">Почему так</div><div class="explain">
 <ul>
-  <li>Атрибут без значения даёт <code>''</code>. Vue превращает <code>''</code> в <code>true</code>, только если в списке типов <code>Boolean</code> стоит раньше <code>String</code>.</li>
-  <li>При <code>[String, Boolean]</code> Vue считает, что пустая строка — нормальное значение для String, и оставляет <code>''</code>. Она falsy — иконки нет.</li>
-  <li><code>[Boolean, String]</code> → <code>true</code> → <code>'star'</code>. Строка <code>"heart"</code> по-прежнему приходит строкой.</li>
-  <li>Не передан вовсе — <code>false</code> при любом порядке: правило «отсутствует → false» работает, если Boolean есть среди типов и нет <code>default</code>.</li>
-</ul></div><div class="say"><b>Коротко вслух:</b> Пустой атрибут становится true, только если Boolean в списке типов стоит раньше String. Иначе Vue оставляет пустую строку как значение для String.</div></div>
+  <li><code>props: ['loading']</code> — проп без типа. Атрибут без значения даёт пустую строку <code>''</code>. Она falsy, поэтому <code>v-if</code> не показывает спиннер.</li>
+  <li>Приведение <code>'' → true</code> Vue делает только для пропа с типом <code>Boolean</code>.</li>
+  <li>С <code>loading: Boolean</code>: <code>&lt;AppButton loading /&gt;</code> → <code>true</code>, не передан → <code>false</code>, <code>:loading="false"</code> → <code>false</code>.</li>
+  <li>Если у пропа несколько типов, <code>Boolean</code> должен стоять раньше <code>String</code>: при <code>[String, Boolean]</code> пустой атрибут так и останется пустой строкой.</li>
+</ul></div><div class="say"><b>Коротко вслух:</b> Особое приведение работает только для пропа с типом Boolean. Без типа атрибут без значения приходит пустой строкой, а она falsy.</div></div>
     </details>
     <div class="task-foot">
       <label class="done"><input type="checkbox" data-id="4.3"> Решил сам</label>
@@ -1350,21 +1356,23 @@ console.log(texts.join(<span class="str">' | '</span>));
       </div>
     </div>
     <div class="block theory">
-      <div class="short"><b>Ответ в двух фразах.</b> Vue 2 не делает реактивным замороженный объект: в <code>this.list = Object.freeze(data)</code> поле <code>list</code> реактивно, а содержимое — нет. Менять такие данные можно только заменой целиком. Второй способ — не объявлять свойство в <code>data</code>, а задать его в <code>created</code> или <code>mounted</code>: это обычное свойство, его изменения не вызывают перерисовку.</div>
+      <div class="short"><b>Суть.</b> Vue 2 не делает реактивным замороженный объект: в <code>this.list = Object.freeze(data)</code> поле <code>list</code> реактивно, а содержимое — нет. Менять такие данные можно только заменой целиком. Второй способ — не объявлять свойство в <code>data</code>, а задать его в <code>created</code> или <code>mounted</code>: это обычное свойство, его изменения не вызывают перерисовку.</div>
       
-<p>Когда объект попадает в <code>data</code>, Vue 2 рекурсивно обходит его. Каждое свойство он превращает в геттер/сеттер (<code>Object.defineProperty</code>) и вешает на объект наблюдателя <code>__ob__</code>. Для больших данных — тысяч строк, справочников — это заметные время и память.</p>
+<p>Когда объект попадает в <code>data</code>, Vue 2 рекурсивно обходит его. Каждое свойство он превращает в геттер/сеттер (<code>Object.defineProperty</code>) и вешает на объект наблюдателя <code>__ob__</code>. У массивов геттеров на индексы нет: Vue подменяет их методы <code>push</code>, <code>splice</code> и другие. Для больших данных — тысяч строк, справочников — это заметные время и память.</p>
 <p>Если данные только показываются и не меняются по частям, реактивность внутри не нужна.</p>
 <p><b>Способы</b></p>
 <ul>
   <li><b><code>Object.freeze(obj)</code> перед присвоением.</b> Vue видит, что объект нерасширяемый (<code>Object.isExtensible</code> = false), и не обходит его. Само поле, например <code>this.items</code>, остаётся реактивным: присвоение нового значения целиком перерисует компонент.</li>
   <li><b>Не объявлять в <code>data</code>.</b> <code>this.chart = new Chart(...)</code> в <code>created</code>/<code>mounted</code> — обычное свойство, Vue о нём не знает. Подходит для экземпляров сторонних библиотек, таймеров, кэшей.</li>
   <li><b>Константа вне компонента</b> — если данные не меняются вообще.</li>
-  <li><b>Vue 2.7 и Vue 3:</b> <code>markRaw(obj)</code>; во Vue 3 ещё <code>shallowRef</code> и <code>shallowReactive</code>.</li>
+  <li><b>Vue 2.7 и Vue 3:</b> <code>markRaw(obj)</code>, а также <code>shallowRef</code> и <code>shallowReactive</code> из Composition API.</li>
 </ul>
 <p><b>Важно</b></p>
 <ul>
   <li><code>freeze</code> неглубокий: вложенные объекты не заморожены. Но Vue 2 внутрь замороженного не заходит, так что реактивными они тоже не станут.</li>
   <li>Изменить замороженное можно только заменой целиком: <code>this.items = Object.freeze(newItems)</code>. <code>push</code> бросит TypeError.</li>
+  <li>Замораживают <b>до</b> присвоения в <code>data</code>. <code>Object.freeze</code> уже реактивного объекта реактивность не снимает: геттеры и сеттеры уже созданы и работают.</li>
+  <li>Нужна обычная, нереактивная копия реактивных данных (например, отправить на сервер) — <code>JSON.parse(JSON.stringify(obj))</code> для простых данных.</li>
   <li>Нереактивное ≠ невидимое. Значение покажется, если компонент перерисуется по другой причине.</li>
   <li>Как проверить: у реактивного объекта есть <code>__ob__</code>, а в DevTools его поля показаны как <code>(...)</code> — это геттеры.</li>
 </ul>
@@ -1469,7 +1477,7 @@ console.log(<span class="str">'строк в DOM:'</span>, vm.$el.children.lengt
   },
   methods: {
     discount() {
-      <span class="kw">this</span>.products[0].price = 50; <span class="com todo">// пиши здесь</span>
+      <span class="kw">this</span>.products[0].price = 50;
     },
   },
   template: <span class="str">'&lt;ul&gt;&lt;li v-for="p in products" :key="p.id"&gt;{{ p.name }}: {{ p.price }}&lt;/li&gt;&lt;/ul&gt;'</span>,
@@ -1480,6 +1488,7 @@ vm.$nextTick(() =&gt; {
   console.log(<span class="str">'данные:'</span>, vm.products[0].price);
   console.log(<span class="str">'экран:'</span>, vm.$el.querySelector(<span class="str">'li'</span>).textContent);
 });
+<span class="com todo">// пиши здесь</span>
 <span class="com now">// сейчас: данные: 50, экран: Чай: 100</span>
 <span class="com need">// нужно:  данные: 50, экран: Чай: 50</span></code></pre></div>
     <details class="solution">
@@ -1515,7 +1524,7 @@ vm.$nextTick(() =&gt; {
 <ul>
   <li><code>freeze</code> неглубокий: заморожен только массив. Объекты-товары внутри можно менять — поэтому в данных 50.</li>
   <li>Но Vue эти объекты реактивными не сделал: в замороженный массив он не заходит. Изменение <code>price</code> никто не отследил — перерисовки нет.</li>
-  <li>Фикс: создать новый массив с новым объектом товара и присвоить в <code>this.products</code>. Само поле <code>products</code> реактивно — будет перерисовка. Новый массив снова замораживаем.</li>
+  <li>Исправление: создать новый массив с новым объектом товара и присвоить в <code>this.products</code>. Само поле <code>products</code> реактивно — будет перерисовка. Новый массив снова замораживаем.</li>
   <li>Правило: нереактивные данные меняют только заменой целиком (иммутабельно).</li>
 </ul></div><div class="say"><b>Коротко вслух:</b> Vue не заходил в замороженный массив, поэтому изменение поля внутри не отслеживается. Меняю иммутабельно: новый массив и присвоение в реактивное поле.</div></div>
     </details>
@@ -1579,7 +1588,7 @@ vm.$nextTick(() =&gt; {
       </div>
     </div>
     <div class="block theory">
-      <div class="short"><b>Ответ в двух фразах.</b> Virtual DOM — дерево обычных JS-объектов (VNode), которое описывает, каким должен быть DOM. Шаблон компилируется в render-функцию, она возвращает это дерево. При изменении данных Vue строит новое дерево, сравнивает со старым и вносит в реальный DOM только отличия. Так можно писать UI декларативно и не трогать DOM вручную.</div>
+      <div class="short"><b>Суть.</b> Virtual DOM — дерево обычных JS-объектов (VNode), которое описывает, каким должен быть DOM. Шаблон компилируется в render-функцию, она возвращает это дерево. При изменении данных Vue строит новое дерево, сравнивает со старым и вносит в реальный DOM только отличия. Так можно писать UI декларативно и не трогать DOM вручную.</div>
       
 <p>Virtual DOM (VDOM) — дерево лёгких JS-объектов (VNode), которое описывает, каким должен быть реальный DOM. VNode — просто объект: тег, атрибуты, дети, key.</p>
 <p><b>Как работает во Vue</b></p>
@@ -1590,10 +1599,11 @@ vm.$nextTick(() =&gt; {
 </ol>
 <p><b>Как сравнивает (упрощённо)</b></p>
 <ul>
-  <li>Сравнивает узлы на одном уровне, а не по всему дереву.</li>
-  <li>Узлы «одинаковые», если совпадают тег и <code>key</code>. Тогда элемент переиспользуется, меняются только атрибуты, текст, дети.</li>
+  <li>Сравнивает узлы одного уровня, а не всё дерево целиком.</li>
+  <li>Узлы считаются одинаковыми, если совпадают тег и <code>key</code> (у <code>input</code> ещё и <code>type</code>). Тогда DOM-элемент переиспользуется, меняются только атрибуты, текст, дети.</li>
   <li>Разный тег или key — старый узел удаляется, новый создаётся. Компонент внутри пересоздаётся: снова <code>created</code>/<code>mounted</code>.</li>
-  <li>Списки сопоставляются по <code>key</code>. Без key — по порядку: элементы правятся «на месте».</li>
+  <li>Без key одинаковыми считаются узлы с тем же тегом. Для списка это значит правку «на месте» по порядку.</li>
+  <li>Поэтому <code>key</code> = индекс — плохо: при вставке или удалении в середине индексы сдвигаются, и Vue переиспользует чужие узлы. Введённый текст и состояние дочерних компонентов «переезжают» к соседу.</li>
 </ul>
 <p><b>Зачем.</b> Операции с реальным DOM дорогие: пересчёт стилей и раскладки. VDOM позволяет писать декларативно («каким должен быть UI»), а Vue сам вычисляет минимальные изменения. Дерево VNode можно отрендерить не только в DOM — например, в строку на сервере (SSR).</p>
 <p><b>Нюансы.</b> Во Vue перерисовывается только компонент, чьи данные изменились, а не всё приложение. VDOM не «быстрее DOM»: он быстрее наивного «перерисовать всё через innerHTML» и удобнее ручных правок.</p>
@@ -1609,14 +1619,14 @@ render(h) {
   data: { attrs: { id: <span class="str">'app'</span> } },
   children: [{ tag: <span class="str">'p'</span>, children: [{ text: <span class="str">'Привет'</span> }] }],
 }</code></pre></div>
-      <div class="sources"><b>Источники</b><ul><li><a href="https://vuejs.org/guide/extras/rendering-mechanism.html" target="_blank" rel="noopener">Из списка: Rendering Mechanism (Virtual DOM, render pipeline)</a></li><li><a href="https://habr.com/ru/company/constanta/blog/435700/" target="_blank" rel="noopener">Статья на Хабре, вопрос 4 «Странное пересоздание компонента»</a></li><li><a href="https://v2.vuejs.org/v2/guide/render-function.html#createElement-Arguments" target="_blank" rel="noopener">Vue 2: render-функции и createElement</a></li><li><a href="https://v2.vuejs.org/v2/guide/conditional.html#Controlling-Reusable-Elements-with-key" target="_blank" rel="noopener">Vue 2: переиспользование элементов и key</a></li></ul></div>
+      <div class="sources"><b>Источники</b><ul><li><a href="https://vuejs.org/guide/extras/rendering-mechanism.html" target="_blank" rel="noopener">Из списка: Rendering Mechanism — документация Vue 3, принцип тот же</a></li><li><a href="https://v2.vuejs.org/v2/guide/conditional.html#Controlling-Reusable-Elements-with-key" target="_blank" rel="noopener">Vue 2: переиспользование элементов и key</a></li><li><a href="https://v2.vuejs.org/v2/guide/render-function.html#createElement-Arguments" target="_blank" rel="noopener">Vue 2: render-функции и createElement</a></li><li><a href="https://habr.com/ru/company/constanta/blog/435700/" target="_blank" rel="noopener">Статья на Хабре, вопрос 4 — тот же механизм на примере компонента</a></li></ul></div>
     </div>
     
   <section class="task" id="task-6-1">
     <h3>
       <span class="num">6.1</span>
       <span class="tname">Смонтируй VNode</span>
-      <span class="badge lvl-1"><span class="dot">🟢</span> базовый</span>
+      <span class="badge lvl-2"><span class="dot">🟡</span> средний</span>
       <span class="time">~5 мин</span>
     </h3>
     <p class="statement">Напиши <code>mount(vnode, container)</code>: по объекту-описанию она создаёт реальные DOM-элементы — так Vue делает при первом рендере. Строка в <code>children</code> — текстовый узел. Используй <code>createElement</code>, <code>setAttribute</code>, <code>createTextNode</code>, <code>appendChild</code>. Vue для этой задачи не нужен — хватит консоли браузера.</p>
@@ -1670,8 +1680,7 @@ console.log(root.innerHTML);
   <li>VNode — просто объект. Реальный DOM по нему строится рекурсивно: создать элемент → проставить атрибуты → смонтировать детей в него → вставить в контейнер.</li>
   <li>Строка — лист дерева: из неё получается текстовый узел. На этом рекурсия останавливается.</li>
   <li>Во Vue это делает функция patch при первом рендере. Настоящий VNode хранит ещё <code>key</code>, слушатели событий и ссылку на созданный элемент (<code>vnode.elm</code>).</li>
-  <li>Ссылка на элемент нужна для обновлений: сравнив старый и новый VNode, Vue знает, какой DOM-узел править.</li>
-  <li>Почему не <code>innerHTML</code>: потеряются состояние элементов (фокус, введённый текст) и слушатели, да и это дороже.</li>
+  <li>Почему не просто <code>innerHTML</code>: Vue нужны ссылки на созданные узлы, чтобы потом править их точечно и вешать на них слушатели и компоненты. При обновлениях через innerHTML пропали бы фокус, введённый текст и слушатели. К тому же вставка строки как HTML — риск XSS.</li>
 </ul></div><div class="say"><b>Коротко вслух:</b> VNode — это описание элемента в виде объекта. При монтировании Vue рекурсивно создаёт по нему реальные узлы и запоминает связь VNode ↔ элемент, чтобы потом обновлять точечно.</div></div>
     </details>
     <div class="task-foot">
@@ -1686,7 +1695,7 @@ console.log(root.innerHTML);
       <span class="badge lvl-1"><span class="dot">🟢</span> базовый</span>
       <span class="time">~4 мин</span>
     </h3>
-    <p class="statement">Перепиши шаблон в render-функцию через <code>h</code> (<code>createElement</code>). Результат в DOM должен совпасть — это то, во что Vue компилирует любой шаблон.</p>
+    <p class="statement">Перепиши шаблон в render-функцию через <code>h</code> (<code>createElement</code>). Результат в DOM должен совпасть, а опции <code>template</code> в компоненте остаться не должно. Это то, во что Vue компилирует любой шаблон.</p>
     <div class="label">Стартовый код</div>
     <div class="codewrap"><pre><code><span class="kw">const</span> vm = <span class="kw">new</span> Vue({
   el: <span class="str">'#app'</span>,
@@ -1703,7 +1712,8 @@ console.log(root.innerHTML);
 });
 
 console.log(vm.$el.outerHTML);
-<span class="com need">// нужно: &lt;section class="list"&gt;&lt;h2&gt;Задачи&lt;/h2&gt;&lt;ul&gt;&lt;li&gt;Купить хлеб&lt;/li&gt;&lt;li&gt;Сдать зачёт&lt;/li&gt;&lt;/ul&gt;&lt;/section&gt;</span></code></pre></div>
+<span class="com need">// нужно: &lt;section class="list"&gt;&lt;h2&gt;Задачи&lt;/h2&gt;&lt;ul&gt;&lt;li&gt;Купить хлеб&lt;/li&gt;&lt;li&gt;Сдать зачёт&lt;/li&gt;&lt;/ul&gt;&lt;/section&gt;</span>
+<span class="com">// — и в компоненте нет template</span></code></pre></div>
     <details class="solution">
       <summary>Решение и объяснение</summary>
       <div class="sol-body"><div class="label">Решение <span class="hint">изменённые строки подсвечены</span></div><div class="codewrap"><pre><code><span class="kw">const</span> vm = <span class="kw">new</span> Vue({
@@ -1721,7 +1731,7 @@ console.log(vm.$el.outerHTML);
 });
 
 console.log(vm.$el.outerHTML);
-<span class="com">// &lt;section class="list"&gt;&lt;h2&gt;Задачи&lt;/h2&gt;&lt;ul&gt;&lt;li&gt;Купить хлеб&lt;/li&gt;&lt;li&gt;Сдать зачёт&lt;/li&gt;&lt;/ul&gt;&lt;/section&gt;</span></code></pre></div><div class="label">Почему так</div><div class="explain">
+<span class="com">// &lt;section class="list"&gt;&lt;h2&gt;Задачи&lt;/h2&gt;&lt;ul&gt;&lt;li&gt;Купить хлеб&lt;/li&gt;&lt;li&gt;Сдать зачёт&lt;/li&gt;&lt;/ul&gt;&lt;/section&gt;</span></code></pre></div><p class="removed">Удалено из стартового кода: опция <code>template</code>.</p><div class="label">Почему так</div><div class="explain">
 <ul>
   <li>Любой шаблон Vue компилирует в такую функцию. <code>h(тег, данные, дети)</code> не создаёт DOM — он возвращает VNode, объект-описание.</li>
   <li><code>{{ title }}</code> → <code>this.title</code>; <code>v-for</code> → обычный <code>map</code>; <code>:key</code> → поле <code>key</code> в данных VNode; <code>class</code> — во втором аргументе.</li>
@@ -1737,76 +1747,62 @@ console.log(vm.$el.outerHTML);
   <section class="task" id="task-6-3">
     <h3>
       <span class="num">6.3</span>
-      <span class="tname">Лишний mounted</span>
-      <span class="badge lvl-3"><span class="dot">🔴</span> сложный</span>
-      <span class="time">~6 мин</span>
+      <span class="tname">Поле сохранило чужой текст</span>
+      <span class="badge lvl-2"><span class="dot">🟡</span> средний</span>
+      <span class="time">~4 мин</span>
     </h3>
-    <p class="statement">По кнопке «Сохранить» над блоком на 300 мс появляется сообщение. Компонент <code>Stats</code> в соседнем блоке при этом монтируется заново — а он тяжёлый и заново загружает данные. Объясни через сравнение VNode, почему так происходит, и исправь одной правкой в шаблоне.</p>
+    <p class="statement">Форма входа переключается между email и телефоном. После переключения в поле «Телефон» остаётся введённый email. Объясни через сравнение VNode, почему Vue оставил тот же <code>&lt;input&gt;</code>, и исправь так, чтобы поле создавалось заново.</p>
     <div class="label">Стартовый код</div>
-    <div class="codewrap"><pre><code><span class="kw">const</span> Stats = {
-  template: <span class="str">'&lt;p&gt;Статистика&lt;/p&gt;'</span>,
-  mounted() {
-    console.log(<span class="str">'Stats mounted'</span>);
-  },
-};
-
-<span class="kw">const</span> vm = <span class="kw">new</span> Vue({
+    <div class="codewrap"><pre><code><span class="kw">const</span> vm = <span class="kw">new</span> Vue({
   el: <span class="str">'#app'</span>,
-  components: { Stats },
-  data: { saved: <span class="kw">false</span> },
+  data: { byPhone: <span class="kw">false</span> },
   template:
     <span class="str">'&lt;div&gt;'</span> +
-      <span class="str">'&lt;div v-if="saved"&gt;Сохранено!&lt;/div&gt;'</span> +
-      <span class="str">'&lt;div&gt;&lt;Stats /&gt;&lt;/div&gt;'</span> + <span class="com todo">// пиши здесь</span>
-      <span class="str">'&lt;button v-if="!saved" @click="save"&gt;Сохранить&lt;/button&gt;'</span> +
+      <span class="str">'&lt;input v-if="byPhone" placeholder="Телефон"&gt;'</span> +
+      <span class="str">'&lt;input v-else placeholder="Email"&gt;'</span> +
     <span class="str">'&lt;/div&gt;'</span>,
-  methods: {
-    save() {
-      <span class="kw">this</span>.saved = <span class="kw">true</span>;
-      setTimeout(() =&gt; { <span class="kw">this</span>.saved = <span class="kw">false</span>; }, 300);
-    },
-  },
 });
 
-vm.$el.querySelector(<span class="str">'button'</span>).click();
-<span class="com now">// сейчас: «Stats mounted» ×3 — при загрузке, при показе и при скрытии сообщения</span>
-<span class="com need">// нужно: «Stats mounted» ×1</span></code></pre></div>
+<span class="com">// пользователь ввёл email и переключился на вход по телефону</span>
+<span class="kw">const</span> field = vm.$el.querySelector(<span class="str">'input'</span>);
+field.value = <span class="str">'anya@mail.ru'</span>;
+vm.byPhone = <span class="kw">true</span>;
+vm.$nextTick(() =&gt; {
+  <span class="kw">const</span> input = vm.$el.querySelector(<span class="str">'input'</span>);
+  console.log(input.placeholder, JSON.stringify(input.value), input === field);
+});
+<span class="com todo">// пиши здесь</span>
+<span class="com now">// сейчас: Телефон "anya@mail.ru" true</span>
+<span class="com need">// нужно: Телефон "" false</span></code></pre></div>
     <details class="solution">
       <summary>Решение и объяснение</summary>
-      <div class="sol-body"><div class="label">Решение <span class="hint">изменённые строки подсвечены</span></div><div class="codewrap"><pre><code><span class="kw">const</span> Stats = {
-  template: <span class="str">'&lt;p&gt;Статистика&lt;/p&gt;'</span>,
-  mounted() {
-    console.log(<span class="str">'Stats mounted'</span>);
-  },
-};
-
-<span class="kw">const</span> vm = <span class="kw">new</span> Vue({
+      <div class="sol-body"><div class="label">Решение <span class="hint">изменённые строки подсвечены</span></div><div class="codewrap"><pre><code><span class="kw">const</span> vm = <span class="kw">new</span> Vue({
   el: <span class="str">'#app'</span>,
-  components: { Stats },
-  data: { saved: <span class="kw">false</span> },
+  data: { byPhone: <span class="kw">false</span> },
   template:
     <span class="str">'&lt;div&gt;'</span> +
-      <span class="str">'&lt;div v-if="saved"&gt;Сохранено!&lt;/div&gt;'</span> +
-<span class="hl">      <span class="str">'&lt;div key="stats"&gt;&lt;Stats /&gt;&lt;/div&gt;'</span> +</span>
-      <span class="str">'&lt;button v-if="!saved" @click="save"&gt;Сохранить&lt;/button&gt;'</span> +
+<span class="hl">      <span class="str">'&lt;input v-if="byPhone" key="phone" placeholder="Телефон"&gt;'</span> +</span>
+<span class="hl">      <span class="str">'&lt;input v-else key="email" placeholder="Email"&gt;'</span> +</span>
     <span class="str">'&lt;/div&gt;'</span>,
-  methods: {
-    save() {
-      <span class="kw">this</span>.saved = <span class="kw">true</span>;
-      setTimeout(() =&gt; { <span class="kw">this</span>.saved = <span class="kw">false</span>; }, 300);
-    },
-  },
 });
 
-vm.$el.querySelector(<span class="str">'button'</span>).click();
-<span class="com">// Stats mounted ×1</span></code></pre></div><div class="label">Вывод</div><div class="codewrap out"><pre><code>Stats mounted</code></pre></div><div class="label">Почему так</div><div class="explain">
+<span class="com">// пользователь ввёл email и переключился на вход по телефону</span>
+<span class="kw">const</span> field = vm.$el.querySelector(<span class="str">'input'</span>);
+field.value = <span class="str">'anya@mail.ru'</span>;
+vm.byPhone = <span class="kw">true</span>;
+vm.$nextTick(() =&gt; {
+  <span class="kw">const</span> input = vm.$el.querySelector(<span class="str">'input'</span>);
+  console.log(input.placeholder, JSON.stringify(input.value), input === field);
+});
+<span class="com">// Телефон "" false</span></code></pre></div><div class="label">Почему так</div><div class="explain">
 <ul>
-  <li><code>v-if="false"</code> оставляет на своём месте пустой узел-комментарий. Дети корневого <code>div</code> до клика: <code>[комментарий, div(Stats), button]</code>. После: <code>[div(«Сохранено!»), div(Stats), комментарий]</code>.</li>
-  <li>Vue идёт по старому и новому списку детей с краёв (начало и конец) и считает узлы одинаковыми, если совпадают тег и key. Пустой комментарий сопоставился с комментарием в конце нового списка. Следующими оказались <code>div</code> со Stats (в старом) и <code>div</code> с «Сохранено!» (в новом). Оба <code>div</code> без key — Vue решил, что это тот же элемент, и заменил его содержимое на текст. Stats уничтожен.</li>
-  <li>Для второго <code>div</code> подходящего старого узла не нашлось — создан новый вместе с новым Stats. При скрытии сообщения всё повторяется. Итого три <code>mounted</code>.</li>
-  <li><code>key="stats"</code> делает узел уникальным: Vue находит его среди старых и переиспользует вместе с компонентом.</li>
-  <li>Другой вариант — <code>v-show</code> вместо <code>v-if</code> у сообщения и кнопки: структура дерева не меняется. Но это уже две правки.</li>
-</ul></div><div class="say"><b>Коротко вслух:</b> Diff сравнивает соседние узлы по тегу и key. Два div без key алгоритм принял за один и тот же элемент и пересоздал компонент внутри. Уникальный key говорит Vue, что это тот же узел.</div></div>
+  <li>До переключения на месте поля VNode <code>input(placeholder="Email")</code>, после — <code>input(placeholder="Телефон")</code>. Тот же уровень, тот же тег, key нет.</li>
+  <li>Для алгоритма сравнения это один и тот же узел. Vue делает patch: меняет только атрибут <code>placeholder</code>, а DOM-элемент оставляет прежним — <code>input === field</code> даёт <code>true</code>.</li>
+  <li>Введённый текст — свойство самого DOM-элемента, в VNode его нет. Элемент остался — остался и текст.</li>
+  <li><code>key</code> говорит алгоритму: это разные узлы. Разные key → старый input удаляется, новый создаётся пустым.</li>
+  <li>Также верно: <code>key</code> только у одного из полей — ключи уже не совпадут. Но понятнее ставить у обоих.</li>
+  <li>Тот же механизм в статье на Хабре (вопрос 4): соседний <code>v-if</code> меняет состав детей, Vue сопоставляет два <code>div</code> без key как один узел — и компонент внутри пересоздаётся. Лечится тоже уникальным <code>key</code>.</li>
+</ul></div><div class="say"><b>Коротко вслух:</b> Diff считает узлы одинаковыми, если совпадают тег и key. Два input без key для Vue — один элемент, поэтому он только поменял placeholder. Разные key заставляют создать новый элемент.</div></div>
     </details>
     <div class="task-foot">
       <label class="done"><input type="checkbox" data-id="6.3"> Решил сам</label>
@@ -1823,12 +1819,18 @@ vm.$el.querySelector(<span class="str">'button'</span>).click();
       </div>
     </div>
     <div class="block theory">
-      <div class="short"><b>Ответ в двух фразах.</b> Vue обновляет DOM не сразу после изменения данных, а пачкой в ближайшей микрозадаче. <code>$nextTick</code> выполняет код сразу после этого обновления — например, чтобы поставить фокус на появившееся поле или измерить элемент. <code>setTimeout</code> — макрозадача: сработает позже, после всех микрозадач, часто уже после отрисовки кадра, и к очереди Vue не привязан.</div>
+      <div class="short"><b>Суть.</b> Vue обновляет DOM не сразу после изменения данных, а пачкой в ближайшей микрозадаче. <code>$nextTick</code> выполняет код сразу после этого обновления — например, чтобы поставить фокус на появившееся поле или измерить элемент. <code>setTimeout</code> — макрозадача: сработает позже, после всех микрозадач, часто уже после отрисовки кадра, и к очереди Vue не привязан.</div>
       
 <p>Vue обновляет DOM не сразу. Изменили данные → watcher компонента попадает в очередь (дубли отбрасываются) → очередь выполняется асинхронно, в микрозадаче (<code>Promise.then</code>) → DOM обновлён. Поэтому сразу после <code>this.x = 1</code> в DOM ещё старое значение.</p>
 <p>Зачем пачкой: три изменения подряд → одна перерисовка с итоговыми значениями, а не три.</p>
 <p><b><code>$nextTick</code></b> — выполнить код после того, как Vue применит изменения к DOM. Две формы: <code>this.$nextTick(cb)</code> и <code>await this.$nextTick()</code>. Глобально — <code>Vue.nextTick</code>.</p>
-<p><b>Когда нужен:</b> фокус на поле, которое только что появилось через <code>v-if</code>; измерить размер или позицию элемента после изменения данных; прокрутить чат вниз после нового сообщения; инициализировать стороннюю библиотеку на обновлённом DOM.</p>
+<p><b>Когда нужен</b></p>
+<ul>
+  <li>поставить фокус на поле, которое только что появилось через <code>v-if</code>;</li>
+  <li>измерить размер или позицию элемента после изменения данных;</li>
+  <li>прокрутить чат вниз после нового сообщения;</li>
+  <li>инициализировать стороннюю библиотеку на обновлённом DOM.</li>
+</ul>
 <table>
   <thead><tr><th></th><th><code>$nextTick</code></th><th><code>setTimeout(fn, 0)</code></th></tr></thead>
   <tbody>
@@ -1838,7 +1840,7 @@ vm.$el.querySelector(<span class="str">'button'</span>).click();
     <tr><td>Итог</td><td>точная точка «DOM обновлён», без мигания</td><td>работает «на удачу», возможен кадр с промежуточным состоянием</td></tr>
   </tbody>
 </table>
-<p><b>Нюанс.</b> <code>nextTick</code> — это очередь в порядке регистрации. Колбэк, поставленный <i>до</i> изменения данных, выполнится <i>до</i> обновления DOM.</p>
+<p><b>Нюанс.</b> <code>nextTick</code> — это очередь в порядке регистрации. Колбэк, поставленный до <i>первого</i> изменения данных в этом тике, выполнится <i>до</i> обновления DOM.</p>
       <div class="label">Пример</div>
       <div class="codewrap"><pre><code>methods: {
   <span class="kw">async</span> openEditor() {
@@ -1877,7 +1879,7 @@ vm.$el.querySelector(<span class="str">'button'</span>).click();
   methods: {
     edit() {
       <span class="kw">this</span>.editing = <span class="kw">true</span>;
-      <span class="kw">this</span>.$refs.field.focus(); <span class="com todo">// пиши здесь</span>
+      <span class="kw">this</span>.$refs.field.focus();
     },
   },
 });
@@ -1886,7 +1888,8 @@ vm.$el.querySelector(<span class="str">'button'</span>).click();
 setTimeout(() =&gt; {
   console.log(<span class="str">'в фокусе:'</span>, document.activeElement === vm.$refs.field);
 }, 50);
-<span class="com now">// сейчас: ошибка «Cannot read properties of undefined (reading 'focus')», в фокусе: false</span>
+<span class="com todo">// пиши здесь</span>
+<span class="com now">// сейчас: в консоли TypeError при вызове focus, в фокусе: false</span>
 <span class="com need">// нужно: в фокусе: true</span></code></pre></div>
     <details class="solution">
       <summary>Решение и объяснение</summary>
@@ -1913,7 +1916,7 @@ setTimeout(() =&gt; {
 }, 50);
 <span class="com">// в фокусе: true</span></code></pre></div><div class="label">Почему так</div><div class="explain">
 <ul>
-  <li><code>this.editing = true</code> только ставит перерисовку в очередь. Input ещё не создан, <code>$refs.field</code> = <code>undefined</code> → <code>undefined.focus()</code> → TypeError.</li>
+  <li><code>this.editing = true</code> только ставит перерисовку в очередь. Input ещё не создан, <code>$refs.field</code> = <code>undefined</code> → <code>undefined.focus()</code> → TypeError. В Chrome текст ошибки: «Cannot read properties of undefined (reading 'focus')».</li>
   <li><code>await this.$nextTick()</code> ждёт, пока Vue выполнит очередь и обновит DOM. После этого ref указывает на input.</li>
   <li>Вариант с колбэком: <code>this.$nextTick(() =&gt; this.$refs.field.focus())</code>.</li>
   <li><code>setTimeout</code> тоже сработал бы, но позже — после микрозадач и, возможно, после кадра без фокуса. <code>nextTick</code> — точная точка «DOM обновлён».</li>
@@ -1928,8 +1931,8 @@ setTimeout(() =&gt; {
     <h3>
       <span class="num">7.2</span>
       <span class="tname">Порядок вывода</span>
-      <span class="badge lvl-2"><span class="dot">🟡</span> средний</span>
-      <span class="time">~5 мин</span>
+      <span class="badge lvl-3"><span class="dot">🔴</span> сложный</span>
+      <span class="time">~6 мин</span>
     </h3>
     <p class="statement">Запиши, в каком порядке и с каким текстом выведутся строки в <code>update()</code>, и объясни. Затем переставь одну строку так, чтобы в строке «3:» был старый текст.</p>
     <div class="label">Стартовый код</div>
@@ -1985,6 +1988,7 @@ vm.update();
   <li><b>4</b> — обычная микрозадача, поставлена после очереди Vue. Тоже видит новый DOM.</li>
   <li><b>2</b> — макрозадача: выполняется только после всех микрозадач.</li>
   <li>Часть 2: если вызвать <code>$nextTick</code> до изменения данных, колбэк окажется в очереди раньше обновления и увидит старый DOM. <code>nextTick</code> не «ждёт обновления» — он ставит колбэк в очередь Vue.</li>
+  <li>Также верно: перенести в конец метода <code>this.msg = 'новый'</code>. Колбэк 3 снова окажется в очереди раньше обновления.</li>
 </ul></div><div class="say"><b>Коротко вслух:</b> Синхронный код идёт первым, потом микрозадачи в порядке постановки — очередь Vue с обновлением DOM и колбэками nextTick, затем Promise.then, и в конце setTimeout.</div></div>
     </details>
     <div class="task-foot">
@@ -2051,7 +2055,7 @@ updated, в DOM: 3</code></pre></div><div class="label">Почему так</div
   <li>Vue складывает все изменения синхронного кода в очередь, каждый watcher — один раз. Потом делает одну перерисовку с итоговыми значениями: три изменения → один patch → один <code>updated</code> с числом 3.</li>
   <li>Это экономит работу и объясняет, почему DOM обновляется асинхронно и зачем нужен <code>nextTick</code>.</li>
   <li><code>await this.$nextTick()</code> между шагами даёт Vue выполнить очередь — получается три перерисовки.</li>
-  <li>В реальном коде так делают редко: например, чтобы сбросить класс и заново запустить CSS-анимацию.</li>
+  <li>В реальном коде так делают редко — например, когда между шагами нужно измерить DOM. Экран при этом не мигает: DOM обновится трижды, но между микрозадачами браузер кадр не рисует, пользователь увидит только итог.</li>
 </ul></div><div class="say"><b>Коротко вслух:</b> Vue буферизует изменения за тик и перерисовывает один раз с финальным значением. Если между изменениями дождаться nextTick, каждое применится к DOM отдельно.</div></div>
     </details>
     <div class="task-foot">
@@ -2069,7 +2073,7 @@ updated, в DOM: 3</code></pre></div><div class="label">Почему так</div
       </div>
     </div>
     <div class="block theory">
-      <div class="short"><b>Ответ в двух фразах.</b> Описание компонента одно на все экземпляры. Если бы <code>data</code> был объектом, все экземпляры делили бы одну ссылку, и изменение в одном меняло бы все. Функция вызывается для каждого экземпляра и возвращает новый объект — у каждого своё состояние. В корневом <code>new Vue()</code> объект допустим: экземпляр один.</div>
+      <div class="short"><b>Суть.</b> Описание компонента одно на все экземпляры. Если бы <code>data</code> был объектом, все экземпляры делили бы одну ссылку, и изменение в одном меняло бы все. Функция вызывается для каждого экземпляра и возвращает новый объект — у каждого своё состояние. В корневом <code>new Vue()</code> объект допустим: экземпляр один.</div>
       
 <p>Описание компонента — шаблон для многих экземпляров. Каждый <code>&lt;Counter /&gt;</code> создаётся по одному и тому же объекту опций.</p>
 <ul>
@@ -2077,7 +2081,7 @@ updated, в DOM: 3</code></pre></div><div class="label">Почему так</div
   <li>Функция вызывается для каждого экземпляра заново и возвращает новый объект — у каждого своё состояние.</li>
   <li>Если в компоненте написать <code>data: { ... }</code>, Vue 2 выдаст предупреждение «The "data" option should be a function…» и <b>проигнорирует</b> такие данные.</li>
   <li>В корневом <code>new Vue({ data: {...} })</code> объект допустим — экземпляр один.</li>
-  <li>Бонус: внутри функции доступен <code>this</code> с уже готовыми props. Начальное состояние можно взять из пропса: <code>data() { return { count: this.start } }</code>.</li>
+  <li>Бонус: внутри функции доступен <code>this</code> с уже готовыми props. Начальное состояние можно взять из пропа: <code>data() { return { count: this.start } }</code>.</li>
   <li><b>Ловушка.</b> Функция не спасает, если возвращает общий объект — переменную снаружи или вложенную ссылку на общий объект. Нужен новый объект или копия.</li>
 </ul>
       <div class="label">Пример</div>
@@ -2108,7 +2112,7 @@ data() {
 
 Vue.component(<span class="str">'Counter'</span>, {
   data() {
-    <span class="kw">return</span> state; <span class="com todo">// пиши здесь</span>
+    <span class="kw">return</span> state;
   },
   template: <span class="str">'&lt;button @click="count++"&gt;{{ count }}&lt;/button&gt;'</span>,
 });
@@ -2122,6 +2126,7 @@ vm.$el.querySelector(<span class="str">'button'</span>).click();
 vm.$nextTick(() =&gt; {
   console.log([...vm.$el.querySelectorAll(<span class="str">'button'</span>)].map((b) =&gt; b.textContent).join(<span class="str">' '</span>));
 });
+<span class="com todo">// пиши здесь</span>
 <span class="com now">// сейчас: 1 1 1</span>
 <span class="com need">// нужно: 1 0 0</span></code></pre></div>
     <details class="solution">
@@ -2142,7 +2147,7 @@ vm.$el.querySelector(<span class="str">'button'</span>).click();
 vm.$nextTick(() =&gt; {
   console.log([...vm.$el.querySelectorAll(<span class="str">'button'</span>)].map((b) =&gt; b.textContent).join(<span class="str">' '</span>));
 });
-<span class="com">// 1 0 0</span></code></pre></div><div class="label">Почему так</div><div class="explain">
+<span class="com">// 1 0 0</span></code></pre></div><p class="removed">Удалено из стартового кода: <code>const state</code> — общий объект больше не нужен.</p><div class="label">Почему так</div><div class="explain">
 <ul>
   <li><code>data</code> — функция, но она возвращает одну и ту же ссылку <code>state</code>. Три экземпляра делят один объект, значит, и один <code>count</code>.</li>
   <li>Литерал <code>{ count: 0 }</code> внутри функции создаёт новый объект при каждом вызове — у каждого экземпляра свой.</li>
@@ -2157,7 +2162,7 @@ vm.$nextTick(() =&gt; {
   <section class="task" id="task-8-2">
     <h3>
       <span class="num">8.2</span>
-      <span class="tname">Начальное значение из пропса</span>
+      <span class="tname">Начальное значение из пропа</span>
       <span class="badge lvl-1"><span class="dot">🟢</span> базовый</span>
       <span class="time">~3 мин</span>
     </h3>
@@ -2212,7 +2217,7 @@ vm.$nextTick(() =&gt; {
   <li>Проп — только начальное значение, дальше состояние локальное. Менять сам проп (<code>this.start++</code>) нельзя: Vue предупредит, и значение перезапишется при перерисовке родителя.</li>
   <li>Нюанс: если <code>start</code> потом изменится у родителя, <code>count</code> не обновится — data вычисляется один раз. Если нужно следить — <code>watch</code> на <code>start</code>.</li>
   <li>Со стрелочной функцией <code>this</code> будет другим, но экземпляр приходит первым аргументом: <code>data: (vm) =&gt; ({ count: vm.start })</code>.</li>
-</ul></div><div class="say"><b>Коротко вслух:</b> data вызывается для каждого экземпляра после инициализации props, поэтому можно взять начальное значение из пропса и дальше менять локальную копию.</div></div>
+</ul></div><div class="say"><b>Коротко вслух:</b> data вызывается для каждого экземпляра после инициализации props, поэтому можно взять начальное значение из пропа и дальше менять локальную копию.</div></div>
     </details>
     <div class="task-foot">
       <label class="done"><input type="checkbox" data-id="8.2"> Решил сам</label>
@@ -2233,12 +2238,12 @@ vm.$nextTick(() =&gt; {
 Vue.component(<span class="str">'OrdersTable'</span>, {
   data() {
     <span class="kw">return</span> {
-      filters: DEFAULT_FILTERS, <span class="com todo">// пиши здесь</span>
+      filters: DEFAULT_FILTERS,
     };
   },
   methods: {
     reset() {
-      <span class="kw">this</span>.filters = DEFAULT_FILTERS; <span class="com todo">// пиши здесь</span>
+      <span class="kw">this</span>.filters = DEFAULT_FILTERS;
     },
   },
   template: <span class="str">'&lt;p&gt;{{ filters.city }}&lt;/p&gt;'</span>,
@@ -2254,6 +2259,7 @@ vm.$refs.a.reset();                  <span class="com">// и сбросили ф
 vm.$nextTick(() =&gt; {
   console.log(vm.$refs.a.filters.city, vm.$refs.b.filters.city, DEFAULT_FILTERS.city);
 });
+<span class="com todo">// пиши здесь</span>
 <span class="com now">// сейчас: Казань Казань Казань</span>
 <span class="com need">// нужно: Все Все Все</span></code></pre></div>
     <details class="solution">
@@ -2288,7 +2294,7 @@ vm.$nextTick(() =&gt; {
 <ul>
   <li>Функция возвращает новый внешний объект, но внутри лежит ссылка на один и тот же <code>DEFAULT_FILTERS</code>. Обе таблицы и сама «константа» указывают на один объект.</li>
   <li>Смена <code>city</code> в первой таблице меняет общий объект — это видно во второй. <code>reset</code> присваивает тот же, уже изменённый объект, поэтому ничего не сбрасывает. Испорчена даже «константа».</li>
-  <li>Нужна копия: <code>{ ...DEFAULT_FILTERS }</code> — для плоского объекта хватит поверхностной. Или фабрика <code>defaultFilters()</code>, которая каждый раз создаёт новый объект.</li>
+  <li>Исправление — копия: <code>{ ...DEFAULT_FILTERS }</code>, для плоского объекта хватит поверхностной. Или фабрика <code>defaultFilters()</code>, которая каждый раз создаёт новый объект.</li>
   <li>Если внутри есть вложенные объекты или массивы, поверхностной копии мало — нужна глубокая копия или фабрика.</li>
 </ul></div><div class="say"><b>Коротко вслух:</b> Новый объект создаётся только на верхнем уровне, а вложенное поле — общая ссылка на константу. Для каждого экземпляра и для сброса нужна своя копия.</div></div>
     </details>
@@ -2307,7 +2313,7 @@ vm.$nextTick(() =&gt; {
       </div>
     </div>
     <div class="block theory">
-      <div class="short"><b>Ответ в двух фразах.</b> Миксин — объект с опциями компонента: data, methods, computed, хуки. Его подключают через <code>mixins: [...]</code>, чтобы переиспользовать одинаковую логику в нескольких компонентах. Опции сливаются: хуки вызываются все (сначала миксина), а в data и methods при конфликте побеждает компонент. Минусы — неявное происхождение свойств и молчаливые конфликты имён.</div>
+      <div class="short"><b>Суть.</b> Миксин — объект с опциями компонента: data, methods, computed, хуки. Его подключают через <code>mixins: [...]</code>, чтобы переиспользовать одинаковую логику в нескольких компонентах. Опции сливаются: хуки вызываются все (сначала миксина), а в data и methods при конфликте побеждает компонент. Минусы — неявное происхождение свойств и молчаливые конфликты имён.</div>
       
 <p>Миксин — обычный объект с опциями компонента (<code>data</code>, <code>computed</code>, <code>methods</code>, <code>watch</code>, хуки). Подключается через <code>mixins: [myMixin]</code>, и его опции сливаются с опциями компонента.</p>
 <p><b>Зачем:</b> переиспользовать одинаковую логику в разных компонентах — флаг загрузки, пагинация, «открыть/закрыть», подписка на <code>resize</code>.</p>
@@ -2324,7 +2330,8 @@ vm.$nextTick(() =&gt; {
 <ul>
   <li>Несколько миксинов применяются по порядку массива, компонент — последним.</li>
   <li><b>Глобальный миксин</b> <code>Vue.mixin({...})</code> попадает в каждый компонент, включая сторонние. Использовать крайне осторожно.</li>
-  <li><b>Минусы:</b> не видно, откуда в компоненте взялось <code>this.loading</code>; конфликты имён без ошибок; неявные зависимости (миксин ждёт, что в компоненте есть <code>this.fetchData</code>). Во Vue 3 вместо миксинов — composables.</li>
+  <li><b>Минусы:</b> не видно, откуда в компоненте взялось <code>this.loading</code>; конфликты имён без ошибок; неявные зависимости — миксин ждёт, что в компоненте есть <code>this.fetchData</code>.</li>
+  <li><b>Альтернатива.</b> Во Vue 2.7 и Vue 3 вместо миксинов рекомендуют composables — функции <code>use…</code> внутри <code>setup</code>. Миксины во Vue 3 по-прежнему работают.</li>
 </ul>
       <div class="label">Пример</div>
       <div class="codewrap"><pre><code><span class="com">// mixins/toggle.js</span>
@@ -2434,7 +2441,7 @@ vm.$el.querySelectorAll(<span class="str">'button'</span>).forEach((b) =&gt; b.c
 vm.$nextTick(() =&gt; {
   console.log(Boolean(vm.$el.querySelector(<span class="str">'ul'</span>)), Boolean(vm.$el.querySelector(<span class="str">'.modal'</span>)));
 });
-<span class="com">// true true</span></code></pre></div><div class="label">Почему так</div><div class="explain">
+<span class="com">// true true</span></code></pre></div><p class="removed">Удалено из стартового кода: <code>data</code> и <code>methods</code> с <code>isOpen</code>/<code>toggle</code> из обоих компонентов.</p><div class="label">Почему так</div><div class="explain">
 <ul>
   <li>Миксин — обычный объект с теми же опциями, что у компонента. Vue сливает его с компонентом, и в шаблоне <code>isOpen</code> и <code>toggle</code> доступны как свои.</li>
   <li><code>data</code> в миксине — тоже функция. Каждый экземпляр получает свой <code>isOpen</code>: Dropdown и Modal друг на друга не влияют.</li>
@@ -2535,7 +2542,7 @@ created компонента: hello компонента
   },
   template:
     <span class="str">'&lt;div&gt;'</span> +
-      <span class="str">'&lt;button class="page" @click="next"&gt;Следующая страница&lt;/button&gt;'</span> + <span class="com todo">// пиши здесь</span>
+      <span class="str">'&lt;button class="page" @click="next"&gt;Следующая страница&lt;/button&gt;'</span> +
       <span class="str">'&lt;button class="step" @click="next"&gt;Следующий шаг&lt;/button&gt;'</span> +
       <span class="str">'&lt;p&gt;страница {{ page }}, шаг {{ step }}&lt;/p&gt;'</span> +
     <span class="str">'&lt;/div&gt;'</span>,
@@ -2543,6 +2550,7 @@ created компонента: hello компонента
 
 vm.$el.querySelector(<span class="str">'.page'</span>).click();
 vm.$nextTick(() =&gt; console.log(vm.$el.querySelector(<span class="str">'p'</span>).textContent));
+<span class="com todo">// пиши здесь</span>
 <span class="com now">// сейчас: страница 1, шаг 2</span>
 <span class="com need">// нужно: страница 2, шаг 1</span></code></pre></div>
     <details class="solution">
@@ -2583,8 +2591,8 @@ vm.$nextTick(() =&gt; console.log(vm.$el.querySelector(<span class="str">'p'</sp
 <ul>
   <li><code>methods</code> миксина и компонента сливаются в один объект. Одинаковое имя — побеждает компонент. Vue не предупреждает.</li>
   <li>В итоге обе кнопки вызывают <code>next</code> компонента — листается шаг, а не страница.</li>
-  <li>Фикс — уникальные имена. Члены миксина называют конкретно (<code>nextPage</code>, <code>paginationReset</code>), чтобы они не пересекались с компонентом. Style guide Vue советует для приватных методов миксинов префикс вида <code>$_pagination_</code>.</li>
-  <li>Это главный минус миксинов — неявные конфликты. Во Vue 3 composables решают его: имена задаёт сам компонент при деструктуризации.</li>
+  <li>Исправление — уникальные имена. Члены миксина называют конкретно (<code>nextPage</code>, <code>paginationReset</code>), чтобы они не пересекались с компонентом. Style guide Vue советует для приватных методов миксинов префикс вида <code>$_pagination_</code>.</li>
+  <li>Это главный минус миксинов — неявные конфликты. Composables (Vue 2.7 и Vue 3) решают его: имена задаёт сам компонент при деструктуризации.</li>
 </ul></div><div class="say"><b>Коротко вслух:</b> Методы миксина и компонента сливаются, и при совпадении имени метод миксина молча перезаписывается. Поэтому у членов миксина должны быть уникальные, «говорящие» имена.</div></div>
     </details>
     <div class="task-foot">
@@ -2602,17 +2610,18 @@ vm.$nextTick(() =&gt; console.log(vm.$el.querySelector(<span class="str">'p'</sp
       </div>
     </div>
     <div class="block theory">
-      <div class="short"><b>Ответ в двух фразах.</b> <code>watch</code> выполняет побочное действие при изменении данных: запрос, запись в localStorage, работу с библиотекой. Для значений, вычисляемых из других данных, нужен <code>computed</code>. <code>immediate: true</code> вызывает обработчик сразу при создании компонента. <code>deep: true</code> реагирует на изменения внутри объекта, а не только на его замену.</div>
+      <div class="short"><b>Суть.</b> <code>watch</code> выполняет побочное действие при изменении данных: запрос, запись в localStorage, работу с библиотекой. Для значений, вычисляемых из других данных, нужен <code>computed</code>. <code>immediate: true</code> вызывает обработчик сразу при создании компонента. <code>deep: true</code> реагирует на изменения внутри объекта, а не только на его замену.</div>
       
 <p><code>watch</code> — реакция на изменение данных побочным действием: запрос к API, сохранение в localStorage, логирование, работа со сторонней библиотекой. Особенно для асинхронных и дорогих операций, например поиска с debounce.</p>
 <p>Если нужно получить значение из других данных — это <code>computed</code>, а не watch.</p>
 <ul>
   <li><b><code>immediate: true</code></b> — вызвать обработчик сразу при создании компонента (ещё до <code>created</code>) с текущим значением. <code>oldVal</code> при этом <code>undefined</code>. Избавляет от дублирования вызова в <code>created</code>.</li>
-  <li><b><code>deep: true</code></b> — следить за изменениями на любой глубине внутри объекта. Без deep watch реагирует только на замену самого объекта (<code>this.form = {...}</code>). У массивов <code>push</code>/<code>splice</code> ловятся и без deep, а изменения полей объектов внутри массива — только с deep.</li>
+  <li><b><code>deep: true</code></b> — следить за изменениями на любой глубине внутри объекта. Без deep watch реагирует на замену объекта и на добавление или удаление ключей через <code>Vue.set</code>/<code>Vue.delete</code>, но не на изменение существующих полей. У массивов <code>push</code>/<code>splice</code> ловятся и без deep, а изменения полей объектов внутри массива — только с deep.</li>
   <li>При изменении внутри объекта (а не замене) <code>newVal === oldVal</code>: это одна и та же ссылка, копию «до» Vue не хранит.</li>
   <li><code>deep</code> на большом объекте дорогой. Лучше следить за конкретным полем: <code>'form.email'</code>.</li>
   <li>Обработчик — обычная функция, не стрелочная, иначе <code>this</code> не будет компонентом.</li>
   <li>Обработчик вызывается асинхронно и один раз на все изменения за тик — с последним значением.</li>
+  <li>В обработчике DOM ещё старый: watch вызывается до перерисовки. Нужен новый DOM — <code>await this.$nextTick()</code> внутри обработчика.</li>
 </ul>
       <div class="label">Пример</div>
       <div class="codewrap"><pre><code>watch: {
@@ -2656,7 +2665,7 @@ unwatch();</code></pre></div>
   watch: {
     userId(id) {
       console.log(<span class="str">'загружаю пользователя'</span>, id);
-    }, <span class="com todo">// пиши здесь</span>
+    },
   },
   template: <span class="str">'&lt;p&gt;id: {{ userId }}&lt;/p&gt;'</span>,
 };
@@ -2669,6 +2678,7 @@ unwatch();</code></pre></div>
 });
 
 setTimeout(() =&gt; { vm.id = 2; }, 50);
+<span class="com todo">// пиши здесь</span>
 <span class="com now">// сейчас: загружаю пользователя 2</span>
 <span class="com need">// нужно: загружаю пользователя 1, затем загружаю пользователя 2 (без вызова в created)</span></code></pre></div>
     <details class="solution">
@@ -2698,7 +2708,7 @@ setTimeout(() =&gt; { vm.id = 2; }, 50);
 <span class="com">// загружаю пользователя 2</span></code></pre></div><div class="label">Почему так</div><div class="explain">
 <ul>
   <li>Обычный watch реагирует только на изменения после создания. Начальное значение 1 изменением не считается — вызова нет.</li>
-  <li><code>immediate: true</code> вызывает handler сразу при создании watcher — в фазе инициализации, ещё до <code>created</code> — с текущим значением. <code>oldVal</code> при этом <code>undefined</code>.</li>
+  <li><code>immediate: true</code> вызывает обработчик сразу при создании watcher — в фазе инициализации, ещё до <code>created</code> — с текущим значением. <code>oldVal</code> при этом <code>undefined</code>.</li>
   <li>Без immediate пришлось бы вызывать загрузку и в <code>created</code>, и в watch — дублирование. Immediate делает то же одной опцией.</li>
 </ul></div><div class="say"><b>Коротко вслух:</b> Watch по умолчанию реагирует только на последующие изменения. immediate: true вызывает обработчик сразу при создании с текущим значением.</div></div>
     </details>
@@ -2712,9 +2722,9 @@ setTimeout(() =&gt; { vm.id = 2; }, 50);
       <span class="num">10.2</span>
       <span class="tname">Изменение внутри объекта</span>
       <span class="badge lvl-2"><span class="dot">🟡</span> средний</span>
-      <span class="time">~4 мин</span>
+      <span class="time">~5 мин</span>
     </h3>
-    <p class="statement">Черновик формы должен сохраняться при каждом изменении полей, но при вводе email сохранения нет. Исправь двумя способами: через <code>deep</code> и через слежение за конкретным полем. Объясни, почему в варианте с deep <code>newVal === oldVal</code>.</p>
+    <p class="statement">Черновик формы должен сохраняться при каждом изменении полей, но при вводе email сохранения нет. Исправь через <code>deep</code> и объясни, почему <code>newVal === oldVal</code>. Затем покажи второй способ — слежение только за <code>'form.email'</code> с выводом старого и нового значения — и скажи, чем он лучше и почему для черновика всей формы его мало.</p>
     <div class="label">Стартовый код</div>
     <div class="codewrap"><pre><code><span class="kw">const</span> vm = <span class="kw">new</span> Vue({
   el: <span class="str">'#app'</span>,
@@ -2724,7 +2734,7 @@ setTimeout(() =&gt; { vm.id = 2; }, 50);
   watch: {
     form(newVal, oldVal) {
       console.log(<span class="str">'сохраняю'</span>, JSON.stringify(newVal), newVal === oldVal);
-    }, <span class="com todo">// пиши здесь</span>
+    },
   },
   template: <span class="str">'&lt;input v-model="form.email"&gt;'</span>,
 });
@@ -2732,6 +2742,7 @@ setTimeout(() =&gt; { vm.id = 2; }, 50);
 <span class="com">// пользователь вводит email</span>
 vm.$el.value = <span class="str">'a@b.ru'</span>;
 vm.$el.dispatchEvent(<span class="kw">new</span> Event(<span class="str">'input'</span>));
+<span class="com todo">// пиши здесь</span>
 <span class="com now">// сейчас: ничего</span>
 <span class="com need">// нужно (способ с deep): сохраняю {"email":"a@b.ru","name":""} true</span></code></pre></div>
     <details class="solution">
@@ -2755,7 +2766,7 @@ vm.$el.dispatchEvent(<span class="kw">new</span> Event(<span class="str">'input'
 <span class="com">// пользователь вводит email</span>
 vm.$el.value = <span class="str">'a@b.ru'</span>;
 vm.$el.dispatchEvent(<span class="kw">new</span> Event(<span class="str">'input'</span>));
-<span class="com">// сохраняю {"email":"a@b.ru","name":""} true</span></code></pre></div><div class="label"><span class="plain">Способ 2: путь к полю</span> <span class="hint">изменённые строки подсвечены</span></div><div class="codewrap"><pre><code><span class="kw">const</span> vm = <span class="kw">new</span> Vue({
+<span class="com">// сохраняю {"email":"a@b.ru","name":""} true</span></code></pre></div><div class="label"><span class="plain">Способ 2: путь к одному полю</span> <span class="hint">изменённые строки подсвечены</span></div><div class="codewrap"><pre><code><span class="kw">const</span> vm = <span class="kw">new</span> Vue({
   el: <span class="str">'#app'</span>,
   data: {
     form: { email: <span class="str">''</span>, name: <span class="str">''</span> },
@@ -2771,12 +2782,12 @@ vm.$el.dispatchEvent(<span class="kw">new</span> Event(<span class="str">'input'
 <span class="com">// пользователь вводит email</span>
 vm.$el.value = <span class="str">'a@b.ru'</span>;
 vm.$el.dispatchEvent(<span class="kw">new</span> Event(<span class="str">'input'</span>));
-<span class="com">// email: "" → "a@b.ru"</span></code></pre></div><div class="label">Почему так</div><div class="explain">
+<span class="com">// email: "" → "a@b.ru"</span></code></pre></div><div class="label">Вывод</div><div class="codewrap out"><pre><code>email: "" → "a@b.ru"</code></pre></div><div class="label">Почему так</div><div class="explain">
 <ul>
-  <li>Без deep watcher на <code>form</code> подписан только на само свойство <code>form</code>, то есть на ссылку. <code>v-model</code> меняет <code>form.email</code>, ссылка та же — watcher молчит.</li>
-  <li><code>deep: true</code> — Vue обходит все вложенные поля и подписывается на каждое. Любое изменение внутри запускает handler.</li>
+  <li>Без deep watcher на <code>form</code> срабатывает при замене объекта и при добавлении или удалении ключей через <code>Vue.set</code>/<code>Vue.delete</code>. <code>v-model</code> меняет существующее поле <code>form.email</code> — watcher молчит.</li>
+  <li><code>deep: true</code> — Vue обходит все вложенные поля и подписывается на каждое. Любое изменение внутри запускает обработчик.</li>
   <li><code>newVal === oldVal</code> → <code>true</code>: объект изменён, а не заменён. Обе переменные указывают на один объект, копию «до» Vue не хранит.</li>
-  <li>Вариант <code>'form.email'</code> дешевле: подписка на одно поле, и <code>oldVal</code> — настоящее старое значение, строка.</li>
+  <li>Способ 2 дешевле: подписка на одно поле, и <code>oldVal</code> — настоящее старое значение, строка. Но изменение <code>name</code> он не заметит. Для черновика всей формы нужен deep или watch на каждое поле.</li>
 </ul></div><div class="say"><b>Коротко вслух:</b> Без deep watch следит только за заменой объекта. deep подписывается на все вложенные поля, но newVal и oldVal — одна и та же ссылка. Если нужно одно поле, дешевле следить за путём form.email.</div></div>
     </details>
     <div class="task-foot">
@@ -2791,7 +2802,7 @@ vm.$el.dispatchEvent(<span class="kw">new</span> Event(<span class="str">'input'
       <span class="badge lvl-1"><span class="dot">🟢</span> базовый</span>
       <span class="time">~4 мин</span>
     </h3>
-    <p class="statement">Полное имя собирается двумя watcher’ами. Перепиши на <code>computed</code> — код станет короче и будет работать так же. Объясни, когда нужен watch, а когда computed.</p>
+    <p class="statement">Полное имя собирается двумя обработчиками watch. Перепиши на <code>computed</code> — код станет короче и будет работать так же. Объясни, когда нужен watch, а когда computed.</p>
     <div class="label">Стартовый код</div>
     <div class="codewrap"><pre><code><span class="kw">const</span> vm = <span class="kw">new</span> Vue({
   el: <span class="str">'#app'</span>,
@@ -2833,10 +2844,11 @@ vm.$nextTick(() =&gt; console.log(vm.$el.textContent));
 
 vm.lastName = <span class="str">'Петрова'</span>;
 vm.$nextTick(() =&gt; console.log(vm.$el.textContent));
-<span class="com">// Анна Петрова</span></code></pre></div><div class="label">Почему так</div><div class="explain">
+<span class="com">// Анна Петрова</span></code></pre></div><p class="removed">Удалено из стартового кода: поле <code>fullName</code> из <code>data</code> и весь <code>watch</code>.</p><div class="label">Почему так</div><div class="explain">
 <ul>
-  <li>Было: <code>fullName</code> — отдельное состояние, которое вручную синхронизируют два обработчика. Легко забыть третье поле, а начальное значение продублировано.</li>
+  <li>Было: <code>fullName</code> — отдельное состояние, которое вручную синхронизируют два обработчика. Начальное значение продублировано. Добавится третье поле, например отчество, — придётся писать третий watch.</li>
   <li><code>computed</code> описывает зависимость декларативно. Vue сам знает, что <code>fullName</code> зависит от <code>firstName</code> и <code>lastName</code>, пересчитывает и кэширует результат.</li>
+  <li>Поле <code>fullName</code> из <code>data</code> нужно удалить: одно имя не может быть и в data, и в computed. Иначе Vue выдаст «The computed property "fullName" is already defined in data», а на экране останется старое значение.</li>
   <li><code>watch</code> — для побочных эффектов: запрос к API, запись в localStorage, таймеры, работа с DOM и библиотеками. Особенно для асинхронных.</li>
   <li><code>computed</code> — для значений, выводимых из других данных. Он должен быть чистым: без запросов и без изменения других данных.</li>
 </ul></div><div class="say"><b>Коротко вслух:</b> Если значение вычисляется из других данных — это computed: он декларативный и кэшируется. Watch — когда на изменение нужно сделать побочное действие.</div></div>
@@ -2852,10 +2864,10 @@ vm.$nextTick(() =&gt; console.log(vm.$el.textContent));
 
 <div class="total">
   <div class="total-inner">
-    <span class="progress">Решено самостоятельно: <span id="doneCount">0</span> / 30<span class="bar"><i id="doneBar"></i></span></span>
+    <span class="progress"><span class="long">Решено самостоятельно:</span><span class="short-l">Решено:</span> <span id="doneCount">0</span> / 30<span class="bar"><i id="doneBar"></i></span></span>
     <button type="button" class="btn" id="openAll">Раскрыть решения</button>
     <button type="button" class="btn" id="closeAll">Свернуть</button>
-    <a class="btn" href="#top" style="text-decoration:none">Наверх</a>
+    <a class="btn" id="toTop" href="#top" style="text-decoration:none">Наверх</a>
   </div>
 </div>
 
