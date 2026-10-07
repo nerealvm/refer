@@ -30,6 +30,9 @@ WB_PAGE = 'https://www.worldbank.org/en/research/commodity-markets'
 FRED_CPI = 'https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS'
 EIA_AER = 'https://www.eia.gov/totalenergy/data/annual/xls/stb0709.xls'
 EIA_API = 'https://api.eia.gov/v2/coal'
+# Д. Джекс, реальные цены коммодити 1850–2020 (1900 = 100). Страница SFU недоступна, берём копию из Web Archive.
+JACKS_URL = ('https://web.archive.org/web/20221007161341/http://www.sfu.ca/~djacks/data/boombust/'
+             'Real%20commodity%20prices,%201850-2020.xlsx')
 SHORT_TON = 0.90718474  # метрических тонн в короткой тонне
 
 THRESHOLD = 0.4  # разворот на 0.4 в логарифме: +49% от дна или −33% от пика
@@ -88,6 +91,8 @@ def download_all():
     fetch(links[0], RAW / 'wb_monthly.xlsx')
     fetch(FRED_CPI, RAW / 'cpi_nsa.csv')
     fetch(EIA_AER, RAW / 'eia_aer_0709.html')
+    if not (RAW / 'jacks.xlsx').exists():  # исторический файл не меняется
+        fetch(JACKS_URL, RAW / 'jacks.xlsx')
     key = os.environ.get('EIA_API_KEY', 'DEMO_KEY')
     fetch(f'{EIA_API}/price-by-rank/data/?api_key={key}&frequency=annual&data[]=price'
           f'&facets[stateRegionId][]=US&facets[coalRankId][]=BIT&length=500', RAW / 'eia_price_bit.json')
@@ -137,6 +142,15 @@ def read_us_bituminous():
             rows[int(x['period'])] = float(x['price'])
     s = pd.Series(rows).sort_index()
     return s / SHORT_TON
+
+
+def read_jacks_coal():
+    """Реальный индекс цены угля Д. Джекса, 1850–2020, 1900 = 100."""
+    d = pd.read_excel(RAW / 'jacks.xlsx', sheet_name='Commodities', header=None)
+    col = [i for i, v in enumerate(d.iloc[1]) if v == 'Coal'][0]
+    rows = d.iloc[2:, [0, col]].dropna()
+    rows = rows[rows.iloc[:, 0].astype(str).str.fullmatch(r'\d{4}')]
+    return pd.Series(rows.iloc[:, 1].astype(float).values, index=rows.iloc[:, 0].astype(int).values)
 
 
 def read_us_exports(rank):
@@ -391,7 +405,19 @@ def build():
 
     au_annual = au_r.groupby(au_r.index.year).mean()
     au_months = au_r.groupby(au_r.index.year).size()
+    # 170 лет: индекс Джекса, после 2020 продлён по годовой реальной цене Newcastle (цепной индекс)
+    jk = read_jacks_coal()
+    last_y = int(jk.index[-1])
+    ext = {y: jk.loc[last_y] * au_annual.loc[y] / au_annual.loc[last_y] for y in au_annual.index if y > last_y}
+    jk_all = pd.concat([jk, pd.Series(ext)])
+    jk_ts = pd.Series(jk_all.values, index=pd.to_datetime([f'{y}-07-01' for y in jk_all.index]))
+    jk_phases = phases_from(jk_ts)
     long_run = dict(
+        jacks=[[int(y), rnd(v, 1), int(y > last_y)] for y, v in jk_all.items()],
+        jacks_phases=[dict(start=int(p['start'].year), end=int(p['end'].year), kind=p['kind'],
+                           change=rnd(p['change'], 4), complete=p['complete']) for p in jk_phases],
+        jacks_last_source_year=last_y,
+        au_partial_months=int(au_months.iloc[-1]),
         us_bit=[[int(y), rnd(bit_n.loc[y], 1), rnd(bit_r.loc[y], 1)] for y in bit_r.index],
         au=[[int(y), rnd(v, 1), int(au_months.loc[y])] for y, v in au_annual.items()],
         us_bit_ma10=[[int(y), rnd(v, 1)] for y, v in bit_r.rolling(10).mean().dropna().items()],
@@ -419,6 +445,7 @@ def build():
                         **ser_position(pos)))
 
     events = json.loads((ROOT / 'data' / 'events.json').read_text(encoding='utf-8'))
+    deals = json.loads((ROOT / 'data' / 'deals.json').read_text(encoding='utf-8'))
 
     payload = dict(
         meta=dict(
@@ -436,6 +463,7 @@ def build():
         long_run=long_run,
         commodities=cmap,
         events=events,
+        deals=deals,
     )
 
     # ---- выгрузки ----
@@ -444,6 +472,8 @@ def build():
     pd.DataFrame({'met_nominal_usd_t': met_n, 'met_real_usd_t': met_r, 'steam_nominal_usd_t': stm_n,
                   'steam_real_usd_t': stm_r}).to_csv(OUT / 'coal_us_exports_quarterly.csv', index_label='quarter')
     pd.DataFrame({'nominal_usd_t': bit_n, 'real_usd_t': bit_r}).to_csv(OUT / 'coal_us_bituminous_annual.csv', index_label='year')
+    pd.DataFrame({'real_index_1900_100': jk_all, 'extended_by_newcastle': [int(y > last_y) for y in jk_all.index]}).to_csv(
+        OUT / 'coal_jacks_1850_annual.csv', index_label='year')
     rows = []
     for key, c in coal.items():
         for p in c['phases']:

@@ -135,6 +135,7 @@ ol.events { list-style: none; margin: 14px 0 0; padding: 0; display: grid; grid-
 ol.events li { display: grid; grid-template-columns: 22px 62px 1fr; gap: 6px; align-items: baseline; color: var(--ink-2); }
 ol.events .n { font-family: var(--font-data); font-size: 11px; color: var(--ink); background: var(--chip-neutral); border-radius: 50%; width: 20px; height: 20px; display: inline-grid; place-items: center; }
 ol.events .d { font-family: var(--font-data); font-size: 12px; color: var(--muted); }
+ol.deals .n { border-radius: 4px; background: var(--ink); color: var(--surface); }
 
 /* таблицы */
 .tbl-wrap { overflow-x: auto; margin: 0 -4px; padding: 0 4px; }
@@ -171,7 +172,7 @@ footer { color: var(--muted); font-size: 12.5px; padding-block: 0 40px; }
 <header class="top wrap">
   <div class="eyebrow" id="eyebrow">Данные до —</div>
   <h1>Угольный цикл</h1>
-  <p class="lede">Где энергетический и коксующийся уголь находятся в большом цикле. Какие коммодити сейчас в окне для сделок. Реальные цены за 56–77 лет из открытых источников.</p>
+  <p class="lede">Где энергетический и коксующийся уголь находятся в большом цикле. Какие коммодити сейчас в окне для сделок. Реальные цены с 1850 года по открытым источникам.</p>
 </header>
 
 <nav class="tabs" aria-label="Разделы">
@@ -212,8 +213,12 @@ footer { color: var(--muted); font-size: 12.5px; padding-block: 0 40px; }
         <span><i class="sw" style="background:var(--wash-up)"></i>Подъём</span>
         <span><i class="sw" style="background:var(--wash-down)"></i>Спад</span>
         <span id="legend-median"><i class="key" style="background:var(--muted);height:1px"></i>Медиана Newcastle с 1970</span>
+        <span><i class="key" style="background:var(--ink);width:10px;height:10px;border-radius:2px"></i>Сделка (под осью)</span>
       </div>
-      <ol class="events" id="events"></ol>
+      <div class="grid2" style="margin-top:14px;gap:6px 24px">
+        <div><h3>События</h3><ol class="events" id="events" style="margin-top:6px;grid-template-columns:1fr"></ol></div>
+        <div><h3>Сделки и банкротства</h3><ol class="events deals" id="deals" style="margin-top:6px;grid-template-columns:1fr"></ol></div>
+      </div>
     </div>
 
     <div class="grid2">
@@ -224,11 +229,11 @@ footer { color: var(--muted); font-size: 12.5px; padding-block: 0 40px; }
         <div class="legend" id="phase-legend"></div>
       </div>
       <div class="panel">
-        <h2>Длинный горизонт: 77 лет</h2>
-        <p class="sub">Среднегодовые реальные цены. Тонкая линия — средняя за 10 лет.</p>
+        <h2>Суперциклы угля за 170 лет</h2>
+        <p class="sub" id="long-sub">Реальный индекс цены угля, 1900 = 100, логарифмическая шкала.</p>
         <div class="chart" id="long-chart"></div>
         <div class="legend" id="long-legend"></div>
-        <p class="note">США — цена битуминозного угля на шахте (внутренний рынок, EIA). Австралия — экспортная цена (Всемирный банк). Это разные рынки: уровень сравнивать нельзя, форму цикла можно.</p>
+        <p class="note" id="long-note"></p>
       </div>
     </div>
 
@@ -406,6 +411,7 @@ const DATA = /*__DATA__*/null;
     host.textContent = '';
     const W = Math.max(280, host.clientWidth), H = cfg.height || (W < 520 ? 300 : 380);
     const m = { l: 46, r: cfg.endLabels ? (W < 520 ? 52 : 92) : 14, t: 12, b: 26 };
+    let H2 = H;
     const iw = W - m.l - m.r;
     const [t0, t1] = cfg.x;
     const xv = (t) => m.l + (t - t0) / (t1 - t0) * iw;
@@ -423,8 +429,22 @@ const DATA = /*__DATA__*/null;
       });
       m.t = 34 + 20 * Math.max(0, ...evRows.map((e) => e.row));
     }
+    const dlRows = [];
+    if (cfg.deals) {
+      const lastX = [];
+      cfg.deals.forEach((dl, i) => {
+        if (dl.t < t0 || dl.t > t1) return;
+        const x = xv(dl.t);
+        let row = lastX.findIndex((lx) => x - lx >= 19);
+        if (row < 0) row = lastX.length;
+        lastX[row] = x;
+        dlRows.push({ x, ev: dl, n: dl.letter, row });
+      });
+      const rows = dlRows.length ? 1 + Math.max(...dlRows.map((e) => e.row)) : 0;
+      H2 = H + rows * 20 + 6;
+    }
     const ih = H - m.t - m.b;
-    const svg = s('svg', { viewBox: `0 0 ${W} ${H}`, height: H, role: 'img', 'aria-label': cfg.aria || '', tabindex: 0 }, host);
+    const svg = s('svg', { viewBox: `0 0 ${W} ${H2}`, height: H2, role: 'img', 'aria-label': cfg.aria || '', tabindex: 0 }, host);
     const vis = cfg.series.filter((x) => x.pts.length);
     let ylo = Infinity, yhi = -Infinity;
     for (const sr of vis) for (const p of sr.pts) if (p.t >= t0 - 0.01 && p.t <= t1 + 0.01 && p.v != null) { ylo = Math.min(ylo, p.v); yhi = Math.max(yhi, p.v); }
@@ -476,7 +496,12 @@ const DATA = /*__DATA__*/null;
         if (p.v == null || p.t < t0 - 1 || p.t > t1 + 1) { pen = false; continue; }
         d += (pen ? 'L' : 'M') + xv(p.t).toFixed(1) + ',' + yv(p.v).toFixed(1); pen = true;
       }
-      s('path', { d, fill: 'none', stroke: `var(${sr.color})`, 'stroke-width': sr.width || 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round', opacity: sr.opacity || 1 }, gl);
+      s('path', { d, fill: 'none', stroke: `var(${sr.color})`, 'stroke-width': sr.width || 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round', opacity: sr.opacity || 1, 'stroke-dasharray': sr.dash || null }, gl);
+    }
+    // подписи к отдельным точкам (годы пиков и т.п.)
+    for (const a of cfg.annot || []) {
+      if (a.t < t0 || a.t > t1) continue;
+      s('text', { x: xv(a.t), y: yv(a.v) + (a.below ? 16 : -8), 'text-anchor': 'middle', class: 'lbl', style: 'font-size:11px' }, svg, a.text);
     }
     // маркеры (минимум текущей фазы и т.п.)
     for (const mk of cfg.markers || []) {
@@ -510,6 +535,13 @@ const DATA = /*__DATA__*/null;
     }
     // события
     const evPos = [];
+    for (const e of dlRows) {
+      const cy = m.t + ih + 34 + e.row * 20;
+      s('line', { x1: e.x, x2: e.x, y1: m.t + ih, y2: cy - 8, stroke: 'var(--axis)', 'stroke-width': 1 }, svg);
+      s('rect', { x: e.x - 8, y: cy - 8, width: 16, height: 16, rx: 3, fill: 'var(--ink)' }, svg);
+      s('text', { x: e.x, y: cy + 3.5, 'text-anchor': 'middle', style: 'fill:var(--surface);font-size:10px;font-family:var(--font-body);font-weight:600' }, svg, e.n);
+      evPos.push({ ...e, cy, deal: true });
+    }
     for (const e of evRows) {
       const cy = m.t - 14 - e.row * 20;
       s('line', { x1: e.x, x2: e.x, y1: cy + 8, y2: m.t + ih, stroke: 'var(--axis)', 'stroke-width': 1, 'stroke-dasharray': '2 4' }, svg);
@@ -521,7 +553,9 @@ const DATA = /*__DATA__*/null;
     const tip = el('div', { class: 'tip', hidden: '' }, host);
     const cross = s('line', { y1: m.t, y2: m.t + ih, stroke: 'var(--ink-2)', 'stroke-width': 1, visibility: 'hidden' }, svg);
     const dots = vis.map((sr) => s('circle', { r: 4, fill: `var(${sr.color})`, stroke: 'var(--surface)', 'stroke-width': 2, visibility: 'hidden' }, svg));
-    const prim = vis[0];
+    const tset = new Set();
+    for (const sr of vis) if (!sr.noTip) for (const p of sr.pts) if (p.v != null) tset.add(Math.round(p.t * 1200) / 1200);
+    const prim = vis.length ? { pts: [...tset].sort((a, b) => a - b).map((t) => ({ t })) } : null;
     let curIdx = -1;
     function show(idx) {
       if (!prim || idx < 0) return;
@@ -531,7 +565,7 @@ const DATA = /*__DATA__*/null;
       const x = xv(t);
       cross.setAttribute('x1', x); cross.setAttribute('x2', x); cross.setAttribute('visibility', 'visible');
       tip.textContent = '';
-      el('div', { class: 't-date' }, tip, cfg.dateOf ? cfg.dateOf(prim, prim.pts[idx]) : tLabel(t));
+      el('div', { class: 't-date' }, tip, cfg.dateOf ? cfg.dateOf(t) : tLabel(t));
       vis.forEach((sr, i) => {
         const j = bisect(sr.pts, t);
         const p = sr.pts[j];
@@ -571,12 +605,13 @@ const DATA = /*__DATA__*/null;
       const hit = s('circle', { cx: p.x, cy: p.cy, r: 11, fill: 'transparent', tabindex: 0, 'aria-label': p.ev.label }, svg);
       const on = () => {
         tip.textContent = '';
-        el('div', { class: 't-date' }, tip, p.n + ' · ' + ymLabel(p.ev.date));
+        el('div', { class: 't-date' }, tip, p.n + ' · ' + ymLabel(p.ev.date) + (p.deal ? ' · сделка' : ''));
         el('div', { style: 'font-weight:600' }, tip, p.ev.label);
         el('div', { class: 't-extra', style: 'border:0;padding:0' }, tip, p.ev.note);
         tip.hidden = false;
         const hw = host.clientWidth, tw = tip.offsetWidth;
-        tip.style.left = Math.min(hw - tw, Math.max(0, p.x * hw / W - tw / 2)) + 'px'; tip.style.top = (m.t + 6) + 'px';
+        tip.style.left = Math.min(hw - tw, Math.max(0, p.x * hw / W - tw / 2)) + 'px';
+        tip.style.top = (p.deal ? Math.max(0, (m.t + ih) * hw / W - tip.offsetHeight - 6) : m.t + 6) + 'px';
       };
       hit.addEventListener('pointerenter', (e) => { e.stopPropagation(); on(); });
       hit.addEventListener('focus', on);
@@ -604,6 +639,15 @@ const DATA = /*__DATA__*/null;
     el('span', { class: 'd' }, li, ymLabel(e.date));
     const tx = el('span', null, li); el('b', { style: 'font-weight:500;color:var(--ink)' }, tx, e.label + '. '); tx.appendChild(document.createTextNode(e.note));
   });
+  const LET = 'АБВГДЕЖИКЛМНПРСТ';
+  const DL = (DATA.deals || []).map((d, i) => ({ ...d, t: ymT(d.date), letter: LET[i] }));
+  const dlList = document.getElementById('deals');
+  DL.forEach((d) => {
+    const li = el('li', null, dlList);
+    el('span', { class: 'n' }, li, d.letter);
+    el('span', { class: 'd' }, li, ymLabel(d.date));
+    const tx = el('span', null, li); el('b', { style: 'font-weight:500;color:var(--ink)' }, tx, d.label + '. '); tx.appendChild(document.createTextNode(d.note));
+  });
   function phaseAt(t) {
     for (const p of SER.thermal_au.phases) if (t >= ymT(p.start) && t <= ymT(p.end)) return p;
     return null;
@@ -622,7 +666,7 @@ const DATA = /*__DATA__*/null;
         hline: { v: ph.confirm_level, label: 'разворот: ' + fmtP(ph.confirm_level) } });
     }
     lineChart(document.getElementById('main-chart'), {
-      x: [t0, lastT + 0.25], log: st.log, series, endLabels: true, events: EV, markers,
+      x: [t0, lastT + 0.25], log: st.log, series, endLabels: true, events: EV, deals: DL, markers,
       bands: SER.thermal_au.phases.map((p) => ({ t0: ymT(p.start), t1: ymT(p.end), kind: p.kind })),
       refLines: st.mode === 'real' ? [{ y: SER.thermal_au.pos.median_all, dash: '4 4' }] : [],
       aria: 'Цена угля с 1970 года, ' + (st.mode === 'real' ? 'реальная' : 'номинальная'),
@@ -644,22 +688,36 @@ const DATA = /*__DATA__*/null;
   // ---------- длинный горизонт ----------
   function drawLong() {
     const L = DATA.long_run;
-    const pt = (rows, vi) => rows.map((r) => ({ t: r[0] + 0.5, v: r[vi] }));
+    const ly = L.jacks_last_source_year;
+    const hist = L.jacks.filter((r) => r[0] <= ly).map((r) => ({ t: r[0] + 0.5, v: r[1] }));
+    const ext = L.jacks.filter((r) => r[0] >= ly).map((r) => ({ t: r[0] + 0.5, v: r[1] }));
     const series = [
-      { name: 'Австралия, экспорт', short: 'Австралия', color: '--s-au', pts: pt(L.au, 1), tol: 0.6 },
-      { name: 'США, на шахте', short: 'США', color: '--s-usbit', pts: pt(L.us_bit, 2), tol: 0.6 },
-      { name: 'Австралия, 10 лет', color: '--s-au', pts: pt(L.au_ma10, 1), width: 1.25, opacity: 0.55, noEnd: true, noTip: true },
-      { name: 'США, 10 лет', color: '--s-usbit', pts: pt(L.us_bit_ma10, 1), width: 1.25, opacity: 0.55, noEnd: true, noTip: true },
+      { name: 'Индекс Джекса', short: 'Индекс', color: '--s-usbit', pts: hist, tol: 0.6, noEnd: true },
+      { name: 'Продление по Newcastle', short: 'Индекс (Newcastle)', color: '--s-usbit', pts: ext, tol: 0.6, dash: '5 4' },
     ];
-    lineChart(document.getElementById('long-chart'), {
-      x: [1949, L.au[L.au.length - 1][0] + 1], log: true, series, endLabels: true, height: 300,
-      aria: 'Среднегодовые реальные цены угля с 1949 года',
-      dateOf: (sr, p) => String(Math.floor(p.t)) + (Math.floor(p.t) === L.au[L.au.length - 1][0] ? ' (неполный год)' : ''),
+    const ph = L.jacks_phases;
+    const val = (y) => (L.jacks.find((r) => r[0] === y) || [0, null])[1];
+    const annot = [];
+    ph.forEach((p, i) => { if (i === 0) annot.push({ t: p.start + 0.5, v: val(p.start), text: p.start, below: p.kind === 'up' }); if (p.complete) annot.push({ t: p.end + 0.5, v: val(p.end), text: p.end, below: p.kind === 'down' }); });
+    const host = document.getElementById('long-chart');
+    const narrow = host.clientWidth < 520;
+    lineChart(host, {
+      x: [1850, L.jacks[L.jacks.length - 1][0] + 1.5], log: true, series, endLabels: true, height: narrow ? 300 : 320,
+      bands: ph.map((p) => ({ t0: p.start + 0.5, t1: p.end + 0.5, kind: p.kind })),
+      annot: annot.filter((a) => a.t < 2011 || a.text === 2022),
+      refLines: [{ y: 100, dash: '4 4' }],
+      aria: 'Реальный индекс цены угля с 1850 года',
+      dateOf: (t) => String(Math.floor(t)) + (Math.floor(t) > ly ? ' · продление' : '') + (Math.floor(t) === L.jacks[L.jacks.length - 1][0] ? ', ' + L.au_partial_months + ' мес.' : ''),
+      extra: (t) => { const y = Math.floor(t); const p = ph.find((q) => y >= q.start && y <= q.end); return p ? (p.kind === 'up' ? 'Подъём ' : 'Спад ') + p.start + '–' + (p.complete ? p.end : 'сейчас') + ': ' + fmtPct(p.change) : null; },
     });
+    const peaks = ph.filter((p) => p.kind === 'up' && p.complete).map((p) => p.end);
+    const big = peaks.filter((y) => [1920, 1948, 1979, 2010].includes(y));
+    const gaps = big.slice(1).map((y, i) => y - big[i]);
+    document.getElementById('long-sub').textContent = 'Реальный индекс цены угля, 1900 = 100, лог. шкала. Пики: ' + peaks.join(', ') + '. Между крупными пиками 1920–2010 годов — ' + Math.min(...gaps) + '–' + Math.max(...gaps) + ' лет.';
     const lg = document.getElementById('long-legend'); lg.textContent = '';
-    [['--s-au', 'Австралия, экспорт (1970–)'], ['--s-usbit', 'США, цена на шахте (1949–)']].forEach(([c, t]) => {
-      const sp = el('span', null, lg); el('i', { class: 'key', style: `background:var(${c})` }, sp); sp.appendChild(document.createTextNode(t));
-    });
+    let sp = el('span', null, lg); el('i', { class: 'key', style: 'background:var(--s-usbit)' }, sp); sp.appendChild(document.createTextNode('Индекс Д. Джекса, 1850–' + ly));
+    sp = el('span', null, lg); el('i', { class: 'key', style: 'background:repeating-linear-gradient(90deg,var(--s-usbit) 0 4px,transparent 4px 7px)' }, sp); sp.appendChild(document.createTextNode('продление по Newcastle, ' + (ly + 1) + '–' + L.jacks[L.jacks.length - 1][0]));
+    document.getElementById('long-note').textContent = 'Источник: D. Jacks, «From Boom to Bust» (NBER w18874), данные 1850–' + ly + '. После ' + ly + ' года индекс продлён по изменению годовой реальной цены Newcastle (Всемирный банк); ' + L.jacks[L.jacks.length - 1][0] + ' — неполный год. Фазы найдены тем же правилом, что и для помесячных цен.';
   }
 
   // ---------- фазы: длительность × амплитуда ----------
@@ -698,7 +756,8 @@ const DATA = /*__DATA__*/null;
       const g = s('g', { tabindex: 0, 'aria-label': SER[a.k].short + ': ' + a.p.start + ', ' + a.p.months + ' мес., ' + fmtPct(a.p.change) }, svg);
       if (!a.p.complete) {
         s('circle', { cx, cy, r: 9, fill: 'none', stroke: 'var(--ink)', 'stroke-width': 2 }, g);
-        s('text', { x: cx + 13, y: cy + 4, class: 'lbl-strong' }, g, 'сейчас');
+        const first = a.k === 'thermal_au';
+        s('text', { x: cx + 13, y: cy + (first ? 14 : -8), class: 'lbl-strong' }, g, first ? 'сейчас: Newcastle' : 'сейчас: коксующийся');
       }
       s('circle', { cx, cy, r: 5, fill: `var(${SER[a.k].color})`, stroke: 'var(--surface)', 'stroke-width': 2 }, g);
       s('circle', { cx, cy, r: 13, fill: 'transparent' }, g);
