@@ -1,0 +1,901 @@
+<title>Угольный цикл</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Unbounded:wght@500;600&display=swap">
+<style>
+/* Layout: one reading column (max 1120px) under a sticky tab bar; each tab is a stack of
+   full-width panels; charts are SVG drawn from the embedded data; tables scroll inside their box. */
+:root {
+  --bg: #eef0ec;          /* серый лист геологической съёмки */
+  --surface: #fbfbf9;
+  --ink: #15171a;         /* антрацит */
+  --ink-2: #4b5056;
+  --muted: #80868c;
+  --grid: #e1e3de;
+  --axis: #c4c7c1;
+  --hair: rgba(21, 23, 26, 0.10);
+  --wash-up: rgba(214, 120, 52, 0.10);
+  --wash-down: rgba(60, 110, 170, 0.08);
+  --s-au: #2a78d6;        /* Newcastle */
+  --s-met: #eb6834;       /* коксующийся */
+  --s-za: #1baf7a;        /* ЮАР */
+  --s-usst: #eda100;      /* экспорт США, энергетический */
+  --s-usbit: #4a3aa7;     /* США, цена на шахте */
+  --good: #0ca30c;
+  --good-ink: #006300;
+  --warn: #c2620f;
+  --warn-ink: #9a4a08;
+  --neutral: #80868c;
+  --chip-good: rgba(12, 163, 12, 0.10);
+  --chip-warn: rgba(236, 131, 90, 0.16);
+  --chip-neutral: rgba(128, 134, 140, 0.13);
+  --font-display: "Unbounded", "Golos Text", system-ui, sans-serif;
+  --font-body: "Golos Text", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-data: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #101211; --surface: #181a19; --ink: #f1f2ef; --ink-2: #c3c6c0; --muted: #8b908b;
+    --grid: #282b29; --axis: #3a3e3b; --hair: rgba(255, 255, 255, 0.10);
+    --wash-up: rgba(235, 130, 60, 0.085); --wash-down: rgba(90, 140, 210, 0.08);
+    --s-au: #3987e5; --s-met: #d95926; --s-za: #199e70; --s-usst: #c98500; --s-usbit: #9085e9;
+    --good-ink: #3cc23c; --warn-ink: #f0955f;
+    --chip-good: rgba(12, 163, 12, 0.18); --chip-warn: rgba(236, 131, 90, 0.20); --chip-neutral: rgba(139, 144, 139, 0.18);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #101211; --surface: #181a19; --ink: #f1f2ef; --ink-2: #c3c6c0; --muted: #8b908b;
+  --grid: #282b29; --axis: #3a3e3b; --hair: rgba(255, 255, 255, 0.10);
+  --wash-up: rgba(235, 130, 60, 0.085); --wash-down: rgba(90, 140, 210, 0.08);
+  --s-au: #3987e5; --s-met: #d95926; --s-za: #199e70; --s-usst: #c98500; --s-usbit: #9085e9;
+  --good-ink: #3cc23c; --warn-ink: #f0955f;
+  --chip-good: rgba(12, 163, 12, 0.18); --chip-warn: rgba(236, 131, 90, 0.20); --chip-neutral: rgba(139, 144, 139, 0.18);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-inline: 20px; }
+@media (max-width: 520px) { .wrap { padding-inline: 16px; } }
+header.top { padding-block: 32px 18px; }
+.eyebrow { font-family: var(--font-data); font-size: 12px; color: var(--muted); letter-spacing: 0.02em; }
+h1 { font-family: var(--font-display); font-weight: 600; font-size: clamp(30px, 5vw, 46px); line-height: 1.05; letter-spacing: -0.01em; margin: 10px 0 12px; text-wrap: balance; }
+.lede { max-width: 66ch; color: var(--ink-2); margin: 0; font-size: 16px; }
+nav.tabs { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--bg); border-bottom: 1px solid var(--hair); }
+nav.tabs .wrap { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+nav.tabs button { font: 500 14px var(--font-body); color: var(--ink-2); background: none; border: 0; padding: 14px 12px 12px; border-bottom: 2px solid transparent; cursor: pointer; white-space: nowrap; }
+nav.tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--ink); }
+nav.tabs button:hover { color: var(--ink); }
+button:focus-visible, [tabindex]:focus-visible, a:focus-visible, select:focus-visible { outline: 2px solid var(--s-au); outline-offset: 2px; }
+main { padding-block: 22px 60px; }
+section.tab { display: grid; gap: 18px; }
+.panel { background: var(--surface); border: 1px solid var(--hair); border-radius: var(--r); padding: 20px; min-width: 0; }
+@media (max-width: 520px) { .panel { padding: 16px 14px; } }
+h2 { font-family: var(--font-display); font-weight: 500; font-size: 19px; line-height: 1.25; margin: 0 0 4px; text-wrap: balance; }
+h3 { font-size: 15px; font-weight: 600; margin: 0 0 6px; }
+.sub { color: var(--ink-2); font-size: 14px; margin: 0 0 14px; max-width: 72ch; }
+.note { color: var(--muted); font-size: 12.5px; margin: 10px 0 0; max-width: 80ch; }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
+.num { font-family: var(--font-data); font-variant-numeric: tabular-nums; }
+
+/* карточки вердикта */
+.verdict { display: grid; gap: 14px; }
+.vhead { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 14px; }
+.vname { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+.key { width: 14px; height: 3px; border-radius: 2px; display: inline-block; flex: none; }
+.price { font-size: 40px; font-weight: 600; line-height: 1; letter-spacing: -0.02em; }
+.price small { font-size: 15px; font-weight: 500; color: var(--ink-2); letter-spacing: 0; margin-left: 4px; }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px 18px; margin: 0; }
+.facts div { min-width: 0; }
+.facts dt { font-size: 12px; color: var(--muted); }
+.facts dd { margin: 2px 0 0; font-size: 14px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 500; padding: 3px 9px 3px 7px; border-radius: 999px; background: var(--chip-neutral); color: var(--ink); white-space: nowrap; }
+.chip .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--neutral); }
+.chip.buy { background: var(--chip-good); } .chip.buy .dot { background: var(--good); }
+.chip.sell { background: var(--chip-warn); } .chip.sell .dot { background: var(--warn); }
+.chip.plain { background: transparent; border: 1px solid var(--hair); }
+.meter { position: relative; height: 8px; border-radius: 4px; background: linear-gradient(90deg, var(--chip-good) 0 33%, var(--chip-neutral) 33% 67%, var(--chip-warn) 67% 100%); }
+.meter i { position: absolute; top: 50%; width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%; background: var(--ink); border: 2px solid var(--surface); }
+.meter i.recent { background: var(--surface); border: 2px solid var(--ink); width: 10px; height: 10px; margin: -5px 0 0 -5px; }
+.meter-scale { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+/* элементы управления */
+.controls { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin-bottom: 10px; }
+.seg { display: inline-flex; border: 1px solid var(--hair); border-radius: 8px; overflow: hidden; }
+.seg button { font: 500 13px var(--font-body); background: transparent; color: var(--ink-2); border: 0; padding: 6px 10px; cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--hair); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--surface); }
+.toggles { display: flex; flex-wrap: wrap; gap: 6px; }
+.toggle { display: inline-flex; align-items: center; gap: 7px; font: 500 13px var(--font-body); color: var(--ink); background: transparent; border: 1px solid var(--hair); border-radius: 999px; padding: 4px 10px; cursor: pointer; }
+.toggle[aria-pressed="false"] { color: var(--muted); }
+.toggle[aria-pressed="false"] .key { opacity: 0.3; }
+
+/* графики */
+.chart { position: relative; width: 100%; min-width: 0; touch-action: pan-y; }
+.chart svg { display: block; width: 100%; overflow: visible; }
+.chart svg text { font-family: var(--font-data); font-size: 11px; fill: var(--muted); }
+.chart svg text.lbl { font-family: var(--font-body); font-size: 12px; fill: var(--ink-2); }
+.chart svg text.lbl-strong { font-family: var(--font-body); font-size: 12px; font-weight: 600; fill: var(--ink); }
+.chart svg text.lbl, .chart svg text.lbl-strong { paint-order: stroke; stroke: var(--surface); stroke-width: 3px; stroke-linejoin: round; }
+.tip { position: absolute; pointer-events: none; z-index: 5; background: var(--surface); color: var(--ink); border: 1px solid var(--hair); border-radius: 8px; box-shadow: 0 6px 22px rgba(0, 0, 0, 0.14); padding: 8px 10px; font-size: 12.5px; min-width: 150px; max-width: 260px; }
+.tip .t-date { color: var(--muted); font-size: 11.5px; margin-bottom: 4px; }
+.tip .t-row { display: flex; align-items: center; gap: 7px; }
+.tip .t-row b { font-family: var(--font-data); font-weight: 500; font-variant-numeric: tabular-nums; }
+.tip .t-row span { color: var(--ink-2); }
+.tip .t-extra { margin-top: 5px; padding-top: 5px; border-top: 1px solid var(--hair); color: var(--ink-2); font-size: 12px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12.5px; color: var(--ink-2); margin-top: 8px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend .sw { width: 14px; height: 10px; border-radius: 2px; display: inline-block; }
+
+/* события */
+ol.events { list-style: none; margin: 14px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 6px 18px; font-size: 13px; }
+ol.events li { display: grid; grid-template-columns: 22px 62px 1fr; gap: 6px; align-items: baseline; color: var(--ink-2); }
+ol.events .n { font-family: var(--font-data); font-size: 11px; color: var(--ink); background: var(--chip-neutral); border-radius: 50%; width: 20px; height: 20px; display: inline-grid; place-items: center; }
+ol.events .d { font-family: var(--font-data); font-size: 12px; color: var(--muted); }
+
+/* таблицы */
+.tbl-wrap { overflow-x: auto; margin: 0 -4px; padding: 0 4px; }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+th { text-align: left; font-weight: 500; font-size: 12px; color: var(--muted); padding: 8px 10px; border-bottom: 1px solid var(--axis); white-space: nowrap; }
+th.sortable { cursor: pointer; } th.sortable:hover { color: var(--ink); }
+th[aria-sort="ascending"]::after { content: " ↑"; } th[aria-sort="descending"]::after { content: " ↓"; }
+td { padding: 9px 10px; border-bottom: 1px solid var(--grid); vertical-align: middle; }
+td.r, th.r { text-align: right; }
+tr.current td { background: var(--chip-neutral); }
+tr.summary td { font-weight: 600; border-bottom: 0; }
+.bar-cell { display: flex; align-items: center; gap: 8px; min-width: 150px; }
+.bar-cell .bar { height: 10px; border-radius: 0 3px 3px 0; }
+.bar-cell .bar.neg { border-radius: 3px 0 0 3px; }
+.tname { font-weight: 500; }
+.tgroup { font-size: 12px; color: var(--muted); }
+.up-txt { color: var(--good-ink); } .down-txt { color: var(--warn-ink); }
+
+/* текстовые вкладки */
+.prose { max-width: 74ch; }
+.prose h2 { margin-top: 8px; }
+.prose h3 { margin-top: 22px; }
+.prose p, .prose li { color: var(--ink); }
+.prose ul, .prose ol { padding-left: 20px; }
+.prose li { margin: 4px 0; }
+.prose a { color: var(--s-au); text-underline-offset: 2px; }
+.prose code { font-family: var(--font-data); font-size: 13px; background: var(--chip-neutral); padding: 1px 5px; border-radius: 4px; }
+.callout { border-left: 3px solid var(--ink); padding: 4px 0 4px 14px; margin: 14px 0; color: var(--ink-2); }
+.filters { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+footer { color: var(--muted); font-size: 12.5px; padding-block: 0 40px; }
+@media (prefers-reduced-motion: no-preference) { .tip { transition: opacity 0.08s; } }
+</style>
+
+<header class="top wrap">
+  <div class="eyebrow" id="eyebrow">Данные до —</div>
+  <h1>Угольный цикл</h1>
+  <p class="lede">Где энергетический и коксующийся уголь находятся в большом цикле. Какие коммодити сейчас в окне для сделок. Реальные цены за 56–77 лет из открытых источников.</p>
+</header>
+
+<nav class="tabs" aria-label="Разделы">
+  <div class="wrap" role="tablist">
+    <button role="tab" id="tab-coal" aria-controls="coal" aria-selected="true">Уголь</button>
+    <button role="tab" id="tab-map" aria-controls="map" aria-selected="false">Выбор коммодити</button>
+    <button role="tab" id="tab-research" aria-controls="research" aria-selected="false">Что смотрят профи</button>
+    <button role="tab" id="tab-method" aria-controls="method" aria-selected="false">Методология</button>
+  </div>
+</nav>
+
+<main class="wrap">
+  <!-- ============ УГОЛЬ ============ -->
+  <section class="tab" id="coal" role="tabpanel" aria-labelledby="tab-coal">
+    <div class="grid2" id="verdicts"></div>
+
+    <div class="panel">
+      <h2>Цена угля с 1970 года и фазы цикла</h2>
+      <p class="sub" id="main-sub">Помесячно, $/т. Цветные полосы — подъёмы и спады энергетического угля Newcastle.</p>
+      <div class="controls">
+        <div class="seg" role="group" aria-label="Цены">
+          <button id="mode-real" aria-pressed="true">Реальные</button>
+          <button id="mode-nom" aria-pressed="false">Номинальные</button>
+        </div>
+        <div class="seg" role="group" aria-label="Шкала">
+          <button id="scale-log" aria-pressed="true">Лог</button>
+          <button id="scale-lin" aria-pressed="false">Линейная</button>
+        </div>
+        <div class="seg" role="group" aria-label="Период">
+          <button data-range="all" aria-pressed="true">Всё</button>
+          <button data-range="30" aria-pressed="false">30 лет</button>
+          <button data-range="10" aria-pressed="false">10 лет</button>
+        </div>
+      </div>
+      <div class="toggles" id="series-toggles"></div>
+      <div class="chart" id="main-chart" style="margin-top:10px"></div>
+      <div class="legend">
+        <span><i class="sw" style="background:var(--wash-up)"></i>Подъём</span>
+        <span><i class="sw" style="background:var(--wash-down)"></i>Спад</span>
+        <span id="legend-median"><i class="key" style="background:var(--muted);height:1px"></i>Медиана Newcastle с 1970</span>
+      </div>
+      <ol class="events" id="events"></ol>
+    </div>
+
+    <div class="grid2">
+      <div class="panel">
+        <h2>Сколько длятся подъёмы и спады</h2>
+        <p class="sub">Каждая точка — завершённая фаза. По горизонтали — длительность, по вертикали — изменение цены. Кольцо — текущая фаза.</p>
+        <div class="chart" id="phase-chart"></div>
+        <div class="legend" id="phase-legend"></div>
+      </div>
+      <div class="panel">
+        <h2>Длинный горизонт: 77 лет</h2>
+        <p class="sub">Среднегодовые реальные цены. Тонкая линия — средняя за 10 лет.</p>
+        <div class="chart" id="long-chart"></div>
+        <div class="legend" id="long-legend"></div>
+        <p class="note">США — цена битуминозного угля на шахте (внутренний рынок, EIA). Австралия — экспортная цена (Всемирный банк). Это разные рынки: уровень сравнивать нельзя, форму цикла можно.</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Все циклы энергетического угля Newcastle</h2>
+      <p class="sub">Фаза засчитывается, когда цена разворачивается на +49% от дна или на −33% от пика. Реальные цены.</p>
+      <div class="tbl-wrap"><table id="cycle-table"></table></div>
+    </div>
+  </section>
+
+  <!-- ============ КАРТА ============ -->
+  <section class="tab" id="map" role="tabpanel" aria-labelledby="tab-map" hidden>
+    <div class="panel">
+      <h2>Карта циклов: 20 коммодити</h2>
+      <p class="sub">По горизонтали — уровень реальной цены в истории с 1970 года (перцентиль). По вертикали — изменение за 12 месяцев. Цвет — сигнал для сделок.</p>
+      <div class="chart" id="map-chart"></div>
+      <div class="legend">
+        <span><i class="chip buy" style="padding:0;background:none"><i class="dot"></i></i>Окно покупки</span>
+        <span><i class="chip sell" style="padding:0;background:none"><i class="dot"></i></i>Окно продажи</span>
+        <span><i class="chip" style="padding:0;background:none"><i class="dot"></i></i>Наблюдать</span>
+      </div>
+      <p class="note">Сигнал — эвристика, а не прогноз. «Окно покупки»: зрелый спад или отскок со дна при цене не выше 60-го перцентиля, либо ранний рост с низкого уровня. «Окно продажи»: зрелый рост или откат от пика при цене выше 67-го перцентиля.</p>
+    </div>
+    <div class="panel">
+      <h2>Таблица сигналов</h2>
+      <p class="sub">Нажмите на заголовок столбца, чтобы отсортировать. Точка на шкале — уровень к истории с 1970 года, кольцо — к последним 20 годам.</p>
+      <div class="filters" id="group-filters"></div>
+      <div class="tbl-wrap"><table id="map-table"></table></div>
+    </div>
+  </section>
+
+  <!-- ============ РЕСЁРЧ ============ -->
+  <section class="tab" id="research" role="tabpanel" aria-labelledby="tab-research" hidden>
+    <div class="panel prose" id="research-body">
+<!--__RESEARCH__-->
+    </div>
+  </section>
+
+  <!-- ============ МЕТОДОЛОГИЯ ============ -->
+  <section class="tab" id="method" role="tabpanel" aria-labelledby="tab-method" hidden>
+    <div class="panel prose">
+<!--__METHOD__-->
+    </div>
+  </section>
+</main>
+
+<footer class="wrap" id="footer"></footer>
+
+<script>
+const DATA = /*__DATA__*/null;
+(function () {
+  'use strict';
+  const M = DATA.meta;
+  const NS = 'http://www.w3.org/2000/svg';
+  const MON = ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
+  const MON_GEN = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+  const nf = (d) => new Intl.NumberFormat('ru-RU', { maximumFractionDigits: d, minimumFractionDigits: d });
+  const fmtP = (v) => v == null ? '—' : (Math.abs(v) >= 100 ? nf(0) : Math.abs(v) >= 10 ? nf(1) : nf(2)).format(v);
+  const fmtPct = (v, d = 0) => v == null ? '—' : (v > 0 ? '+' : v < 0 ? '−' : '') + nf(d).format(Math.abs(v * 100)) + '%';
+  const ymT = (s) => { const [y, m] = s.split('-').map(Number); return y + (m - 1) / 12; };
+  const ymLabel = (s) => { const [y, m] = s.split('-').map(Number); return MON[m - 1] + ' ' + y; };
+  const qLabel = (s) => { const [y, m] = s.split('-').map(Number); return Math.floor((m - 1) / 3) + 1 + ' кв. ' + y; };
+  const tLabel = (t) => { const y = Math.floor(t + 1e-6); const m = Math.round((t - y) * 12); return MON[Math.min(11, m)] + ' ' + y; };
+  const months = (n) => { const a = n % 10, b = n % 100; return n + ' ' + (a === 1 && b !== 11 ? 'месяц' : a >= 2 && a <= 4 && (b < 12 || b > 14) ? 'месяца' : 'месяцев'); };
+  const mo = (n) => n + ' мес.';
+  const cssVar = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  function el(tag, attrs, parent, text) {
+    const e = document.createElement(tag);
+    if (attrs) for (const k in attrs) { if (k === 'class') e.className = attrs[k]; else if (k === 'style') e.style.cssText = attrs[k]; else e.setAttribute(k, attrs[k]); }
+    if (text != null) e.textContent = text;
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function s(tag, attrs, parent, text) {
+    const e = document.createElementNS(NS, tag);
+    if (attrs) for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text != null) e.textContent = text;
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+
+  const [by, bm] = M.cpi_base.split('-').map(Number);
+  const baseTxt = 'в ценах ' + MON_GEN[bm - 1] + ' ' + by;
+  const [ly, lm] = M.last_month.split('-').map(Number);
+  document.getElementById('eyebrow').textContent = 'Данные по ' + MON[lm - 1] + ' ' + ly + ' · реальные $ ' + MON_GEN[bm - 1].replace(/я$/, 'я') + ' ' + by + ' · сборка ' + M.built;
+
+  // ---------- серии угля ----------
+  const SER = {
+    thermal_au: { name: 'Энергетический, Newcastle', short: 'Newcastle', color: '--s-au', on: true, q: false },
+    met_us: { name: 'Коксующийся, экспорт США', short: 'Коксующийся', color: '--s-met', on: true, q: true },
+    thermal_za: { name: 'Энергетический, ЮАР', short: 'ЮАР', color: '--s-za', on: false, q: false },
+    steam_us: { name: 'Энергетический, экспорт США', short: 'Экспорт США', color: '--s-usst', on: false, q: true },
+  };
+  for (const k in SER) {
+    const c = DATA.coal[k];
+    SER[k].pts = c.series.map((r) => ({ t: ymT(r[0]) + (SER[k].q ? 1 / 12 : 0), d: r[0], nom: r[1], real: r[2] }));
+    SER[k].pos = c.position;
+    SER[k].phases = c.phases;
+  }
+  const dateLbl = (k, d) => SER[k].q ? qLabel(d) : ymLabel(d);
+
+  // ---------- карточки вердикта ----------
+  function stanceChip(parent, cls, label) {
+    const c = el('span', { class: 'chip ' + cls }, parent);
+    el('i', { class: 'dot' }, c); c.appendChild(document.createTextNode(label));
+  }
+  function verdict(k, title, note) {
+    const p = SER[k].pos, ph = p.phase, st = p.stats;
+    const box = el('div', { class: 'panel verdict' }, document.getElementById('verdicts'));
+    const head = el('div', { class: 'vhead' }, box);
+    const nm = el('div', { class: 'vname' }, head);
+    el('i', { class: 'key', style: 'background:var(' + SER[k].color + ')' }, nm);
+    el('span', null, nm, title);
+    el('span', { class: 'eyebrow' }, head, dateLbl(k, p.last_date));
+    const pr = el('div', { class: 'price' }, box, fmtP(p.last));
+    el('small', null, pr, '$/т ' + (SER[k].q ? '(реальная)' : ''));
+    const chips = el('div', { class: 'chips' }, box);
+    stanceChip(chips, p.stance === 'buy' ? 'buy' : p.stance === 'sell' ? 'sell' : '', p.stance_label);
+    el('span', { class: 'chip plain' }, chips, p.stage_label);
+    el('span', { class: 'chip plain' }, chips, p.level + ' · ' + Math.round(p.pct_all) + '-й перцентиль');
+    const dl = el('dl', { class: 'facts' }, box);
+    const fact = (dt, dd) => { const d = el('div', null, dl); el('dt', null, d, dt); el('dd', null, d, dd); };
+    const kindTxt = ph.kind === 'down' ? 'Спад' : 'Подъём';
+    fact(kindTxt + ' с ' + dateLbl(k, ph.start), mo(ph.months) + ', ' + fmtPct(ph.change) + ' от ' + (ph.kind === 'down' ? 'пика ' : 'дна ') + fmtP(ph.p0));
+    if (ph.extreme_date) {
+      fact((ph.kind === 'down' ? 'Минимум ' : 'Максимум ') + dateLbl(k, ph.extreme_date), fmtP(ph.extreme_price) + ' $/т, с тех пор ' + fmtPct(ph.since_extreme));
+      fact(ph.kind === 'down' ? 'Разворот вверх подтвердится' : 'Разворот вниз подтвердится', (ph.kind === 'down' ? 'выше ' : 'ниже ') + fmtP(ph.confirm_level) + ' $/т');
+    }
+    const med = st[ph.kind];
+    if (med) fact('Типичный ' + (ph.kind === 'down' ? 'спад' : 'подъём') + ' (медиана, ' + med.n + ' шт.)', mo(Math.round(med.median_months)) + ', ' + fmtPct(med.median_change));
+    fact('За 12 месяцев', fmtPct(p.chg12));
+    fact('Медиана с ' + p.hist_from.slice(0, 4), fmtP(p.median_all) + ' $/т');
+    const m = el('div', null, box);
+    const meter = el('div', { class: 'meter', role: 'img', 'aria-label': 'Перцентиль к истории: ' + Math.round(p.pct_all) + ', к последним 20 годам: ' + Math.round(p.pct_recent) }, m);
+    el('i', { style: 'left:' + p.pct_all + '%', title: 'С ' + p.hist_from.slice(0, 4) + ': ' + Math.round(p.pct_all) }, meter);
+    el('i', { class: 'recent', style: 'left:' + p.pct_recent + '%', title: '20 лет: ' + Math.round(p.pct_recent) }, meter);
+    const sc = el('div', { class: 'meter-scale' }, m);
+    el('span', null, sc, 'дёшево'); el('span', null, sc, '● с ' + p.hist_from.slice(0, 4) + ' · ○ за 20 лет'); el('span', null, sc, 'дорого');
+    if (note) el('p', { class: 'note', style: 'margin:0' }, box, note);
+  }
+  verdict('thermal_au', 'Энергетический уголь, Newcastle', 'Цены Всемирного банка: Австралия, FOB Newcastle, 6000 ккал/кг.');
+  verdict('met_us', 'Коксующийся уголь (прокси)', 'Средняя экспортная цена угля для металлургии из США, поквартально. Бесплатного ряда бенчмарка PLV HCC нет. История с 2000 года.');
+
+  // ---------- общий движок линейного графика ----------
+  function niceLinTicks(lo, hi, n) {
+    const span = hi - lo, step0 = span / Math.max(1, n);
+    const mag = Math.pow(10, Math.floor(Math.log10(step0)));
+    const step = [1, 2, 2.5, 5, 10].map((x) => x * mag).find((x) => x >= step0) || mag * 10;
+    const out = []; for (let v = Math.ceil(lo / step) * step; v <= hi + 1e-9; v += step) out.push(+v.toFixed(10));
+    return out;
+  }
+  function niceLogTicks(lo, hi) {
+    const out = [];
+    for (const mult of [[1, 2, 5], [1, 1.5, 2, 3, 5, 7]]) {
+      out.length = 0;
+      for (let e = Math.floor(Math.log10(lo)); e <= Math.ceil(Math.log10(hi)); e++)
+        for (const m of mult) { const v = m * Math.pow(10, e); if (v >= lo && v <= hi) out.push(v); }
+      if (out.length >= 4) break;
+    }
+    return out;
+  }
+  function yearTicks(t0, t1, w) {
+    const span = t1 - t0; const step = [1, 2, 5, 10, 20].find((st) => (w / (span / st)) >= 58) || 20;
+    const out = []; for (let y = Math.ceil(t0 / step) * step; y <= t1; y += step) out.push(y);
+    return out;
+  }
+  function bisect(pts, t) {
+    let lo = 0, hi = pts.length - 1;
+    if (!pts.length) return -1;
+    while (hi - lo > 1) { const mid = (lo + hi) >> 1; if (pts[mid].t < t) lo = mid; else hi = mid; }
+    return Math.abs(pts[lo].t - t) <= Math.abs(pts[hi].t - t) ? lo : hi;
+  }
+
+  function lineChart(host, cfg) {
+    host.textContent = '';
+    const W = Math.max(280, host.clientWidth), H = cfg.height || (W < 520 ? 300 : 380);
+    const m = { l: 46, r: cfg.endLabels ? (W < 520 ? 52 : 92) : 14, t: 12, b: 26 };
+    const iw = W - m.l - m.r;
+    const [t0, t1] = cfg.x;
+    const xv = (t) => m.l + (t - t0) / (t1 - t0) * iw;
+    // события раскладываем по рядам, чтобы номера не налезали друг на друга
+    const evRows = [];
+    if (cfg.events) {
+      const lastX = [];
+      cfg.events.forEach((ev, i) => {
+        if (ev.t < t0 || ev.t > t1) return;
+        const x = xv(ev.t);
+        let row = lastX.findIndex((lx) => x - lx >= 19);
+        if (row < 0) row = lastX.length;
+        lastX[row] = x;
+        evRows.push({ x, ev, n: i + 1, row });
+      });
+      m.t = 34 + 20 * Math.max(0, ...evRows.map((e) => e.row));
+    }
+    const ih = H - m.t - m.b;
+    const svg = s('svg', { viewBox: `0 0 ${W} ${H}`, height: H, role: 'img', 'aria-label': cfg.aria || '', tabindex: 0 }, host);
+    const vis = cfg.series.filter((x) => x.pts.length);
+    let ylo = Infinity, yhi = -Infinity;
+    for (const sr of vis) for (const p of sr.pts) if (p.t >= t0 - 0.01 && p.t <= t1 + 0.01 && p.v != null) { ylo = Math.min(ylo, p.v); yhi = Math.max(yhi, p.v); }
+    for (const r of cfg.refLines || []) { ylo = Math.min(ylo, r.y); yhi = Math.max(yhi, r.y); }
+    if (!isFinite(ylo)) { ylo = 1; yhi = 10; }
+    let yv, yticks;
+    if (cfg.log) {
+      const a = Math.log(ylo * 0.9), b = Math.log(yhi * 1.08);
+      yv = (v) => m.t + ih - (Math.log(v) - a) / (b - a) * ih;
+      yticks = niceLogTicks(Math.exp(a), Math.exp(b));
+    } else {
+      const lo = cfg.zero === false ? ylo * 0.9 : 0, hi = yhi * 1.06;
+      yv = (v) => m.t + ih - (v - lo) / (hi - lo) * ih;
+      yticks = niceLinTicks(lo, hi, 5);
+    }
+    const clipId = 'c' + Math.random().toString(36).slice(2);
+    s('rect', { x: m.l, y: m.t, width: iw, height: ih, fill: 'none' }, s('clipPath', { id: clipId }, s('defs', null, svg)));
+    // полосы фаз
+    const gb = s('g', { 'clip-path': `url(#${clipId})` }, svg);
+    for (const b of cfg.bands || []) {
+      const x0 = xv(Math.max(t0, b.t0)), x1 = xv(Math.min(t1, b.t1));
+      if (x1 <= x0) continue;
+      s('rect', { x: x0, y: m.t, width: x1 - x0, height: ih, fill: b.kind === 'up' ? 'var(--wash-up)' : 'var(--wash-down)' }, gb);
+    }
+    // сетка
+    const gg = s('g', null, svg);
+    for (const v of yticks) {
+      const y = yv(v);
+      s('line', { x1: m.l, x2: m.l + iw, y1: y, y2: y, stroke: 'var(--grid)', 'stroke-width': 1 }, gg);
+      s('text', { x: m.l - 6, y: y + 3.5, 'text-anchor': 'end' }, gg, cfg.yFmt ? cfg.yFmt(v) : Number.isInteger(v) ? nf(0).format(v) : fmtP(v));
+    }
+    for (const y of yearTicks(t0, t1, iw)) {
+      const x = xv(y);
+      s('line', { x1: x, x2: x, y1: m.t + ih, y2: m.t + ih + 4, stroke: 'var(--axis)' }, gg);
+      s('text', { x, y: m.t + ih + 17, 'text-anchor': 'middle' }, gg, y);
+    }
+    s('line', { x1: m.l, x2: m.l + iw, y1: m.t + ih, y2: m.t + ih, stroke: 'var(--axis)' }, gg);
+    // опорные линии
+    for (const r of cfg.refLines || []) {
+      const y = yv(r.y);
+      s('line', { x1: m.l, x2: m.l + iw, y1: y, y2: y, stroke: 'var(--muted)', 'stroke-width': 1, 'stroke-dasharray': r.dash || null }, svg);
+      if (r.label) s('text', { x: m.l + 6, y: y - 5, class: 'lbl' }, svg, r.label);
+    }
+    // линии
+    const gl = s('g', { 'clip-path': `url(#${clipId})` }, svg);
+    for (const sr of vis) {
+      let d = '', pen = false;
+      for (const p of sr.pts) {
+        if (p.v == null || p.t < t0 - 1 || p.t > t1 + 1) { pen = false; continue; }
+        d += (pen ? 'L' : 'M') + xv(p.t).toFixed(1) + ',' + yv(p.v).toFixed(1); pen = true;
+      }
+      s('path', { d, fill: 'none', stroke: `var(${sr.color})`, 'stroke-width': sr.width || 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round', opacity: sr.opacity || 1 }, gl);
+    }
+    // маркеры (минимум текущей фазы и т.п.)
+    for (const mk of cfg.markers || []) {
+      if (mk.t < t0 || mk.t > t1) continue;
+      const x = xv(mk.t), y = yv(mk.v);
+      if (mk.hline) {
+        s('line', { x1: x, x2: m.l + iw, y1: yv(mk.hline.v), y2: yv(mk.hline.v), stroke: 'var(--ink)', 'stroke-width': 1, 'stroke-dasharray': '3 3' }, svg);
+        s('text', { x: x - 8, y: yv(mk.hline.v) - 6, 'text-anchor': 'end', class: 'lbl-strong' }, svg, mk.hline.label);
+      }
+      s('circle', { cx: x, cy: y, r: 5, fill: 'var(--surface)', stroke: 'var(--ink)', 'stroke-width': 2 }, svg);
+      if (mk.label) s('text', { x: x - 8, y: y + 18, 'text-anchor': 'end', class: 'lbl' }, svg, mk.label);
+    }
+    // подписи на концах
+    if (cfg.endLabels) {
+      const ends = [];
+      for (const sr of vis) {
+        if (sr.noEnd) continue;
+        const inr = sr.pts.filter((p) => p.v != null && p.t <= t1 + 0.01);
+        if (!inr.length) continue;
+        const p = inr[inr.length - 1];
+        ends.push({ sr, p, y: yv(p.v) });
+      }
+      ends.sort((a, b) => a.y - b.y);
+      for (let i = 1; i < ends.length; i++) if (ends[i].y - ends[i - 1].y < 15) ends[i].y = ends[i - 1].y + 15;
+      for (const e of ends) {
+        const x = xv(e.p.t);
+        s('circle', { cx: x, cy: yv(e.p.v), r: 4, fill: `var(${e.sr.color})`, stroke: 'var(--surface)', 'stroke-width': 2 }, svg);
+        if (Math.abs(e.y - yv(e.p.v)) > 2) s('line', { x1: x + 5, x2: m.l + iw + 6, y1: yv(e.p.v), y2: e.y, stroke: 'var(--axis)' }, svg);
+        s('text', { x: m.l + iw + 8, y: e.y + 4, class: 'lbl-strong' }, svg, fmtP(e.p.v));
+      }
+    }
+    // события
+    const evPos = [];
+    for (const e of evRows) {
+      const cy = m.t - 14 - e.row * 20;
+      s('line', { x1: e.x, x2: e.x, y1: cy + 8, y2: m.t + ih, stroke: 'var(--axis)', 'stroke-width': 1, 'stroke-dasharray': '2 4' }, svg);
+      s('circle', { cx: e.x, cy, r: 8.5, fill: 'var(--surface)', stroke: 'var(--axis)', 'stroke-width': 1 }, svg);
+      s('text', { x: e.x, y: cy + 3.5, 'text-anchor': 'middle', style: 'fill:var(--ink);font-size:10px' }, svg, e.n);
+      evPos.push({ ...e, cy });
+    }
+    // слой наведения
+    const tip = el('div', { class: 'tip', hidden: '' }, host);
+    const cross = s('line', { y1: m.t, y2: m.t + ih, stroke: 'var(--ink-2)', 'stroke-width': 1, visibility: 'hidden' }, svg);
+    const dots = vis.map((sr) => s('circle', { r: 4, fill: `var(${sr.color})`, stroke: 'var(--surface)', 'stroke-width': 2, visibility: 'hidden' }, svg));
+    const prim = vis[0];
+    let curIdx = -1;
+    function show(idx) {
+      if (!prim || idx < 0) return;
+      curIdx = idx;
+      const t = prim.pts[idx].t;
+      if (t < t0 || t > t1) return;
+      const x = xv(t);
+      cross.setAttribute('x1', x); cross.setAttribute('x2', x); cross.setAttribute('visibility', 'visible');
+      tip.textContent = '';
+      el('div', { class: 't-date' }, tip, cfg.dateOf ? cfg.dateOf(prim, prim.pts[idx]) : tLabel(t));
+      vis.forEach((sr, i) => {
+        const j = bisect(sr.pts, t);
+        const p = sr.pts[j];
+        if (!p || Math.abs(p.t - t) > (sr.tol || 0.13) || p.v == null) { dots[i].setAttribute('visibility', 'hidden'); return; }
+        dots[i].setAttribute('cx', xv(p.t)); dots[i].setAttribute('cy', yv(p.v)); dots[i].setAttribute('visibility', 'visible');
+        if (sr.noTip) return;
+        const row = el('div', { class: 't-row' }, tip);
+        el('i', { class: 'key', style: `background:var(${sr.color})` }, row);
+        el('b', null, row, fmtP(p.v));
+        el('span', null, row, sr.short || sr.name);
+      });
+      if (cfg.extra) { const ex = cfg.extra(t); if (ex) el('div', { class: 't-extra' }, tip, ex); }
+      tip.hidden = false;
+      const tw = tip.offsetWidth, hw = host.clientWidth;
+      let left = x * hw / W + 14; if (left + tw > hw) left = x * hw / W - tw - 14;
+      tip.style.left = Math.max(0, left) + 'px'; tip.style.top = (m.t + 8) + 'px';
+    }
+    function hide() { tip.hidden = true; cross.setAttribute('visibility', 'hidden'); dots.forEach((d) => d.setAttribute('visibility', 'hidden')); }
+    svg.addEventListener('pointermove', (e) => {
+      const r = svg.getBoundingClientRect();
+      const x = (e.clientX - r.left) * W / r.width;
+      if (x < m.l - 10 || x > m.l + iw + 10 || !prim) { hide(); return; }
+      show(bisect(prim.pts, t0 + (x - m.l) / iw * (t1 - t0)));
+    });
+    svg.addEventListener('pointerleave', hide);
+    svg.addEventListener('blur', hide);
+    svg.addEventListener('keydown', (e) => {
+      if (!prim) return;
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      e.preventDefault();
+      let i = curIdx < 0 ? prim.pts.length - 1 : curIdx + (e.key === 'ArrowRight' ? 1 : -1) * (e.shiftKey ? 12 : 1);
+      i = Math.max(0, Math.min(prim.pts.length - 1, i));
+      show(i);
+    });
+    // подсказки событий
+    for (const p of evPos) {
+      const hit = s('circle', { cx: p.x, cy: p.cy, r: 11, fill: 'transparent', tabindex: 0, 'aria-label': p.ev.label }, svg);
+      const on = () => {
+        tip.textContent = '';
+        el('div', { class: 't-date' }, tip, p.n + ' · ' + ymLabel(p.ev.date));
+        el('div', { style: 'font-weight:600' }, tip, p.ev.label);
+        el('div', { class: 't-extra', style: 'border:0;padding:0' }, tip, p.ev.note);
+        tip.hidden = false;
+        const hw = host.clientWidth, tw = tip.offsetWidth;
+        tip.style.left = Math.min(hw - tw, Math.max(0, p.x * hw / W - tw / 2)) + 'px'; tip.style.top = (m.t + 6) + 'px';
+      };
+      hit.addEventListener('pointerenter', (e) => { e.stopPropagation(); on(); });
+      hit.addEventListener('focus', on);
+      hit.addEventListener('pointerleave', hide);
+      hit.addEventListener('blur', hide);
+    }
+    return svg;
+  }
+
+  // ---------- главный график ----------
+  const st = { mode: 'real', log: true, range: 'all' };
+  const tg = document.getElementById('series-toggles');
+  for (const k in SER) {
+    const b = el('button', { class: 'toggle', 'aria-pressed': SER[k].on ? 'true' : 'false' }, tg);
+    el('i', { class: 'key', style: `background:var(${SER[k].color})` }, b);
+    b.appendChild(document.createTextNode(SER[k].name));
+    if (k === 'thermal_au') { b.disabled = true; b.title = 'Основной ряд'; }
+    b.addEventListener('click', () => { SER[k].on = !SER[k].on; b.setAttribute('aria-pressed', SER[k].on); drawMain(); });
+  }
+  const EV = DATA.events.map((e) => ({ ...e, t: ymT(e.date) }));
+  const evList = document.getElementById('events');
+  EV.forEach((e, i) => {
+    const li = el('li', null, evList);
+    el('span', { class: 'n' }, li, i + 1);
+    el('span', { class: 'd' }, li, ymLabel(e.date));
+    const tx = el('span', null, li); el('b', { style: 'font-weight:500;color:var(--ink)' }, tx, e.label + '. '); tx.appendChild(document.createTextNode(e.note));
+  });
+  function phaseAt(t) {
+    for (const p of SER.thermal_au.phases) if (t >= ymT(p.start) && t <= ymT(p.end)) return p;
+    return null;
+  }
+  function drawMain() {
+    const lastT = SER.thermal_au.pts[SER.thermal_au.pts.length - 1].t;
+    const t0 = st.range === 'all' ? 1970 : lastT - (+st.range);
+    const series = Object.keys(SER).filter((k) => SER[k].on).map((k) => ({
+      key: k, name: SER[k].name, short: SER[k].short, color: SER[k].color, tol: SER[k].q ? 0.17 : 0.05,
+      pts: SER[k].pts.map((p) => ({ t: p.t, d: p.d, v: st.mode === 'real' ? p.real : p.nom })),
+    }));
+    const ph = SER.thermal_au.pos.phase;
+    const markers = [];
+    if (st.mode === 'real' && ph.extreme_date) {
+      markers.push({ t: ymT(ph.extreme_date), v: ph.extreme_price, label: (ph.kind === 'down' ? 'дно? ' : 'пик? ') + ymLabel(ph.extreme_date),
+        hline: { v: ph.confirm_level, label: 'разворот: ' + fmtP(ph.confirm_level) } });
+    }
+    lineChart(document.getElementById('main-chart'), {
+      x: [t0, lastT + 0.25], log: st.log, series, endLabels: true, events: EV, markers,
+      bands: SER.thermal_au.phases.map((p) => ({ t0: ymT(p.start), t1: ymT(p.end), kind: p.kind })),
+      refLines: st.mode === 'real' ? [{ y: SER.thermal_au.pos.median_all, dash: '4 4' }] : [],
+      aria: 'Цена угля с 1970 года, ' + (st.mode === 'real' ? 'реальная' : 'номинальная'),
+      extra: (t) => { const p = phaseAt(t); return p ? (p.kind === 'up' ? 'Подъём ' : 'Спад ') + ymLabel(p.start) + ' – ' + (p.complete ? ymLabel(p.end) : 'сейчас') + ': ' + fmtPct(p.change) : null; },
+    });
+    document.getElementById('legend-median').hidden = st.mode !== 'real';
+    document.getElementById('main-sub').textContent = (st.mode === 'real' ? 'Реальные цены, $/т ' + baseTxt + '.' : 'Номинальные цены, $/т.') +
+      ' Помесячно, коксующийся поквартально. Полосы — подъёмы и спады Newcastle. Кольцо и пунктир — текущее дно и уровень, выше которого разворот подтвердится.';
+  }
+  function seg(ids, key, val) {
+    ids.forEach(([id, v]) => { const b = document.getElementById(id); b.addEventListener('click', () => { st[key] = v; ids.forEach(([i2, v2]) => document.getElementById(i2).setAttribute('aria-pressed', v2 === v)); drawMain(); }); });
+  }
+  seg([['mode-real', 'real'], ['mode-nom', 'nom']], 'mode');
+  seg([['scale-log', true], ['scale-lin', false]], 'log');
+  document.querySelectorAll('[data-range]').forEach((b) => b.addEventListener('click', () => {
+    st.range = b.dataset.range; document.querySelectorAll('[data-range]').forEach((x) => x.setAttribute('aria-pressed', x === b)); drawMain();
+  }));
+
+  // ---------- длинный горизонт ----------
+  function drawLong() {
+    const L = DATA.long_run;
+    const pt = (rows, vi) => rows.map((r) => ({ t: r[0] + 0.5, v: r[vi] }));
+    const series = [
+      { name: 'Австралия, экспорт', short: 'Австралия', color: '--s-au', pts: pt(L.au, 1), tol: 0.6 },
+      { name: 'США, на шахте', short: 'США', color: '--s-usbit', pts: pt(L.us_bit, 2), tol: 0.6 },
+      { name: 'Австралия, 10 лет', color: '--s-au', pts: pt(L.au_ma10, 1), width: 1.25, opacity: 0.55, noEnd: true, noTip: true },
+      { name: 'США, 10 лет', color: '--s-usbit', pts: pt(L.us_bit_ma10, 1), width: 1.25, opacity: 0.55, noEnd: true, noTip: true },
+    ];
+    lineChart(document.getElementById('long-chart'), {
+      x: [1949, L.au[L.au.length - 1][0] + 1], log: true, series, endLabels: true, height: 300,
+      aria: 'Среднегодовые реальные цены угля с 1949 года',
+      dateOf: (sr, p) => String(Math.floor(p.t)) + (Math.floor(p.t) === L.au[L.au.length - 1][0] ? ' (неполный год)' : ''),
+    });
+    const lg = document.getElementById('long-legend'); lg.textContent = '';
+    [['--s-au', 'Австралия, экспорт (1970–)'], ['--s-usbit', 'США, цена на шахте (1949–)']].forEach(([c, t]) => {
+      const sp = el('span', null, lg); el('i', { class: 'key', style: `background:var(${c})` }, sp); sp.appendChild(document.createTextNode(t));
+    });
+  }
+
+  // ---------- фазы: длительность × амплитуда ----------
+  function drawPhases() {
+    const host = document.getElementById('phase-chart'); host.textContent = '';
+    const W = Math.max(280, host.clientWidth), H = W < 520 ? 280 : 300;
+    const m = { l: 50, r: 16, t: 14, b: 34 }, iw = W - m.l - m.r, ih = H - m.t - m.b;
+    const svg = s('svg', { viewBox: `0 0 ${W} ${H}`, height: H, role: 'img', 'aria-label': 'Длительность и глубина фаз цикла' }, host);
+    const keys = ['thermal_au', 'met_us'];
+    const all = [];
+    for (const k of keys) for (const p of SER[k].phases) if (!p.data_start) all.push({ k, p });
+    const xl = (v) => Math.log(v);
+    const x0 = xl(3), x1 = xl(300);
+    const ys = all.map((a) => Math.log(1 + a.p.change));
+    const y0 = Math.min(-1.7, ...ys) - 0.1, y1 = Math.max(2.1, ...ys) + 0.1;
+    const xv = (v) => m.l + (xl(Math.max(3, v)) - x0) / (x1 - x0) * iw;
+    const yv = (lr) => m.t + ih - (lr - y0) / (y1 - y0) * ih;
+    for (const c of [-0.8, -0.5, 0, 1, 3, 6]) {
+      const lr = Math.log(1 + c); if (lr < y0 || lr > y1) continue;
+      const y = yv(lr);
+      s('line', { x1: m.l, x2: m.l + iw, y1: y, y2: y, stroke: c === 0 ? 'var(--axis)' : 'var(--grid)' }, svg);
+      s('text', { x: m.l - 6, y: y + 3.5, 'text-anchor': 'end' }, svg, fmtPct(c));
+    }
+    for (const v of [6, 12, 24, 48, 120, 240]) {
+      const x = xv(v);
+      s('line', { x1: x, x2: x, y1: m.t + ih, y2: m.t + ih + 4, stroke: 'var(--axis)' }, svg);
+      s('text', { x, y: m.t + ih + 17, 'text-anchor': 'middle' }, svg, v);
+    }
+    s('text', { x: m.l + iw, y: m.t + ih + 31, 'text-anchor': 'end' }, svg, 'месяцев, лог. шкала');
+    s('line', { x1: m.l, x2: m.l + iw, y1: m.t + ih, y2: m.t + ih, stroke: 'var(--axis)' }, svg);
+    s('text', { x: m.l + 6, y: m.t + 12, class: 'lbl' }, svg, 'Подъёмы');
+    s('text', { x: m.l + 6, y: m.t + ih - 8, class: 'lbl' }, svg, 'Спады');
+    const tip = el('div', { class: 'tip', hidden: '' }, host);
+    for (const a of all) {
+      const cx = xv(a.p.months), cy = yv(Math.log(1 + a.p.change));
+      const g = s('g', { tabindex: 0, 'aria-label': SER[a.k].short + ': ' + a.p.start + ', ' + a.p.months + ' мес., ' + fmtPct(a.p.change) }, svg);
+      if (!a.p.complete) {
+        s('circle', { cx, cy, r: 9, fill: 'none', stroke: 'var(--ink)', 'stroke-width': 2 }, g);
+        s('text', { x: cx + 13, y: cy + 4, class: 'lbl-strong' }, g, 'сейчас');
+      }
+      s('circle', { cx, cy, r: 5, fill: `var(${SER[a.k].color})`, stroke: 'var(--surface)', 'stroke-width': 2 }, g);
+      s('circle', { cx, cy, r: 13, fill: 'transparent' }, g);
+      const on = () => {
+        tip.textContent = '';
+        el('div', { class: 't-date' }, tip, SER[a.k].short + ' · ' + (a.p.kind === 'up' ? 'подъём' : 'спад'));
+        const r = el('div', { class: 't-row' }, tip); el('b', null, r, fmtPct(a.p.change)); el('span', null, r, 'за ' + mo(a.p.months));
+        el('div', { class: 't-extra' }, tip, dateLbl(a.k, a.p.start) + ' – ' + (a.p.complete ? dateLbl(a.k, a.p.end) : 'сейчас') + ' · ' + fmtP(a.p.p0) + ' → ' + fmtP(a.p.p1) + ' $/т');
+        tip.hidden = false;
+        const hw = host.clientWidth, tw = tip.offsetWidth;
+        let left = cx * hw / W + 14; if (left + tw > hw) left = cx * hw / W - tw - 14;
+        tip.style.left = Math.max(0, left) + 'px'; tip.style.top = Math.max(0, cy * hw / W - 30) + 'px';
+      };
+      g.addEventListener('pointerenter', on); g.addEventListener('focus', on);
+      g.addEventListener('pointerleave', () => tip.hidden = true); g.addEventListener('blur', () => tip.hidden = true);
+    }
+    const lg = document.getElementById('phase-legend'); lg.textContent = '';
+    keys.forEach((k) => { const sp = el('span', null, lg); el('i', { class: 'key', style: `background:var(${SER[k].color});height:8px;width:8px;border-radius:50%` }, sp); sp.appendChild(document.createTextNode(SER[k].name)); });
+    const a = SER.thermal_au.pos.stats;
+    const sp = el('span', null, lg);
+    sp.textContent = 'Newcastle, медианы: подъём ' + mo(Math.round(a.up.median_months)) + ' / ' + fmtPct(a.up.median_change) + ', спад ' + mo(Math.round(a.down.median_months)) + ' / ' + fmtPct(a.down.median_change);
+  }
+
+  // ---------- таблица циклов ----------
+  function drawCycleTable() {
+    const t = document.getElementById('cycle-table'); t.textContent = '';
+    const hr = el('tr', null, el('thead', null, t));
+    ['Фаза', 'Период', 'Длительность', 'Цена, $/т', 'Изменение'].forEach((h, i) => el('th', { class: i >= 2 && i <= 3 ? 'r' : '' }, hr, h));
+    const tb = el('tbody', null, t);
+    const ph = SER.thermal_au.phases;
+    const maxUp = Math.max(...ph.map((p) => Math.log(1 + p.change)));
+    for (const p of ph) {
+      const tr = el('tr', { class: p.complete ? '' : 'current' }, tb);
+      el('td', { class: p.kind === 'up' ? 'up-txt' : 'down-txt' }, tr, (p.kind === 'up' ? '↗ Подъём' : '↘ Спад') + (p.complete ? '' : ' (идёт)'));
+      el('td', { class: 'num' }, tr, ymLabel(p.start) + ' – ' + (p.complete ? ymLabel(p.end) : 'сейчас'));
+      el('td', { class: 'num r' }, tr, mo(p.months));
+      el('td', { class: 'num r' }, tr, fmtP(p.p0) + ' → ' + fmtP(p.p1));
+      const td = el('td', null, tr); const bc = el('div', { class: 'bar-cell' }, td);
+      const w = Math.abs(Math.log(1 + p.change)) / maxUp * 110;
+      el('span', { class: 'bar' + (p.change < 0 ? ' neg' : ''), style: `width:${w.toFixed(0)}px;background:${p.kind === 'up' ? 'var(--s-met)' : 'var(--s-au)'}` }, bc);
+      el('span', { class: 'num' }, bc, fmtPct(p.change));
+    }
+    const a = SER.thermal_au.pos.stats;
+    for (const [k, lbl] of [['up', 'Медиана подъёма'], ['down', 'Медиана спада']]) {
+      const tr = el('tr', { class: 'summary' }, tb);
+      el('td', null, tr, lbl); el('td', { class: 'tgroup' }, tr, a[k].n + ' завершённых');
+      el('td', { class: 'num r' }, tr, mo(Math.round(a[k].median_months))); el('td', null, tr, '');
+      el('td', { class: 'num' }, tr, fmtPct(a[k].median_change));
+    }
+  }
+
+  // ---------- карта коммодити ----------
+  const C = DATA.commodities;
+  const stanceVar = { buy: '--good', sell: '--warn', wait: '--neutral' };
+  function drawMap() {
+    const host = document.getElementById('map-chart'); host.textContent = '';
+    const W = Math.max(280, host.clientWidth), H = W < 520 ? 400 : 470;
+    const m = { l: 48, r: 16, t: 26, b: 38 }, iw = W - m.l - m.r, ih = H - m.t - m.b;
+    const svg = s('svg', { viewBox: `0 0 ${W} ${H}`, height: H, role: 'img', 'aria-label': 'Карта циклов коммодити' }, host);
+    const ys = C.map((c) => c.chg12);
+    const y0 = Math.min(-0.3, ...ys) - 0.08, y1 = Math.max(0.6, ...ys) + 0.08;
+    const xv = (p) => m.l + p / 100 * iw, yv = (v) => m.t + ih - (v - y0) / (y1 - y0) * ih;
+    s('rect', { x: xv(0), y: m.t, width: xv(33) - xv(0), height: ih, fill: 'var(--chip-good)', opacity: 0.6 }, svg);
+    s('rect', { x: xv(67), y: m.t, width: xv(100) - xv(67), height: ih, fill: 'var(--chip-warn)', opacity: 0.6 }, svg);
+    for (const v of niceLinTicks(y0, y1, 6)) {
+      const y = yv(v);
+      s('line', { x1: m.l, x2: m.l + iw, y1: y, y2: y, stroke: v === 0 ? 'var(--axis)' : 'var(--grid)' }, svg);
+      s('text', { x: m.l - 6, y: y + 3.5, 'text-anchor': 'end' }, svg, fmtPct(v));
+    }
+    for (const p of [0, 33, 50, 67, 100]) {
+      s('line', { x1: xv(p), x2: xv(p), y1: m.t + ih, y2: m.t + ih + 4, stroke: 'var(--axis)' }, svg);
+      s('text', { x: xv(p), y: m.t + ih + 17, 'text-anchor': 'middle' }, svg, p);
+    }
+    s('text', { x: xv(16.5), y: m.t - 9, 'text-anchor': 'middle', class: 'lbl' }, svg, 'Дёшево');
+    s('text', { x: xv(50), y: m.t - 9, 'text-anchor': 'middle', class: 'lbl' }, svg, 'Средне');
+    s('text', { x: xv(83.5), y: m.t - 9, 'text-anchor': 'middle', class: 'lbl' }, svg, 'Дорого');
+    s('text', { x: m.l + iw, y: m.t + ih + 32, 'text-anchor': 'end' }, svg, 'перцентиль реальной цены с 1970 г.');
+    // подписи с простым обходом наложений
+    const placed = [];
+    const fits = (b) => b.x0 >= m.l && b.x1 <= m.l + iw && b.y0 >= m.t && b.y1 <= m.t + ih && !placed.some((o) => b.x0 < o.x1 && b.x1 > o.x0 && b.y0 < o.y1 && b.y1 > o.y0);
+    const pts = C.map((c) => ({ c, x: xv(c.pct_all), y: yv(c.chg12) }));
+    pts.forEach((p) => placed.push({ x0: p.x - 6, x1: p.x + 6, y0: p.y - 6, y1: p.y + 6 }));
+    const tip = el('div', { class: 'tip', hidden: '' }, host);
+    const short = (n) => n.replace('Уголь энергетический, ', 'Уголь ').replace('Уголь коксующийся (экспорт США)', 'Уголь коксующ.').replace('Калий хлористый', 'Калий');
+    for (const p of pts.sort((a, b) => (a.c.group === 'Уголь' ? -1 : 0) - (b.c.group === 'Уголь' ? -1 : 0))) {
+      const g = s('g', { tabindex: 0, 'aria-label': p.c.name + ': ' + Math.round(p.c.pct_all) + '-й перцентиль, ' + fmtPct(p.c.chg12) + ' за 12 мес., ' + p.c.stance_label }, svg);
+      const coal = p.c.group === 'Уголь';
+      s('circle', { cx: p.x, cy: p.y, r: coal ? 6.5 : 5, fill: `var(${stanceVar[p.c.stance]})`, stroke: coal ? 'var(--ink)' : 'var(--surface)', 'stroke-width': coal ? 2 : 2 }, g);
+      s('circle', { cx: p.x, cy: p.y, r: 13, fill: 'transparent' }, g);
+      const label = short(p.c.name), w = label.length * 6.4 + 4;
+      const cands = [[p.x + 9, p.y + 4, 'start'], [p.x - 9, p.y + 4, 'end'], [p.x, p.y - 10, 'middle'], [p.x, p.y + 17, 'middle'],
+        [p.x - 9, p.y - 8, 'end'], [p.x - 9, p.y + 16, 'end'], [p.x + 9, p.y - 8, 'start'], [p.x + 9, p.y + 16, 'start']];
+      for (const [x, y, anc] of cands) {
+        const x0 = anc === 'start' ? x : anc === 'end' ? x - w : x - w / 2;
+        const b = { x0, x1: x0 + w, y0: y - 11, y1: y + 3 };
+        if (fits(b)) { placed.push(b); s('text', { x, y, 'text-anchor': anc, class: coal ? 'lbl-strong' : 'lbl', style: 'font-size:11.5px' }, g, label); break; }
+      }
+      const on = () => {
+        tip.textContent = '';
+        el('div', { class: 't-date' }, tip, p.c.group + ' · ' + ymLabel(p.c.last_date));
+        el('div', { style: 'font-weight:600;margin-bottom:3px' }, tip, p.c.name);
+        let r = el('div', { class: 't-row' }, tip); el('b', null, r, fmtP(p.c.nominal)); el('span', null, r, p.c.unit + ', номинал');
+        r = el('div', { class: 't-row' }, tip); el('b', null, r, Math.round(p.c.pct_all) + '-й'); el('span', null, r, 'перцентиль с ' + p.c.hist_from.slice(0, 4));
+        r = el('div', { class: 't-row' }, tip); el('b', null, r, fmtPct(p.c.chg12)); el('span', null, r, 'за 12 месяцев');
+        el('div', { class: 't-extra' }, tip, p.c.stage_label + ' · ' + p.c.stance_label);
+        tip.hidden = false;
+        const hw = host.clientWidth, tw = tip.offsetWidth;
+        let left = p.x * hw / W + 14; if (left + tw > hw) left = p.x * hw / W - tw - 14;
+        tip.style.left = Math.max(0, left) + 'px'; tip.style.top = Math.max(0, p.y * hw / W - 40) + 'px';
+      };
+      g.addEventListener('pointerenter', on); g.addEventListener('focus', on);
+      g.addEventListener('pointerleave', () => tip.hidden = true); g.addEventListener('blur', () => tip.hidden = true);
+    }
+  }
+
+  const tstate = { group: 'Все', sort: 'stance', dir: 1 };
+  const stanceOrder = { buy: 0, wait: 1, sell: 2 };
+  function spark(parent, c) {
+    const W = 120, H = 30, sv = s('svg', { viewBox: `0 0 ${W} ${H}`, width: W, height: H, 'aria-hidden': 'true' }, parent);
+    const v = c.spark.map((r) => r[1]); const lo = Math.min(...v), hi = Math.max(...v);
+    const y = (x) => H - 3 - (Math.log(x) - Math.log(lo)) / (Math.log(hi) - Math.log(lo) || 1) * (H - 6);
+    const x = (i) => 2 + i / (v.length - 1) * (W - 8);
+    s('path', { d: v.map((val, i) => (i ? 'L' : 'M') + x(i).toFixed(1) + ',' + y(val).toFixed(1)).join(''), fill: 'none', stroke: 'var(--muted)', 'stroke-width': 1.5, 'stroke-linejoin': 'round' }, sv);
+    s('circle', { cx: x(v.length - 1), cy: y(v[v.length - 1]), r: 3, fill: 'var(--ink)' }, sv);
+  }
+  function drawTable() {
+    const t = document.getElementById('map-table'); t.textContent = '';
+    const cols = [['name', 'Коммодити'], ['nominal', 'Цена, ном.'], ['pct_all', 'Уровень в истории'], ['chg12', '12 мес.'], ['stage', 'Фаза цикла'], ['stance', 'Сигнал'], ['spark', 'Реальная цена с 1970']];
+    const hr = el('tr', null, el('thead', null, t));
+    for (const [k, h] of cols) {
+      const th = el('th', { class: (['nominal', 'chg12'].includes(k) ? 'r ' : '') + (['pct_all', 'chg12', 'stance', 'name'].includes(k) ? 'sortable' : '') }, hr, h);
+      if (th.classList.contains('sortable')) {
+        th.tabIndex = 0;
+        if (tstate.sort === k) th.setAttribute('aria-sort', tstate.dir > 0 ? 'ascending' : 'descending');
+        const go = () => { tstate.dir = tstate.sort === k ? -tstate.dir : 1; tstate.sort = k; drawTable(); };
+        th.addEventListener('click', go); th.addEventListener('keydown', (e) => { if (e.key === 'Enter') go(); });
+      }
+    }
+    const tb = el('tbody', null, t);
+    const rows = C.filter((c) => tstate.group === 'Все' || c.group === tstate.group).slice().sort((a, b) => {
+      const k = tstate.sort;
+      let va = k === 'stance' ? stanceOrder[a.stance] * 1000 + a.pct_all : a[k], vb = k === 'stance' ? stanceOrder[b.stance] * 1000 + b.pct_all : b[k];
+      if (k === 'name') return tstate.dir * a.name.localeCompare(b.name, 'ru');
+      return tstate.dir * (va - vb);
+    });
+    for (const c of rows) {
+      const tr = el('tr', null, tb);
+      let td = el('td', null, tr); el('div', { class: 'tname' }, td, c.name);
+      el('div', { class: 'tgroup' }, td, c.group + (c.short_history ? ' · история с 2000, поквартально' : ' · с ' + c.hist_from.slice(0, 4)));
+      td = el('td', { class: 'num r' }, tr); td.textContent = fmtP(c.nominal); el('div', { class: 'tgroup' }, td, c.unit);
+      td = el('td', null, tr);
+      const mt = el('div', { class: 'meter', style: 'min-width:130px', role: 'img', 'aria-label': Math.round(c.pct_all) + '-й перцентиль' }, td);
+      el('i', { style: 'left:' + c.pct_all + '%' }, mt); el('i', { class: 'recent', style: 'left:' + c.pct_recent + '%' }, mt);
+      el('div', { class: 'tgroup', style: 'margin-top:4px' }, td, c.level + ' · ' + Math.round(c.pct_all) + ' / ' + Math.round(c.pct_recent));
+      el('td', { class: 'num r ' + (c.chg12 >= 0 ? 'up-txt' : 'down-txt') }, tr, fmtPct(c.chg12));
+      td = el('td', null, tr); el('div', null, td, c.stage_label);
+      const ph = c.phase;
+      el('div', { class: 'tgroup' }, td, (ph.kind === 'up' ? 'рост ' : 'спад ') + mo(ph.months) + ', ' + fmtPct(ph.change) + (ph.extreme_date ? '; от ' + (ph.kind === 'down' ? 'дна ' : 'пика ') + fmtPct(ph.since_extreme) : ''));
+      td = el('td', null, tr); stanceChip(td, c.stance === 'buy' ? 'buy' : c.stance === 'sell' ? 'sell' : '', c.stance_label);
+      td = el('td', null, tr); spark(td, c);
+    }
+  }
+  const gf = document.getElementById('group-filters');
+  ['Все', ...new Set(C.map((c) => c.group))].forEach((g) => {
+    const b = el('button', { class: 'toggle', 'aria-pressed': g === tstate.group ? 'true' : 'false' }, gf, g);
+    b.addEventListener('click', () => { tstate.group = g; gf.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', x === b)); drawTable(); });
+  });
+
+  // ---------- вкладки ----------
+  const TABS = ['coal', 'map', 'research', 'method'];
+  const drawn = {};
+  function drawTab(id) {
+    if (id === 'coal') { drawMain(); drawLong(); drawPhases(); if (!drawn.ct) { drawCycleTable(); drawn.ct = 1; } }
+    if (id === 'map') { drawMap(); if (!drawn.mt) { drawTable(); drawn.mt = 1; } }
+  }
+  let active = 'coal';
+  function openTab(id, push) {
+    if (!TABS.includes(id)) id = 'coal';
+    active = id;
+    for (const t of TABS) {
+      document.getElementById(t).hidden = t !== id;
+      document.getElementById('tab-' + t).setAttribute('aria-selected', t === id);
+    }
+    drawTab(id);
+    if (push) { try { history.replaceState(null, '', '#' + id); } catch (e) { /* песочница */ } }
+  }
+  TABS.forEach((t) => document.getElementById('tab-' + t).addEventListener('click', () => openTab(t, true)));
+  document.querySelector('[role="tablist"]').addEventListener('keydown', (e) => {
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+    const i = (TABS.indexOf(active) + (e.key === 'ArrowRight' ? 1 : TABS.length - 1)) % TABS.length;
+    openTab(TABS[i], true); document.getElementById('tab-' + TABS[i]).focus();
+  });
+  openTab((location.hash || '').slice(1), false);
+  let rt; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => drawTab(active), 120); });
+  try { window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => drawTab(active)); } catch (e) { /* старый браузер */ }
+
+  const f = document.getElementById('footer');
+  f.textContent = 'Источники: Всемирный банк (Pink Sheet, обновление ' + M.wb_updated + '), EIA (США), FRED (индекс потребительских цен США). Реальные цены ' + baseTxt + '. Сигналы — эвристика для обсуждения, не инвестиционная рекомендация.';
+})();
+</script>
