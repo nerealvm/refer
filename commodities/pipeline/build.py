@@ -122,7 +122,9 @@ def read_cpi():
     c = pd.read_csv(RAW / 'cpi_nsa.csv')
     c.columns = ['date', 'cpi']
     c['date'] = pd.to_datetime(c['date'])
-    return c.set_index('date')['cpi'].astype(float)
+    cpi = pd.to_numeric(c.set_index('date')['cpi'], errors='coerce')
+    # внутренние пропуски (октябрь 2025 года в FRED пуст) — лог-линейная интерполяция между соседями
+    return np.exp(np.log(cpi).interpolate(limit_area='inside')).dropna()
 
 
 def read_us_bituminous():
@@ -167,11 +169,26 @@ def read_us_exports(rank):
 
 # ---------- аналитика ----------
 
+def despike(series, thr=THRESHOLD):
+    """Убирает одиночные выбросы: точка отличается от обоих соседей больше чем на thr в логарифме
+    в одну сторону (скачок и возврат). Значение заменяется средним геометрическим соседей.
+    Только для датировки циклов; на графиках остаются исходные цены."""
+    s = series.dropna().copy()
+    lv = np.log(s.values)
+    fixed = []
+    for i in range(1, len(lv) - 1):
+        a, b = lv[i] - lv[i - 1], lv[i] - lv[i + 1]
+        if a * b > 0 and min(abs(a), abs(b)) > thr:
+            new = (lv[i - 1] + lv[i + 1]) / 2
+            fixed.append((s.index[i], float(s.iloc[i]), float(np.exp(new))))
+            lv[i] = new
+    return pd.Series(np.exp(lv), index=s.index), fixed
+
+
 def zigzag(series, thr=THRESHOLD):
     """Подтверждённые точки разворота: цена ушла от экстремума на thr в логарифме.
 
     Возвращает список (дата, 'P'|'T', цена) и незавершённый экстремум текущей фазы.
-    Первая точка — начало данных, это не настоящий разворот.
     """
     s = series.dropna()
     v = np.log(s.values)
@@ -186,63 +203,91 @@ def zigzag(series, thr=THRESHOLD):
             if v[i] > v[hi]:
                 hi = i
             if v[i] - v[lo] >= thr:
-                pts.append((lo, 'T')); trend, ext = 1, i
+                pts.append([lo, 'T']); trend, ext = 1, i
             elif v[hi] - v[i] >= thr:
-                pts.append((hi, 'P')); trend, ext = -1, i
+                pts.append([hi, 'P']); trend, ext = -1, i
         elif trend == 1:
             if v[i] > v[ext]:
                 ext = i
             elif v[ext] - v[i] >= thr:
-                pts.append((ext, 'P')); trend, ext = -1, i
+                pts.append([ext, 'P']); trend, ext = -1, i
         else:
             if v[i] < v[ext]:
                 ext = i
             elif v[i] - v[ext] >= thr:
-                pts.append((ext, 'T')); trend, ext = 1, i
+                pts.append([ext, 'T']); trend, ext = 1, i
+    end = ext if trend else len(v) - 1
+    pts = drop_short(pts, v, idx, end)
     out = [(idx[i], k, float(s.iloc[i])) for i, k in pts]
-    out = drop_short(out)
     pending = (idx[ext], 'P' if trend == 1 else 'T', float(s.iloc[ext])) if trend else None
     return out, pending
 
 
-def drop_short(pts, min_months=MIN_PHASE_MONTHS):
-    """Убирает внутренние фазы короче min_months (всплески вроде ЮАР 10–11.2021).
+def snap(pts, v, end):
+    """Каждая точка — настоящий экстремум между соседними точками (пик — максимум, дно — минимум)."""
+    for j, (i, k) in enumerate(pts):
+        lo = pts[j - 1][0] + 1 if j else 0
+        hi = pts[j + 1][0] - 1 if j + 1 < len(pts) else end
+        if hi < lo:
+            continue
+        seg = v[lo:hi + 1]
+        pts[j][0] = lo + int(np.argmax(seg) if k == 'P' else np.argmin(seg))
+    return pts
 
-    Из двух соседних точек одного типа остаётся более экстремальная, чередование P/T сохраняется.
+
+def drop_short(pts, v, idx, end, min_months=MIN_PHASE_MONTHS):
+    """Склеивает завершённые фазы короче min_months (всплески вроде ЮАР 10–11.2021).
+
+    Из двух ближайших однотипных точек остаётся более экстремальная, затем все точки
+    переносятся на настоящие экстремумы между соседями. Повторяем, пока коротких фаз нет.
+    Последняя подтверждённая фаза (перед текущей) не склеивается: за ней нет точки того же типа.
     """
-    pts = list(pts)
-    while True:
-        short = [i for i in range(1, len(pts) - 2) if months_between(pts[i][0], pts[i + 1][0]) < min_months]
+    pts = snap([list(p) for p in pts], v, end)
+    for _ in range(len(pts) + 1):
+        short = [j for j in range(0, len(pts) - 2) if months_between(idx[pts[j][0]], idx[pts[j + 1][0]]) < min_months]
         if not short:
-            return pts
-        i = min(short, key=lambda j: months_between(pts[j][0], pts[j + 1][0]))
-        a, c = pts[i], pts[i + 2]
-        a_wins = a[2] > c[2] if a[1] == 'P' else a[2] < c[2]
+            break
+        j = min(short, key=lambda q: months_between(idx[pts[q][0]], idx[pts[q + 1][0]]))
+        a, c = pts[j], pts[j + 2]
+        a_wins = v[a[0]] > v[c[0]] if a[1] == 'P' else v[a[0]] < v[c[0]]
         if a_wins:
-            del pts[i + 1:i + 3]
+            del pts[j + 1:j + 3]
         else:
-            del pts[i:i + 2]
+            del pts[j:j + 2]
+        pts = snap(pts, v, end)
+    return pts
 
 
 def months_between(a, b):
     return (b.year - a.year) * 12 + (b.month - a.month)
 
 
-def phases_from(series, freq_months=1):
-    pts, pending = zigzag(series)
+def phases_from(series, outliers=None):
+    """Фазы цикла по реальной цене. Цены фаз берутся из исходного ряда, датировка — по ряду без выбросов."""
     s = series.dropna()
+    monthly = len(s) > 2 and (s.index[1:] - s.index[:-1]).median().days <= 31
+    # выбросы ищем только в помесячных рядах: в годовых и квартальных одна точка — это уже целый период
+    clean, fixed = despike(s) if monthly else (s, [])
+    if outliers is not None:
+        outliers.extend(fixed)
+    pts, pending = zigzag(clean)
+    pts = [(d, k, float(s.loc[d])) for d, k, _ in pts]
+    if pending:
+        pending = (pending[0], pending[1], float(s.loc[pending[0]]))
+    # фаза, начатая в первые 12 месяцев ряда, обрезана началом данных — в статистику не идёт
+    cut = lambda d: months_between(s.index[0], d) < 12
     phases = []
     for (d0, k0, p0), (d1, k1, p1) in zip(pts, pts[1:]):
         phases.append(dict(start=d0, end=d1, kind='up' if k0 == 'T' else 'down',
                            p0=p0, p1=p1, months=months_between(d0, d1),
-                           change=p1 / p0 - 1, complete=True, data_start=(d0 == s.index[0])))
+                           change=p1 / p0 - 1, complete=True, data_start=cut(d0)))
     if pts:
         d0, k0, p0 = pts[-1]
         last_d, last_p = s.index[-1], float(s.iloc[-1])
         kind = 'up' if k0 == 'T' else 'down'
         ph = dict(start=d0, end=last_d, kind=kind, p0=p0, p1=last_p,
                   months=months_between(d0, last_d), change=last_p / p0 - 1,
-                  complete=False, data_start=(d0 == s.index[0]))
+                  complete=False, data_start=cut(d0))
         if pending:
             pd_, pk, pp = pending
             ph['extreme_date'] = pd_
@@ -392,10 +437,11 @@ def build():
     za_r = real['Coal, South African **'].dropna()
     za_n = pink['Coal, South African **'].dropna()
 
+    outliers = []
     coal = {}
     for key, rs, ns, freq in (('thermal_au', au_r, au_n, 'M'), ('thermal_za', za_r, za_n, 'M'),
                               ('met_us', met_r, met_n, 'Q'), ('steam_us', stm_r, stm_n, 'Q')):
-        ph = phases_from(rs)
+        ph = phases_from(rs)  # выбросы угля попадают в список через карту коммодити
         coal[key] = dict(
             freq=freq,
             series=[[ym(d), rnd(ns.loc[d], 1), rnd(rs.loc[d], 1)] for d in rs.index],
@@ -405,10 +451,13 @@ def build():
 
     au_annual = au_r.groupby(au_r.index.year).mean()
     au_months = au_r.groupby(au_r.index.year).size()
-    # 170 лет: индекс Джекса, после 2020 продлён по годовой реальной цене Newcastle (цепной индекс)
+    # 170 лет: индекс Джекса, после 2020 продлён по годовой реальной цене Newcastle.
+    # Коэффициент связки — среднее отношение индекса к Newcastle за 2010–2020, а не один 2020 год.
     jk = read_jacks_coal()
     last_y = int(jk.index[-1])
-    ext = {y: jk.loc[last_y] * au_annual.loc[y] / au_annual.loc[last_y] for y in au_annual.index if y > last_y}
+    link_years = [y for y in range(2010, last_y + 1) if y in au_annual.index]
+    link = float(np.mean([jk.loc[y] / au_annual.loc[y] for y in link_years]))
+    ext = {y: au_annual.loc[y] * link for y in au_annual.index if y > last_y}
     jk_all = pd.concat([jk, pd.Series(ext)])
     jk_ts = pd.Series(jk_all.values, index=pd.to_datetime([f'{y}-07-01' for y in jk_all.index]))
     jk_phases = phases_from(jk_ts)
@@ -417,6 +466,7 @@ def build():
         jacks_phases=[dict(start=int(p['start'].year), end=int(p['end'].year), kind=p['kind'],
                            change=rnd(p['change'], 4), complete=p['complete']) for p in jk_phases],
         jacks_last_source_year=last_y,
+        jacks_link_years=[link_years[0], link_years[-1]],
         au_partial_months=int(au_months.iloc[-1]),
         us_bit=[[int(y), rnd(bit_n.loc[y], 1), rnd(bit_r.loc[y], 1)] for y in bit_r.index],
         au=[[int(y), rnd(v, 1), int(au_months.loc[y])] for y, v in au_annual.items()],
@@ -428,17 +478,19 @@ def build():
     cmap = []
     for key, col, name, group, unit in COMMODITIES:
         rs = real[col].dropna()
-        ph = phases_from(rs)
+        found = []
+        ph = phases_from(rs, found)
+        outliers.extend((name, d, o, r) for d, o, r in found)
         pos = position(rs, ph)
         annual = rs[rs.index >= PCT_FROM].groupby(rs[rs.index >= PCT_FROM].index.year).mean()
-        cmap.append(dict(key=key, name=name, group=group, unit=unit, nominal=rnd(pink[col].dropna().iloc[-1], 2),
+        cmap.append(dict(key=key, name=name, group=group, unit=unit, freq='M', nominal=rnd(pink[col].dropna().iloc[-1], 2),
                          spark=[[int(y), rnd(v, 3)] for y, v in annual.items()],
                          cycles=sum(1 for p in ph if p['complete'] and not p['data_start']),
                          **ser_position(pos)))
     # коксующийся уголь (прокси) — отдельной строкой, история с 2000 года
     ph = phases_from(met_r)
     pos = position(met_r, ph)
-    cmap.insert(2, dict(key='met_us', name='Уголь коксующийся (экспорт США)', group='Уголь', unit='$/т',
+    cmap.insert(2, dict(key='met_us', name='Уголь коксующийся (экспорт США)', group='Уголь', unit='$/т', freq='Q',
                         nominal=rnd(met_n.iloc[-1], 1), short_history=True,
                         spark=[[int(y), rnd(v, 3)] for y, v in met_r.groupby(met_r.index.year).mean().items()],
                         cycles=sum(1 for p in ph if p['complete'] and not p['data_start']),
@@ -458,6 +510,8 @@ def build():
             down_pct=rnd(np.exp(-THRESHOLD) - 1, 3),
             pct_from=PCT_FROM[:4],
             recent_years=PCT_RECENT_YEARS,
+            outliers=[dict(series=n, date=ym(d), original=rnd(o, 1), replaced=rnd(r, 1))
+                      for n, d, o, r in sorted({(n, d, o, r) for n, d, o, r in outliers}, key=lambda x: (x[0], x[1]))],
         ),
         coal=coal,
         long_run=long_run,
@@ -469,8 +523,10 @@ def build():
     # ---- выгрузки ----
     OUT.mkdir(exist_ok=True)
     pd.DataFrame({'nominal_usd_t': au_n, 'real_usd_t': au_r}).to_csv(OUT / 'coal_newcastle_monthly.csv', index_label='month')
-    pd.DataFrame({'met_nominal_usd_t': met_n, 'met_real_usd_t': met_r, 'steam_nominal_usd_t': stm_n,
-                  'steam_real_usd_t': stm_r}).to_csv(OUT / 'coal_us_exports_quarterly.csv', index_label='quarter')
+    qdf = pd.DataFrame({'met_nominal_usd_t': met_n, 'met_real_usd_t': met_r, 'steam_nominal_usd_t': stm_n,
+                        'steam_real_usd_t': stm_r})
+    qdf.index = [f'{d.year}-Q{(d.month - 1) // 3 + 1}' for d in qdf.index]
+    qdf.to_csv(OUT / 'coal_us_exports_quarterly.csv', index_label='quarter')
     pd.DataFrame({'nominal_usd_t': bit_n, 'real_usd_t': bit_r}).to_csv(OUT / 'coal_us_bituminous_annual.csv', index_label='year')
     pd.DataFrame({'real_index_1900_100': jk_all, 'extended_by_newcastle': [int(y > last_y) for y in jk_all.index]}).to_csv(
         OUT / 'coal_jacks_1850_annual.csv', index_label='year')
@@ -479,8 +535,10 @@ def build():
         for p in c['phases']:
             rows.append(dict(series=key, **{k: v for k, v in p.items()}))
     pd.DataFrame(rows).to_csv(OUT / 'coal_cycles.csv', index=False)
-    pd.DataFrame([{k: v for k, v in c.items() if k not in ('spark', 'phase', 'stats')} for c in cmap]).to_csv(
-        OUT / 'commodity_map.csv', index=False)
+    qlab = lambda d: f'{d[:4]}-Q{(int(d[5:7]) - 1) // 3 + 1}'
+    pd.DataFrame([{**{k: v for k, v in c.items() if k not in ('spark', 'phase', 'stats')},
+                   **({'last_date': qlab(c['last_date']), 'hist_from': qlab(c['hist_from'])} if c['freq'] == 'Q' else {})}
+                  for c in cmap]).to_csv(OUT / 'commodity_map.csv', index=False)
     (OUT / 'dashboard.json').write_text(json.dumps(payload, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
 
     tpl = (DASH / 'template.html').read_text(encoding='utf-8')

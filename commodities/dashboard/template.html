@@ -248,7 +248,7 @@ footer { color: var(--muted); font-size: 12.5px; padding-block: 0 40px; }
   <section class="tab" id="map" role="tabpanel" aria-labelledby="tab-map" hidden>
     <div class="panel">
       <h2>Карта циклов: 20 коммодити</h2>
-      <p class="sub">По горизонтали — уровень реальной цены в истории с 1970 года (перцентиль). По вертикали — изменение за 12 месяцев. Цвет — сигнал для сделок.</p>
+      <p class="sub">По горизонтали — уровень реальной цены в истории с 1970 года или с начала ряда (перцентиль). По вертикали — изменение за 12 месяцев. Цвет — сигнал для сделок.</p>
       <div class="chart" id="map-chart"></div>
       <div class="legend">
         <span><i class="chip buy" style="padding:0;background:none"><i class="dot"></i></i>Окно покупки</span>
@@ -329,7 +329,7 @@ const DATA = /*__DATA__*/null;
   };
   for (const k in SER) {
     const c = DATA.coal[k];
-    SER[k].pts = c.series.map((r) => ({ t: ymT(r[0]) + (SER[k].q ? 1 / 12 : 0), d: r[0], nom: r[1], real: r[2] }));
+    SER[k].pts = c.series.map((r) => ({ t: ymT(r[0]) + (SER[k].q ? 1.5 / 12 : 0), d: r[0], nom: r[1], real: r[2] }));
     SER[k].pos = c.position;
     SER[k].phases = c.phases;
   }
@@ -349,7 +349,7 @@ const DATA = /*__DATA__*/null;
     el('span', null, nm, title);
     el('span', { class: 'eyebrow' }, head, dateLbl(k, p.last_date));
     const pr = el('div', { class: 'price' }, box, fmtP(p.last));
-    el('small', null, pr, '$/т ' + (SER[k].q ? '(реальная)' : ''));
+    el('small', null, pr, ' $/т' + (SER[k].q ? ' (реальная)' : ''));
     const chips = el('div', { class: 'chips' }, box);
     stanceChip(chips, p.stance === 'buy' ? 'buy' : p.stance === 'sell' ? 'sell' : '', p.stance_label);
     el('span', { class: 'chip plain' }, chips, p.stage_label);
@@ -375,7 +375,7 @@ const DATA = /*__DATA__*/null;
     if (note) el('p', { class: 'note', style: 'margin:0' }, box, note);
   }
   verdict('thermal_au', 'Энергетический уголь, Newcastle', 'Цены Всемирного банка: Австралия, FOB Newcastle, 6000 ккал/кг.');
-  verdict('met_us', 'Коксующийся уголь (прокси)', 'Средняя экспортная цена угля для металлургии из США, поквартально. Бесплатного ряда бенчмарка PLV HCC нет. История с 2000 года.');
+  verdict('met_us', 'Коксующийся уголь (прокси)', 'Средняя экспортная цена угля для металлургии из США, поквартально, с 2000 года. Сглажена: на пиках 47–65% от бенчмарка HCC, спад 2008–09 годов в ней не виден. Надёжность сигнала низкая: медианы по 2 фазам.');
 
   // ---------- общий движок линейного графика ----------
   function niceLinTicks(lo, hi, n) {
@@ -717,7 +717,13 @@ const DATA = /*__DATA__*/null;
     const lg = document.getElementById('long-legend'); lg.textContent = '';
     let sp = el('span', null, lg); el('i', { class: 'key', style: 'background:var(--s-usbit)' }, sp); sp.appendChild(document.createTextNode('Индекс Д. Джекса, 1850–' + ly));
     sp = el('span', null, lg); el('i', { class: 'key', style: 'background:repeating-linear-gradient(90deg,var(--s-usbit) 0 4px,transparent 4px 7px)' }, sp); sp.appendChild(document.createTextNode('продление по Newcastle, ' + (ly + 1) + '–' + L.jacks[L.jacks.length - 1][0]));
-    document.getElementById('long-note').textContent = 'Источник: D. Jacks, «From Boom to Bust» (NBER w18874), данные 1850–' + ly + '. После ' + ly + ' года индекс продлён по изменению годовой реальной цены Newcastle (Всемирный банк); ' + L.jacks[L.jacks.length - 1][0] + ' — неполный год. Фазы найдены тем же правилом, что и для помесячных цен.';
+    const au = Object.fromEntries(L.au.map((r) => [r[0], r[1]])), us = Object.fromEntries(L.us_bit.map((r) => [r[0], r[2]]));
+    const auPre = Math.max(...L.au.filter((r) => r[0] < 2000).map((r) => r[1])), auPreY = L.au.find((r) => r[1] === auPre)[0];
+    const usPre = Math.max(...L.us_bit.filter((r) => r[0] < 2000).map((r) => r[2])), usPreY = L.us_bit.find((r) => r[2] === usPre)[0];
+    const fx = (x) => nf(1).format(x);
+    document.getElementById('long-note').textContent = 'Источник: D. Jacks, «From Boom to Bust» (NBER w18874), данные 1850–' + ly + '. До 2010 года индекс — цена угля на шахтах США, после — морской рынок. После ' + ly +
+      ' года он продлён по Newcastle через среднее соотношение ' + L.jacks_link_years.join('–') + ' годов; ' + L.jacks[L.jacks.length - 1][0] + ' — неполный год. Уровни до и после 2010 года напрямую не сравнимы: 2022 год в ценах Newcastle в ' + fx(au[2022] / auPre) + ' раза выше ' + auPreY +
+      ' года, а по цене на шахтах США — ' + fx(us[2022] / usPre) + ' от уровня ' + usPreY + ' года. Даты пиков и спадов надёжнее уровней.';
   }
 
   // ---------- фазы: длительность × амплитуда ----------
@@ -954,6 +960,12 @@ const DATA = /*__DATA__*/null;
   let rt; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => drawTab(active), 120); });
   try { window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => drawTab(active)); } catch (e) { /* старый браузер */ }
 
+  const ol = document.getElementById('outlier-list');
+  if (ol) {
+    const rows = M.outliers || [];
+    if (!rows.length) el('li', null, ol, 'Выбросов не найдено.');
+    rows.forEach((o) => el('li', null, ol, o.series + ', ' + ymLabel(o.date) + ': ' + fmtP(o.original) + ' → ' + fmtP(o.replaced) + ' (реальные $)'));
+  }
   const f = document.getElementById('footer');
   f.textContent = 'Источники: Всемирный банк (Pink Sheet, обновление ' + M.wb_updated + '), EIA (США), FRED (индекс потребительских цен США). Реальные цены ' + baseTxt + '. Сигналы — эвристика для обсуждения, не инвестиционная рекомендация.';
 })();
