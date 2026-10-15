@@ -1,5 +1,584 @@
 [
  {
+  "company": "Coal India",
+  "ticker": "COALINDIA",
+  "country": "Индия",
+  "segment": "thermal",
+  "currency": "INR",
+  "unit": "млн",
+  "fiscal_year_end": "март",
+  "source": "https://stockanalysis.com/quote/nse/COALINDIA/financials/cash-flow-statement/ (+ /financials/ для выручки) (FY2022-26); https://www.screener.in/company/COALINDIA/consolidated/ (FY2015-21, крор x10)",
+  "notes": "year = год окончания фингода (FY2026 = апр 2025 - март 2026). Склейка источников между FY2021 и FY2022: D&A у screener выше SA ~3%; выручка FY23/FY24 у screener выше SA на 4,6%/7,0%, взята SA.",
+  "years": [
+   {
+    "year": 2015,
+    "capex": 49010.0,
+    "da": 23200.0,
+    "revenue": 741200.0
+   },
+   {
+    "year": 2016,
+    "capex": 57860.0,
+    "da": 28260.0,
+    "revenue": 778610.0
+   },
+   {
+    "year": 2017,
+    "capex": 86760.0,
+    "da": 29070.0,
+    "revenue": 781640.0
+   },
+   {
+    "year": 2018,
+    "capex": 85290.0,
+    "da": 30630.0,
+    "revenue": 852440.0
+   },
+   {
+    "year": 2019,
+    "capex": 70570.0,
+    "da": 34500.0,
+    "revenue": 995860.0
+   },
+   {
+    "year": 2020,
+    "capex": 56200.0,
+    "da": 34510.0,
+    "revenue": 960800.0
+   },
+   {
+    "year": 2021,
+    "capex": 108800.0,
+    "da": 37180.0,
+    "revenue": 900260.0
+   },
+   {
+    "year": 2022,
+    "capex": 120237.0,
+    "da": 42842.0,
+    "revenue": 1097154.2
+   },
+   {
+    "year": 2023,
+    "capex": 153181.1,
+    "da": 66601.5,
+    "revenue": 1321099.6
+   },
+   {
+    "year": 2024,
+    "capex": 168213.4,
+    "da": 65323.5,
+    "revenue": 1352714.9
+   },
+   {
+    "year": 2025,
+    "capex": 143321.4,
+    "da": 89607.5,
+    "revenue": 1691773.7
+   },
+   {
+    "year": 2026,
+    "capex": 124996.4,
+    "da": 99253.7,
+    "revenue": 1684002.9
+   }
+  ]
+ },
+ {
+  "company": "China Shenhua Energy",
+  "ticker": "1088.HK",
+  "country": "Китай",
+  "segment": "thermal",
+  "currency": "CNY",
+  "unit": "млн",
+  "fiscal_year_end": "декабрь",
+  "source": "https://stockanalysis.com/quote/hkg/1088/financials/cash-flow-statement/ (+ /financials/ для выручки) (2021-25, МСФО); 2010-20: A-акция 601088 по CAS, Eastmoney datacenter RPT_F10_FINANCE_GCASHFLOW + Sina getFinanceReport2022",
+  "notes": "Консолидировано (уголь, электро, ж/д, порты, химия). 2010-20 по китайским стандартам (CAS): capex = выплаты на ОС/НМА/долгосрочные активы; D&A = амортизация ОС + НМА + долгоср. расходов + права пользования. Склейка 2020/2021: D&A по CAS на ~2-5% выше МСФО, capex на ~3%.",
+  "years": [
+   {
+    "year": 2010,
+    "capex": 32171.0,
+    "da": 14400.0,
+    "revenue": 157662.0
+   },
+   {
+    "year": 2011,
+    "capex": 45341.0,
+    "da": 16345.0,
+    "revenue": 209225.0
+   },
+   {
+    "year": 2012,
+    "capex": 54629.0,
+    "da": 20252.0,
+    "revenue": 254575.0
+   },
+   {
+    "year": 2013,
+    "capex": 51665.0,
+    "da": 20181.0,
+    "revenue": 283797.0
+   },
+   {
+    "year": 2014,
+    "capex": 45151.0,
+    "da": 21911.0,
+    "revenue": 253081.0
+   },
+   {
+    "year": 2015,
+    "capex": 29876.0,
+    "da": 23625.0,
+    "revenue": 177069.0
+   },
+   {
+    "year": 2016,
+    "capex": 29058.0,
+    "da": 23945.0,
+    "revenue": 183127.0
+   },
+   {
+    "year": 2017,
+    "capex": 20268.0,
+    "da": 24625.0,
+    "revenue": 248746.0
+   },
+   {
+    "year": 2018,
+    "capex": 20935.0,
+    "da": 23584.0,
+    "revenue": 264101.0
+   },
+   {
+    "year": 2019,
+    "capex": 19009.0,
+    "da": 20560.0,
+    "revenue": 241871.0
+   },
+   {
+    "year": 2020,
+    "capex": 20673.0,
+    "da": 19831.0,
+    "revenue": 233263.0
+   },
+   {
+    "year": 2021,
+    "capex": 23011.0,
+    "da": 20383.0,
+    "revenue": 335640.0
+   },
+   {
+    "year": 2022,
+    "capex": 28684.0,
+    "da": 21587.0,
+    "revenue": 344533.0
+   },
+   {
+    "year": 2023,
+    "capex": 36103.0,
+    "da": 22098.0,
+    "revenue": 343074.0
+   },
+   {
+    "year": 2024,
+    "capex": 36814.0,
+    "da": 23160.0,
+    "revenue": 339788.0
+   },
+   {
+    "year": 2025,
+    "capex": 46674.0,
+    "da": 23283.0,
+    "revenue": 294916.0
+   }
+  ]
+ },
+ {
+  "company": "China Coal Energy",
+  "ticker": "1898.HK",
+  "country": "Китай",
+  "segment": "mixed",
+  "currency": "CNY",
+  "unit": "млн",
+  "fiscal_year_end": "декабрь",
+  "source": "https://stockanalysis.com/quote/hkg/1898/financials/cash-flow-statement/ (+ /financials/ для выручки) (2021-25); 2010-20: A-акция 601898 по CAS, Eastmoney + Sina",
+  "notes": "Уголь (энергетический и коксующийся) + угольная химия + оборудование. 2010-20 по CAS; D&A собрана как у Shenhua.",
+  "years": [
+   {
+    "year": 2010,
+    "capex": 12304.5,
+    "da": 4281.8,
+    "revenue": 71268.4
+   },
+   {
+    "year": 2011,
+    "capex": 20220.0,
+    "da": 4246.7,
+    "revenue": 90864.7
+   },
+   {
+    "year": 2012,
+    "capex": 27559.7,
+    "da": 4205.0,
+    "revenue": 87291.7
+   },
+   {
+    "year": 2013,
+    "capex": 25374.5,
+    "da": 4767.8,
+    "revenue": 82316.5
+   },
+   {
+    "year": 2014,
+    "capex": 19695.2,
+    "da": 5141.5,
+    "revenue": 70663.8
+   },
+   {
+    "year": 2015,
+    "capex": 11440.9,
+    "da": 6741.6,
+    "revenue": 59270.9
+   },
+   {
+    "year": 2016,
+    "capex": 9016.1,
+    "da": 6309.7,
+    "revenue": 60664.1
+   },
+   {
+    "year": 2017,
+    "capex": 8577.3,
+    "da": 6761.5,
+    "revenue": 81512.6
+   },
+   {
+    "year": 2018,
+    "capex": 9434.4,
+    "da": 7472.4,
+    "revenue": 104140.1
+   },
+   {
+    "year": 2019,
+    "capex": 10945.5,
+    "da": 9625.2,
+    "revenue": 129334.7
+   },
+   {
+    "year": 2020,
+    "capex": 10308.3,
+    "da": 9947.7,
+    "revenue": 140964.7
+   },
+   {
+    "year": 2021,
+    "capex": 10427.5,
+    "da": 10626.9,
+    "revenue": 239828.4
+   },
+   {
+    "year": 2022,
+    "capex": 9756.2,
+    "da": 10456.9,
+    "revenue": 220576.9
+   },
+   {
+    "year": 2023,
+    "capex": 17574.9,
+    "da": 11103.9,
+    "revenue": 192968.8
+   },
+   {
+    "year": 2024,
+    "capex": 18081.9,
+    "da": 10247.6,
+    "revenue": 189396.0
+   },
+   {
+    "year": 2025,
+    "capex": 21787.1,
+    "da": 10524.5,
+    "revenue": 148056.7
+   }
+  ]
+ },
+ {
+  "company": "Thungela Resources",
+  "ticker": "TGA",
+  "country": "ЮАР",
+  "segment": "thermal",
+  "currency": "ZAR",
+  "unit": "млн",
+  "fiscal_year_end": "декабрь",
+  "source": "https://stockanalysis.com/quote/jse/TGA/financials/cash-flow-statement/ (+ /financials/ для выручки)",
+  "notes": "До 2021 (сегмент Anglo American) не найдено.",
+  "years": [
+   {
+    "year": 2021,
+    "capex": 2312.0,
+    "da": 1018.0,
+    "revenue": 26282.0
+   },
+   {
+    "year": 2022,
+    "capex": 1923.0,
+    "da": 1197.0,
+    "revenue": 50753.0
+   },
+   {
+    "year": 2023,
+    "capex": 3116.0,
+    "da": 1557.0,
+    "revenue": 30634.0
+   },
+   {
+    "year": 2024,
+    "capex": 3333.0,
+    "da": 2452.0,
+    "revenue": 35554.0
+   },
+   {
+    "year": 2025,
+    "capex": 3051.0,
+    "da": 2914.0,
+    "revenue": 29599.0
+   }
+  ]
+ },
+ {
+  "company": "Exxaro Resources",
+  "ticker": "EXX",
+  "country": "ЮАР",
+  "segment": "mixed",
+  "currency": "ZAR",
+  "unit": "млн",
+  "fiscal_year_end": "декабрь",
+  "source": "https://stockanalysis.com/quote/jse/EXX/financials/cash-flow-statement/ (+ /financials/ для выручки) (2021-25); https://investor.exxaro.com/integrated-reports2021/pdf/full-afs.pdf (2020); https://investor.exxaro.com/integrated-reports2018/pdf/full-afs.pdf (2017-18)",
+  "notes": "Консолидировано, не только уголь (есть возобновляемая энергетика). 2017/2018: capex = PPE на поддержание + на расширение + нематериальные (2018: 2 847 + 2 943 + 1); D&A и выручка из AFS 2018, колонки не сверялись с пересчётом. 2019 и 2010-16 не найдено.",
+  "years": [
+   {
+    "year": 2017,
+    "capex": 3922.0,
+    "da": 1393.0,
+    "revenue": 22813.0
+   },
+   {
+    "year": 2018,
+    "capex": 5791.0,
+    "da": 1582.0,
+    "revenue": 25491.0
+   },
+   {
+    "year": 2020,
+    "capex": 3177.0,
+    "da": 2436.0,
+    "revenue": 28924.0
+   },
+   {
+    "year": 2021,
+    "capex": 2471.0,
+    "da": 2677.0,
+    "revenue": 32771.0
+   },
+   {
+    "year": 2022,
+    "capex": 1652.0,
+    "da": 2679.0,
+    "revenue": 46369.0
+   },
+   {
+    "year": 2023,
+    "capex": 2699.0,
+    "da": 2715.0,
+    "revenue": 38698.0
+   },
+   {
+    "year": 2024,
+    "capex": 2448.0,
+    "da": 2773.0,
+    "revenue": 40725.0
+   },
+   {
+    "year": 2025,
+    "capex": 5099.0,
+    "da": 2888.0,
+    "revenue": 41771.0
+   }
+  ]
+ },
+ {
+  "company": "Bumi Resources",
+  "ticker": "BUMI",
+  "country": "Индонезия",
+  "segment": "thermal",
+  "currency": "USD",
+  "unit": "млн",
+  "fiscal_year_end": "декабрь",
+  "source": "https://stockanalysis.com/quote/idx/BUMI/financials/cash-flow-statement/ (+ /financials/ для выручки)",
+  "notes": "Отчётность в USD, не в IDR. До 2021 не найдено.",
+  "years": [
+   {
+    "year": 2021,
+    "capex": 238.9,
+    "da": 39.6,
+    "revenue": 1008.2
+   },
+   {
+    "year": 2022,
+    "capex": 129.8,
+    "da": 38.0,
+    "revenue": 1830.1
+   },
+   {
+    "year": 2023,
+    "capex": 51.9,
+    "da": 43.9,
+    "revenue": 1679.9
+   },
+   {
+    "year": 2024,
+    "capex": 25.0,
+    "da": 40.3,
+    "revenue": 1359.7
+   },
+   {
+    "year": 2025,
+    "capex": 99.8,
+    "da": 44.6,
+    "revenue": 1424.8
+   }
+  ]
+ },
+ {
+  "company": "Adaro Energy / Alamtri Resources",
+  "ticker": "ADRO",
+  "country": "Индонезия",
+  "segment": "thermal",
+  "currency": "USD",
+  "unit": "млн",
+  "fiscal_year_end": "декабрь",
+  "source": "https://stockanalysis.com/quote/idx/ADRO/financials/cash-flow-statement/ (+ /financials/ для выручки)",
+  "notes": "Отчётность в USD. capex из cash flow (stockanalysis) не равен «Capex» из таблицы компании (2023: 585 против 379 после пересчёта). До 2021 не найдено.",
+  "years": [
+   {
+    "year": 2021,
+    "capex": 180.0,
+    "da": 485.9,
+    "revenue": 3992.7
+   },
+   {
+    "year": 2022,
+    "capex": 402.0,
+    "da": 523.7,
+    "revenue": 8102.4
+   },
+   {
+    "year": 2023,
+    "capex": 585.3,
+    "da": 224.0,
+    "revenue": 2135.4
+   },
+   {
+    "year": 2024,
+    "capex": 836.6,
+    "da": 228.0,
+    "revenue": 2078.7
+   },
+   {
+    "year": 2025,
+    "capex": 801.6,
+    "da": 253.1,
+    "revenue": 1873.5
+   }
+  ]
+ },
+ {
+  "company": "Banpu",
+  "ticker": "BANPU",
+  "country": "Таиланд",
+  "segment": "thermal",
+  "currency": "USD",
+  "unit": "млн",
+  "fiscal_year_end": "декабрь",
+  "source": "https://stockanalysis.com/quote/bkk/BANPU/financials/cash-flow-statement/ (+ /financials/ для выручки)",
+  "notes": "Отчётность в USD, не в THB. Консолидировано (уголь Индонезия/Австралия, газ, электро). D&A 2022 (1 008) включает нетипичные статьи. До 2021 не найдено.",
+  "years": [
+   {
+    "year": 2021,
+    "capex": 281.3,
+    "da": 497.1,
+    "revenue": 4123.6
+   },
+   {
+    "year": 2022,
+    "capex": 283.8,
+    "da": 1008.2,
+    "revenue": 7693.2
+   },
+   {
+    "year": 2023,
+    "capex": 327.5,
+    "da": 572.5,
+    "revenue": 5083.0
+   },
+   {
+    "year": 2024,
+    "capex": 345.2,
+    "da": 607.2,
+    "revenue": 5148.4
+   },
+   {
+    "year": 2025,
+    "capex": 552.3,
+    "da": 622.5,
+    "revenue": 5278.1
+   }
+  ]
+ },
+ {
+  "company": "Indo Tambangraya Megah",
+  "ticker": "ITMG",
+  "country": "Индонезия",
+  "segment": "thermal",
+  "currency": "USD",
+  "unit": "млн",
+  "fiscal_year_end": "декабрь",
+  "source": "https://stockanalysis.com/quote/idx/ITMG/financials/cash-flow-statement/ (+ /financials/ для выручки)",
+  "notes": "Отчётность в USD. До 2021 не найдено.",
+  "years": [
+   {
+    "year": 2021,
+    "capex": 11.8,
+    "da": 94.2,
+    "revenue": 2076.8
+   },
+   {
+    "year": 2022,
+    "capex": 28.4,
+    "da": 100.4,
+    "revenue": 3636.2
+   },
+   {
+    "year": 2023,
+    "capex": 53.6,
+    "da": 65.4,
+    "revenue": 2374.3
+   },
+   {
+    "year": 2024,
+    "capex": 68.0,
+    "da": 48.4,
+    "revenue": 2304.5
+   },
+   {
+    "year": 2025,
+    "capex": 79.0,
+    "da": 76.2,
+    "revenue": 1881.1
+   }
+  ]
+ },
+ {
   "company": "Peabody Energy",
   "ticker": "BTU",
   "country": "США",
@@ -488,7 +1067,7 @@
   "unit": "млн",
   "fiscal_year_end": "июнь",
   "source": "https://stockanalysis.com/quote/asx/whc/financials/cash-flow-statement/ (+ /financials/ для выручки)",
-  "note": "FY = год, закончившийся в июне; 2026 = FY до 30.06.2026; D&A 2023-26 (785/1270/2454/2438) резко выше FY22 - вероятно, включена амортизация активов после покупки угольных активов BMA (2024) и/или прочее, по годовому отчёту не проверено",
+  "note": "FY = год, закончившийся в июне; 2026 = FY до 30.06.2026; D&A 2023-26 (785/1270/2454/2438) резко выше FY22 - вероятно, включена амортизация активов после покупки угольных активов BMA (2024) и/или прочее, по годовому отчёту не проверено D&A за FY2023–26 по stockanalysis выглядит завышенной относительно выручки и по годовым отчётам не сверена: ряд показан, но в медиану не входит.",
   "years": [
    {
     "year": 2022,
@@ -520,7 +1099,8 @@
     "da": 2438.0,
     "revenue": 5401.0
    }
-  ]
+  ],
+  "exclude_from_median": true
  },
  {
   "company": "Yancoal Australia",

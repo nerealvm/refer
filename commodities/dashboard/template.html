@@ -1098,22 +1098,28 @@ const DATA = /*__DATA__*/null;
     if (!CO.length) { note.textContent = 'Данные по компаниям ещё не собраны.'; return; }
     const years = [...new Set(CO.flatMap((c) => c.years.filter((y) => y.capex != null && y.da).map((y) => y.year)))].sort();
     const ratio = {}; CO.forEach((c) => { ratio[c.company] = Object.fromEntries(c.years.filter((y) => y.capex != null && y.da).map((y) => [y.year, y.capex / y.da])); });
-    const med = years.map((y) => { const v = CO.map((c) => ratio[c.company][y]).filter((x) => x != null && isFinite(x)).sort((a, b) => a - b); return { t: y + 0.5, v: v.length >= 2 ? (v.length % 2 ? v[(v.length - 1) / 2] : (v[v.length / 2 - 1] + v[v.length / 2]) / 2) : null, n: v.length }; });
+    const med = years.map((y) => { const v = CO.filter((c) => !c.exclude_from_median).map((c) => ratio[c.company][y]).filter((x) => x != null && isFinite(x) && x < 6).sort((a, b) => a - b); return { t: y + 0.5, v: v.length >= 2 ? (v.length % 2 ? v[(v.length - 1) / 2] : (v[v.length / 2 - 1] + v[v.length / 2]) / 2) : null, n: v.length }; });
     const series = CO.map((c) => ({ name: c.company, short: c.company, color: '--muted', width: 1, opacity: 0.45, noEnd: true, tol: 0.6,
       pts: years.map((y) => ({ t: y + 0.5, v: ratio[c.company][y] != null && isFinite(ratio[c.company][y]) ? Math.min(6, ratio[c.company][y]) : null })) }));
-    series.push({ name: 'Медиана по компаниям', short: 'медиана', color: '--s-au', width: 2.6, tol: 0.6, pts: med.map((m) => ({ t: m.t, v: m.v })) });
+    const medOf = (subset) => years.map((y) => { const v = subset.filter((c) => !c.exclude_from_median).map((c) => ratio[c.company][y]).filter((x) => x != null && isFinite(x) && x < 6).sort((a, b) => a - b); return { t: y + 0.5, v: v.length >= 2 ? (v.length % 2 ? v[(v.length - 1) / 2] : (v[v.length / 2 - 1] + v[v.length / 2]) / 2) : null, n: v.length }; });
+    const medUS = medOf(CO.filter((c) => c.country === 'США'));
+    series.push({ name: 'Медиана, США', short: 'медиана США', color: '--s-met', width: 1.8, dash: '6 4', tol: 0.6, pts: medUS.map((m) => ({ t: m.t, v: m.v })) });
+    series.push({ name: 'Медиана по компаниям', short: 'медиана, все', color: '--s-au', width: 2.6, tol: 0.6, pts: med.map((m) => ({ t: m.t, v: m.v })) });
     const narrow = host.clientWidth < 520;
     lineChart(host, { x: [years[0], years[years.length - 1] + 1], log: false, zero: true, series, endLabels: true, height: narrow ? 280 : 320,
       refLines: [{ y: 1, dash: '4 4', label: 'капзатраты = амортизация' }], aria: 'Капзатраты к амортизации у угольных компаний',
       dateOf: (t) => String(Math.floor(t)), yFmt: (v) => nf(1).format(v) + '×',
       extra: (t) => { const m = med.find((x) => Math.floor(x.t) === Math.floor(t)); return m ? 'компаний в выборке: ' + m.n : null; } });
-    let sp = el('span', null, lg); el('i', { class: 'key', style: 'background:var(--s-au)' }, sp); sp.appendChild(document.createTextNode('медиана по ' + CO.length + ' компаниям'));
-    sp = el('span', null, lg); el('i', { class: 'key', style: 'background:var(--muted);height:1px' }, sp); sp.appendChild(document.createTextNode('отдельные компании: ' + CO.map((c) => c.company).join(', ')));
-    const last = med.filter((m) => m.v != null).slice(-1)[0], first = med.filter((m) => m.v != null)[0];
+    let sp = el('span', null, lg); el('i', { class: 'key', style: 'background:var(--s-au)' }, sp); sp.appendChild(document.createTextNode('медиана по всем компаниям (' + CO.filter((c) => !c.exclude_from_median).length + ')'));
+    sp = el('span', null, lg); el('i', { class: 'key', style: 'background:repeating-linear-gradient(90deg,var(--s-met) 0 6px,transparent 6px 10px)' }, sp); sp.appendChild(document.createTextNode('медиана, компании США (' + CO.filter((c) => c.country === 'США').length + ')'));
+    sp = el('span', null, lg); el('i', { class: 'key', style: 'background:var(--muted);height:1px' }, sp); sp.appendChild(document.createTextNode('отдельные компании: ' + CO.map((c) => c.company.replace(/ \(.*\)| \/.*$/, '') + (c.exclude_from_median ? ' (вне медианы)' : '')).join(', ')));
+    const solid = med.filter((m) => m.v != null && m.n >= 5), last = (solid.length ? solid : med.filter((m) => m.v != null)).slice(-1)[0];
     const lo = med.filter((m) => m.v != null).reduce((a, b) => (b.v < a.v ? b : a));
     note.textContent = last ? 'Медиана в ' + Math.floor(last.t) + ' году — ' + nf(2).format(last.v) + '× (' + last.n + ' компаний). Минимум — ' + nf(2).format(lo.v) + '× в ' + Math.floor(lo.t) + ' году. ' +
       (last.v < 1 ? 'Отрасль инвестирует меньше, чем амортизирует: при прочих равных предложение будет сжиматься.' : last.v > 1.5 ? 'Капитал вернулся в отрасль: через несколько лет предложение вырастет.' : 'Инвестиции примерно на уровне воспроизводства.') +
-      ' Соотношение считается в валюте отчётности каждой компании, поэтому сравнимы траектории, а не абсолютные суммы. Выбросы выше 6× обрезаны.' : '';
+      (() => { const us = medUS.filter((m) => m.v != null); const lo = us.length ? us.reduce((a, b) => (b.v < a.v ? b : a)) : null; const lastUS = us.slice(-1)[0]; return lo ? ' У компаний США минимум ' + nf(2).format(lo.v) + '× пришёлся на ' + Math.floor(lo.t) + ' год, в ' + Math.floor(lastUS.t) + ' году — ' + nf(2).format(lastUS.v) + '×: недоинвестирование 2014–2021 годов и есть тот самый «капитальный цикл», который дал сверхприбыли 2021–2022.' : ''; })() +
+      ' Состав выборки меняется: до 2021 года в ней почти только США, с 2021 добавились Азия и Африка.' +
+      ' Соотношение считается в валюте отчётности каждой компании, поэтому сравнимы траектории, а не абсолютные суммы. Выбросы выше 6× обрезаны. Источники: отчётность SEC (США), stockanalysis, screener.in, Eastmoney; у азиатских и африканских компаний история в основном с 2021 года.' : '';
   }
 
   // ---------- рейтинг типов событий ----------
