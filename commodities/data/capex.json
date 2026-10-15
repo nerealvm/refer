@@ -1,0 +1,611 @@
+[
+ {
+  "company": "Peabody Energy",
+  "ticker": "BTU",
+  "country": "США",
+  "segment": "thermal",
+  "currency": "USD",
+  "unit": "млн",
+  "fiscal_year_end": "декабрь",
+  "source": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001064728.json (10-K, XBRL)",
+  "note": "2017 = сумма предшественника (1 янв-1 апр) и преемника (2 апр-31 дек) из-за fresh-start; после 2017 D&A на новой базе активов; capex = Purchases of PP&E (без Additions to mine development отдельно, если есть)",
+  "years": [
+   {
+    "year": 2010,
+    "capex": 546.0,
+    "da": 429.5,
+    "revenue": 6668.2
+   },
+   {
+    "year": 2011,
+    "capex": 847.4,
+    "da": 474.3,
+    "revenue": 7895.9
+   },
+   {
+    "year": 2012,
+    "capex": 986.0,
+    "da": 663.4,
+    "revenue": 8077.5
+   },
+   {
+    "year": 2013,
+    "capex": 328.4,
+    "da": 740.3,
+    "revenue": 7013.7
+   },
+   {
+    "year": 2014,
+    "capex": 194.4,
+    "da": 655.7,
+    "revenue": 6792.2
+   },
+   {
+    "year": 2015,
+    "capex": 126.8,
+    "da": 572.2,
+    "revenue": 5609.2
+   },
+   {
+    "year": 2016,
+    "capex": 126.6,
+    "da": 465.4,
+    "revenue": 4715.3
+   },
+   {
+    "year": 2017,
+    "capex": 199.4,
+    "da": 641.5,
+    "revenue": 5578.8
+   },
+   {
+    "year": 2018,
+    "capex": 301.0,
+    "da": 679.0,
+    "revenue": 5581.8
+   },
+   {
+    "year": 2019,
+    "capex": 285.4,
+    "da": 601.0,
+    "revenue": 4623.4
+   },
+   {
+    "year": 2020,
+    "capex": 191.4,
+    "da": 346.0,
+    "revenue": 2881.1
+   },
+   {
+    "year": 2021,
+    "capex": 183.1,
+    "da": 308.7,
+    "revenue": 3318.3
+   },
+   {
+    "year": 2022,
+    "capex": 221.5,
+    "da": 317.6,
+    "revenue": 4981.9
+   },
+   {
+    "year": 2023,
+    "capex": 348.3,
+    "da": 321.4,
+    "revenue": 4946.7
+   },
+   {
+    "year": 2024,
+    "capex": 401.3,
+    "da": 343.0,
+    "revenue": 4236.7
+   },
+   {
+    "year": 2025,
+    "capex": 411.4,
+    "da": 384.5,
+    "revenue": 3861.5
+   }
+  ]
+ },
+ {
+  "company": "Warrior Met Coal",
+  "ticker": "HCC",
+  "country": "США",
+  "segment": "met",
+  "currency": "USD",
+  "unit": "млн",
+  "fiscal_year_end": "декабрь",
+  "source": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001691303.json (10-K, XBRL)",
+  "note": "история с 2017 (IPO); capex = закупки PP&E, без отдельной строки PaymentsToAcquireMiningAssets (2023-25: 33.1/31.1/81.9 млн); 2016 неполный период после покупки активов Walter - не включён",
+  "years": [
+   {
+    "year": 2017,
+    "capex": 92.6,
+    "da": 75.4,
+    "revenue": 1169.1
+   },
+   {
+    "year": 2018,
+    "capex": 101.6,
+    "da": 97.2,
+    "revenue": 1378.0
+   },
+   {
+    "year": 2019,
+    "capex": 107.3,
+    "da": 97.3,
+    "revenue": 1268.3
+   },
+   {
+    "year": 2020,
+    "capex": 87.5,
+    "da": 118.1,
+    "revenue": 782.7
+   },
+   {
+    "year": 2021,
+    "capex": 57.9,
+    "da": 141.4,
+    "revenue": 1059.2
+   },
+   {
+    "year": 2022,
+    "capex": 205.2,
+    "da": 115.3,
+    "revenue": 1738.7
+   },
+   {
+    "year": 2023,
+    "capex": 491.7,
+    "da": 127.4,
+    "revenue": 1676.6
+   },
+   {
+    "year": 2024,
+    "capex": 457.2,
+    "da": 154.0,
+    "revenue": 1525.2
+   },
+   {
+    "year": 2025,
+    "capex": 320.3,
+    "da": 188.6,
+    "revenue": 1310.0
+   }
+  ]
+ },
+ {
+  "company": "Alpha Metallurgical Resources (до 2021 Contura Energy)",
+  "ticker": "AMR",
+  "country": "США",
+  "segment": "met",
+  "currency": "USD",
+  "unit": "млн",
+  "fiscal_year_end": "декабрь",
+  "source": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001704715.json (10-K, XBRL) ; D&A 2021-25: https://stockanalysis.com/stocks/amr/financials/cash-flow-statement/",
+  "note": "история с 2017; D&A 2021-25 - строка D&A из отчёта о движении денег (stockanalysis), она выше, чем DD&A в отчёте о прибылях (110.0/107.6/136.9/167.3/174.5); D&A 2017-2020 в XBRL не нашлась",
+  "years": [
+   {
+    "year": 2017,
+    "capex": 72.7,
+    "da": null,
+    "revenue": 1650.0
+   },
+   {
+    "year": 2018,
+    "capex": 81.9,
+    "da": null,
+    "revenue": 2031.2
+   },
+   {
+    "year": 2019,
+    "capex": 160.4,
+    "da": null,
+    "revenue": 2001.3
+   },
+   {
+    "year": 2020,
+    "capex": 119.6,
+    "da": null,
+    "revenue": 1416.2
+   },
+   {
+    "year": 2021,
+    "capex": 83.3,
+    "da": 149.8,
+    "revenue": 2258.7
+   },
+   {
+    "year": 2022,
+    "capex": 164.3,
+    "da": 150.9,
+    "revenue": 4101.6
+   },
+   {
+    "year": 2023,
+    "capex": 245.4,
+    "da": 170.9,
+    "revenue": 3471.4
+   },
+   {
+    "year": 2024,
+    "capex": 198.8,
+    "da": 199.1,
+    "revenue": 2957.3
+   },
+   {
+    "year": 2025,
+    "capex": 127.2,
+    "da": 202.1,
+    "revenue": 2129.5
+   }
+  ]
+ },
+ {
+  "company": "CONSOL Energy / Core Natural Resources",
+  "ticker": "CNR (ранее CEIX)",
+  "country": "США",
+  "segment": "thermal",
+  "currency": "USD",
+  "unit": "млн",
+  "fiscal_year_end": "декабрь",
+  "source": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001710366.json (10-K, XBRL)",
+  "note": "2015-2016 - угольный бизнес CONSOL Energy в составе предшественника; 2025 - уже объединённая Core Natural Resources (слияние с Arch 14.01.2025), ряд несопоставим с 2024",
+  "years": [
+   {
+    "year": 2015,
+    "capex": 143.1,
+    "da": 195.3,
+    "revenue": 1421.7
+   },
+   {
+    "year": 2016,
+    "capex": 53.6,
+    "da": 178.1,
+    "revenue": 1230.9
+   },
+   {
+    "year": 2017,
+    "capex": 81.4,
+    "da": 172.0,
+    "revenue": 1411.9
+   },
+   {
+    "year": 2018,
+    "capex": 145.7,
+    "da": 201.3,
+    "revenue": 1532.0
+   },
+   {
+    "year": 2019,
+    "capex": 169.7,
+    "da": 207.1,
+    "revenue": 1430.9
+   },
+   {
+    "year": 2020,
+    "capex": 86.0,
+    "da": 210.8,
+    "revenue": 1021.6
+   },
+   {
+    "year": 2021,
+    "capex": 132.8,
+    "da": 224.6,
+    "revenue": 1258.9
+   },
+   {
+    "year": 2022,
+    "capex": 171.5,
+    "da": 226.9,
+    "revenue": 2101.9
+   },
+   {
+    "year": 2023,
+    "capex": 167.8,
+    "da": 241.3,
+    "revenue": 2568.9
+   },
+   {
+    "year": 2024,
+    "capex": 178.0,
+    "da": 223.5,
+    "revenue": 2236.3
+   },
+   {
+    "year": 2025,
+    "capex": 284.6,
+    "da": 621.1,
+    "revenue": 4164.8
+   }
+  ]
+ },
+ {
+  "company": "Arch Resources (с 2025 в составе Core Natural Resources)",
+  "ticker": "ARCH",
+  "country": "США",
+  "segment": "mixed",
+  "currency": "USD",
+  "unit": "млн",
+  "fiscal_year_end": "декабрь",
+  "source": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001037676.json (10-K, XBRL)",
+  "note": "2016 пропущен (банкротство, fresh-start, в XBRL только 4 кв.); 2024 нет - Arch не подавала 10-K за 2024; выручка 2010-2015 = продажи угля (CoalProductsAndServicesRevenue), могла быть ниже общей выручки; последняя редакция значений из поздних 10-K",
+  "years": [
+   {
+    "year": 2010,
+    "capex": 314.7,
+    "da": 365.1,
+    "revenue": 3186.3
+   },
+   {
+    "year": 2011,
+    "capex": 540.9,
+    "da": 466.6,
+    "revenue": 3883.0
+   },
+   {
+    "year": 2012,
+    "capex": 395.2,
+    "da": 525.5,
+    "revenue": 3768.1
+   },
+   {
+    "year": 2013,
+    "capex": 297.0,
+    "da": 447.7,
+    "revenue": 3014.4
+   },
+   {
+    "year": 2014,
+    "capex": 147.3,
+    "da": 418.7,
+    "revenue": 2937.1
+   },
+   {
+    "year": 2015,
+    "capex": 119.0,
+    "da": 379.3,
+    "revenue": 2573.3
+   },
+   {
+    "year": 2017,
+    "capex": 59.2,
+    "da": 122.5,
+    "revenue": 2324.6
+   },
+   {
+    "year": 2018,
+    "capex": 95.3,
+    "da": 130.7,
+    "revenue": 2451.8
+   },
+   {
+    "year": 2019,
+    "capex": 266.4,
+    "da": 111.6,
+    "revenue": 2294.4
+   },
+   {
+    "year": 2020,
+    "capex": 285.8,
+    "da": 121.6,
+    "revenue": 1467.6
+   },
+   {
+    "year": 2021,
+    "capex": 245.4,
+    "da": 120.3,
+    "revenue": 2208.0
+   },
+   {
+    "year": 2022,
+    "capex": 172.7,
+    "da": 133.3,
+    "revenue": 3724.6
+   },
+   {
+    "year": 2023,
+    "capex": 176.0,
+    "da": 146.4,
+    "revenue": 3145.8
+   }
+  ]
+ },
+ {
+  "company": "Coronado Global Resources",
+  "ticker": "CRN",
+  "country": "Австралия/США (листинг ASX, регистрация США)",
+  "segment": "met",
+  "currency": "USD",
+  "unit": "млн",
+  "fiscal_year_end": "декабрь",
+  "source": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001770561.json (10-K, XBRL)",
+  "note": "отчитывается в USD, 10-K с 2019; 2017 - только американские активы (Curragh с 2018)",
+  "years": [
+   {
+    "year": 2017,
+    "capex": 63.9,
+    "da": 75.5,
+    "revenue": 768.2
+   },
+   {
+    "year": 2018,
+    "capex": 114.3,
+    "da": 162.1,
+    "revenue": 1980.5
+   },
+   {
+    "year": 2019,
+    "capex": 183.3,
+    "da": 176.5,
+    "revenue": 2215.7
+   },
+   {
+    "year": 2020,
+    "capex": 117.9,
+    "da": 191.2,
+    "revenue": 1462.3
+   },
+   {
+    "year": 2021,
+    "capex": 89.7,
+    "da": 177.9,
+    "revenue": 2148.5
+   },
+   {
+    "year": 2022,
+    "capex": 199.7,
+    "da": 167.0,
+    "revenue": 3571.5
+   },
+   {
+    "year": 2023,
+    "capex": 237.2,
+    "da": 160.7,
+    "revenue": 2890.6
+   },
+   {
+    "year": 2024,
+    "capex": 248.1,
+    "da": 187.4,
+    "revenue": 2507.7
+   },
+   {
+    "year": 2025,
+    "capex": 244.8,
+    "da": 185.3,
+    "revenue": 1949.8
+   }
+  ]
+ },
+ {
+  "company": "Whitehaven Coal",
+  "ticker": "WHC.AX",
+  "country": "Австралия",
+  "segment": "mixed",
+  "currency": "AUD",
+  "unit": "млн",
+  "fiscal_year_end": "июнь",
+  "source": "https://stockanalysis.com/quote/asx/whc/financials/cash-flow-statement/ (+ /financials/ для выручки)",
+  "note": "FY = год, закончившийся в июне; 2026 = FY до 30.06.2026; D&A 2023-26 (785/1270/2454/2438) резко выше FY22 - вероятно, включена амортизация активов после покупки угольных активов BMA (2024) и/или прочее, по годовому отчёту не проверено",
+  "years": [
+   {
+    "year": 2022,
+    "capex": 158.0,
+    "da": 254.0,
+    "revenue": 4927.0
+   },
+   {
+    "year": 2023,
+    "capex": 258.0,
+    "da": 785.0,
+    "revenue": 6073.0
+   },
+   {
+    "year": 2024,
+    "capex": 454.0,
+    "da": 1270.0,
+    "revenue": 3824.0
+   },
+   {
+    "year": 2025,
+    "capex": 393.0,
+    "da": 2454.0,
+    "revenue": 5832.0
+   },
+   {
+    "year": 2026,
+    "capex": 355.0,
+    "da": 2438.0,
+    "revenue": 5401.0
+   }
+  ]
+ },
+ {
+  "company": "Yancoal Australia",
+  "ticker": "YAL.AX",
+  "country": "Австралия",
+  "segment": "thermal",
+  "currency": "AUD",
+  "unit": "млн",
+  "fiscal_year_end": "декабрь",
+  "source": "https://stockanalysis.com/quote/asx/yal/financials/cash-flow-statement/ (+ /financials/ для выручки)",
+  "note": "D&A включает амортизацию прав на добычу; в AUD по данным stockanalysis, годовые отчёты не открывались",
+  "years": [
+   {
+    "year": 2021,
+    "capex": 269.0,
+    "da": 928.0,
+    "revenue": 5408.0
+   },
+   {
+    "year": 2022,
+    "capex": 550.0,
+    "da": 1147.0,
+    "revenue": 10567.0
+   },
+   {
+    "year": 2023,
+    "capex": 622.0,
+    "da": 879.0,
+    "revenue": 7799.0
+   },
+   {
+    "year": 2024,
+    "capex": 705.0,
+    "da": 748.0,
+    "revenue": 6860.0
+   },
+   {
+    "year": 2025,
+    "capex": 751.0,
+    "da": 775.0,
+    "revenue": 5971.0
+   }
+  ]
+ },
+ {
+  "company": "New Hope Corporation",
+  "ticker": "NHC.AX",
+  "country": "Австралия",
+  "segment": "thermal",
+  "currency": "AUD",
+  "unit": "млн",
+  "fiscal_year_end": "июль",
+  "source": "https://stockanalysis.com/quote/asx/nhc/financials/cash-flow-statement/ (+ /financials/ для выручки)",
+  "note": "FY заканчивается 31 июля; 2026 = FY до 31.07.2026",
+  "years": [
+   {
+    "year": 2022,
+    "capex": 77.8,
+    "da": 140.7,
+    "revenue": 2552.0
+   },
+   {
+    "year": 2023,
+    "capex": 186.3,
+    "da": 141.4,
+    "revenue": 2754.0
+   },
+   {
+    "year": 2024,
+    "capex": 271.8,
+    "da": 173.9,
+    "revenue": 1802.0
+   },
+   {
+    "year": 2025,
+    "capex": 310.7,
+    "da": 244.7,
+    "revenue": 1776.0
+   },
+   {
+    "year": 2026,
+    "capex": 193.1,
+    "da": 238.5,
+    "revenue": 1767.0
+   }
+  ]
+ }
+]

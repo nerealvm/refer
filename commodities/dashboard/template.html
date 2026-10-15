@@ -143,6 +143,17 @@ h3 { font-size: 15px; font-weight: 600; margin: 0 0 6px; }
 .facts li .v { color: var(--ink-2); }
 .facts li .src { font-family: var(--font-data); font-size: 11px; color: var(--muted); white-space: nowrap; }
 .facts li .src a { color: var(--muted); }
+.sig-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; margin-top: 10px; }
+.sig { border: 1px solid var(--hair); border-radius: 10px; padding: 10px 12px; background: var(--surface); display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.sig .sname { font-size: 13px; color: var(--ink-2); line-height: 1.25; }
+.sig .sval { font-family: var(--font-data); font-size: 22px; font-weight: 600; color: var(--ink); line-height: 1.1; }
+.sig .sval small { font-size: 12px; font-weight: 400; color: var(--muted); margin-left: 4px; }
+.sig .sdate { font-family: var(--font-data); font-size: 11px; color: var(--muted); }
+.sig .smean { font-size: 12.5px; color: var(--ink-2); line-height: 1.3; }
+.sig .ssrc { font-size: 11px; color: var(--muted); margin-top: auto; }
+.sig .ssrc a { color: var(--muted); }
+.sig.low { border-style: dashed; }
+.sig .chg { font-family: var(--font-data); font-size: 12px; }
 select.pick { font: inherit; font-size: 13px; padding: 5px 8px; border-radius: 8px; border: 1px solid var(--hair); background: var(--surface); color: var(--ink); max-width: 100%; }
 ol.events { list-style: none; margin: 14px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 6px 18px; font-size: 13px; }
 ol.events li { display: grid; grid-template-columns: 22px 62px 1fr; gap: 6px; align-items: baseline; color: var(--ink-2); }
@@ -178,7 +189,10 @@ tr.summary td { font-weight: 600; border-bottom: 0; }
 .up-txt { color: var(--good-ink); } .down-txt { color: var(--warn-ink); }
 
 /* текстовые вкладки */
-.prose { max-width: 74ch; }
+.prose { max-width-off: 74ch; }
+.prose p, .prose ul, .prose ol, .prose h2, .prose h3, .prose .callout { max-width: 76ch; }
+.prose .chart, .prose .sig-grid, .prose .legend, .prose .tbl-wrap { max-width: none; }
+
 .prose h2 { margin-top: 8px; }
 .prose h3 { margin-top: 22px; }
 .prose p, .prose li { color: var(--ink); }
@@ -938,8 +952,9 @@ const DATA = /*__DATA__*/null;
   }));
 
   // ---------- длинный горизонт ----------
-  function drawLong() {
+  function drawLong(sfx = '') {
     const L = DATA.long_run;
+    const byId = (b) => document.getElementById(b + sfx);
     const ly = L.jacks_last_source_year;
     const hist = L.jacks.filter((r) => r[0] <= ly).map((r) => ({ t: r[0] + 0.5, v: r[1] }));
     const ext = L.jacks.filter((r) => r[0] >= ly).map((r) => ({ t: r[0] + 0.5, v: r[1] }));
@@ -952,7 +967,8 @@ const DATA = /*__DATA__*/null;
     const val = (y) => (L.jacks.find((r) => r[0] === y) || [0, null])[1];
     const annot = [];
     ph.forEach((p, i) => { if (i === 0) annot.push({ t: p.start + 0.5, v: val(p.start), text: p.start, below: p.kind === 'up' }); if (p.complete) annot.push({ t: p.end + 0.5, v: val(p.end), text: p.end, below: p.kind === 'down' }); });
-    const host = document.getElementById('long-chart');
+    const host = byId('long-chart');
+    if (!host) return;
     const narrow = host.clientWidth < 520;
     lineChart(host, {
       x: [1850, L.jacks[L.jacks.length - 1][0] + 1.5], log: true, series, endLabels: true, height: narrow ? 300 : 320,
@@ -966,8 +982,8 @@ const DATA = /*__DATA__*/null;
     const peaks = ph.filter((p) => p.kind === 'up' && p.complete).map((p) => p.end);
     const big = peaks.filter((y) => [1920, 1948, 1979, 2010].includes(y));
     const gaps = big.slice(1).map((y, i) => y - big[i]);
-    document.getElementById('long-sub').textContent = 'Реальный индекс цены угля, 1900 = 100, лог. шкала. Пики: ' + peaks.join(', ') + '. Между крупными пиками 1920–2010 годов — ' + Math.min(...gaps) + '–' + Math.max(...gaps) + ' лет.';
-    const lg = document.getElementById('long-legend'); lg.textContent = '';
+    byId('long-sub').textContent = 'Реальный индекс цены угля, 1900 = 100, лог. шкала. Пики: ' + peaks.join(', ') + '. Между крупными пиками 1920–2010 годов — ' + Math.min(...gaps) + '–' + Math.max(...gaps) + ' лет.';
+    const lg = byId('long-legend'); lg.textContent = '';
     let sp = el('span', null, lg); el('i', { class: 'key', style: 'background:var(--s-usbit)' }, sp); sp.appendChild(document.createTextNode('Индекс Д. Джекса, 1850–' + ly));
     sp = el('span', null, lg); el('i', { class: 'key', style: 'background:repeating-linear-gradient(90deg,var(--s-usbit) 0 4px,transparent 4px 7px)' }, sp); sp.appendChild(document.createTextNode('продление по Newcastle, ' + (ly + 1) + '–' + L.jacks[L.jacks.length - 1][0]));
     sp = el('span', null, lg); el('i', { class: 'key', style: 'background:repeating-linear-gradient(90deg,var(--s-usbit) 0 8px,transparent 8px 12px);height:1px' }, sp); sp.appendChild(document.createTextNode('скользящая средняя за 10 лет'));
@@ -975,7 +991,7 @@ const DATA = /*__DATA__*/null;
     const auPre = Math.max(...L.au.filter((r) => r[0] < 2000).map((r) => r[1])), auPreY = L.au.find((r) => r[1] === auPre)[0];
     const usPre = Math.max(...L.us_bit.filter((r) => r[0] < 2000).map((r) => r[2])), usPreY = L.us_bit.find((r) => r[2] === usPre)[0];
     const fx = (x) => nf(1).format(x);
-    document.getElementById('long-note').textContent = 'Источник: D. Jacks, «From Boom to Bust» (NBER w18874), данные 1850–' + ly + '. По 2009 год индекс — цена угля на шахтах США (EIA), с 2010 года он ближе к морскому рынку; источник этого отрезка автор не уточняет. После ' + ly +
+    byId('long-note').textContent = 'Источник: D. Jacks, «From Boom to Bust» (NBER w18874), данные 1850–' + ly + '. По 2009 год индекс — цена угля на шахтах США (EIA), с 2010 года он ближе к морскому рынку; источник этого отрезка автор не уточняет. После ' + ly +
       ' года он продлён по Newcastle через среднее соотношение ' + L.jacks_link_years.join('–') + ' годов; ' + L.jacks[L.jacks.length - 1][0] + ' — неполный год. Уровни до и после 2010 года напрямую не сравнимы: 2022 год в ценах Newcastle в ' + fx(au[2022] / auPre) + ' раза выше ' + auPreY +
       ' года, а по цене на шахтах США — ' + fx(us[2022] / usPre) + ' от уровня ' + usPreY + ' года. Даты пиков и спадов надёжнее уровней.';
   }
@@ -1041,6 +1057,64 @@ const DATA = /*__DATA__*/null;
       'Корреляция говорит, что ряды ходят вместе, но не почему: причины движений — в событиях на графике выше.';
   }
   const fmtCorr = (c) => (c > 0 ? '+' : c < 0 ? '−' : '') + nf(2).format(Math.abs(c));
+
+  // ---------- табло сигналов ----------
+  function drawSignals() {
+    const grid = document.getElementById('signals-grid'); if (!grid) return;
+    grid.textContent = '';
+    const S = DATA.signals || [];
+    let dated = [];
+    for (const sg of S) {
+      const card = el('div', { class: 'sig' + (sg.confidence === 'low' ? ' low' : '') }, grid);
+      el('div', { class: 'sname' }, card, sg.name);
+      if (sg.value == null) {
+        el('div', { class: 'sval', style: 'color:var(--muted);font-size:16px' }, card, 'нет данных');
+        el('div', { class: 'smean' }, card, sg.meaning || '');
+        continue;
+      }
+      const v = el('div', { class: 'sval' }, card, typeof sg.value === 'number' ? fmtP(sg.value) : String(sg.value));
+      el('small', null, v, sg.unit || '');
+      const d = el('div', { class: 'sdate' }, card, sg.date || '');
+      if (sg.change_pct != null) {
+        const c = el('span', { class: 'chg', style: 'margin-left:8px;color:' + (sg.direction_for_price > 0 ? 'var(--up)' : sg.direction_for_price < 0 ? 'var(--down)' : 'var(--ink-2)') }, d, fmtPct(sg.change_pct / 100, 1) + (sg.prev_label ? ' к ' + sg.prev_label.replace(/ \(.*\)$/, '') : ''));
+      }
+      const dir = sg.direction_for_price > 0 ? '▲ для цены вверх' : sg.direction_for_price < 0 ? '▼ для цены вниз' : '→ нейтрально';
+      el('div', { class: 'smean' }, card, dir + '. ' + (sg.meaning || ''));
+      const src = el('div', { class: 'ssrc' }, card);
+      if (sg.source) el('a', { href: sg.source, target: '_blank', rel: 'noopener' }, src, sg.source_name || 'источник'); else src.textContent = sg.source_name || '';
+      if (sg.confidence === 'low') src.appendChild(document.createTextNode(' · низкая надёжность'));
+      if (sg.date) dated.push(sg.date);
+    }
+    dated.sort();
+    document.getElementById('signals-note').textContent = S.length ? 'Снимок собран ' + (M.built || '') + '; даты значений от ' + (dated[0] || '—') + ' до ' + (dated[dated.length - 1] || '—') + '. Карточки с пунктирной рамкой — данные из вторичных пересказов или устаревшие. Запасы в Китае и форвардная кривая Newcastle в открытых источниках не найдены: это место для платных данных (Argus, globalCOAL) или для еженедельного автоматического сбора.' : 'Табло пока пустое.';
+  }
+
+  // ---------- капитальный цикл ----------
+  function drawCapex() {
+    const host = document.getElementById('capex-chart'); if (!host) return;
+    host.textContent = '';
+    const CO = (DATA.capex || []).filter((c) => c.years && c.years.some((y) => y.capex != null && y.da));
+    const note = document.getElementById('capex-note'), lg = document.getElementById('capex-legend'); lg.textContent = '';
+    if (!CO.length) { note.textContent = 'Данные по компаниям ещё не собраны.'; return; }
+    const years = [...new Set(CO.flatMap((c) => c.years.filter((y) => y.capex != null && y.da).map((y) => y.year)))].sort();
+    const ratio = {}; CO.forEach((c) => { ratio[c.company] = Object.fromEntries(c.years.filter((y) => y.capex != null && y.da).map((y) => [y.year, y.capex / y.da])); });
+    const med = years.map((y) => { const v = CO.map((c) => ratio[c.company][y]).filter((x) => x != null && isFinite(x)).sort((a, b) => a - b); return { t: y + 0.5, v: v.length >= 2 ? (v.length % 2 ? v[(v.length - 1) / 2] : (v[v.length / 2 - 1] + v[v.length / 2]) / 2) : null, n: v.length }; });
+    const series = CO.map((c) => ({ name: c.company, short: c.company, color: '--muted', width: 1, opacity: 0.45, noEnd: true, tol: 0.6,
+      pts: years.map((y) => ({ t: y + 0.5, v: ratio[c.company][y] != null && isFinite(ratio[c.company][y]) ? Math.min(6, ratio[c.company][y]) : null })) }));
+    series.push({ name: 'Медиана по компаниям', short: 'медиана', color: '--s-au', width: 2.6, tol: 0.6, pts: med.map((m) => ({ t: m.t, v: m.v })) });
+    const narrow = host.clientWidth < 520;
+    lineChart(host, { x: [years[0], years[years.length - 1] + 1], log: false, zero: true, series, endLabels: true, height: narrow ? 280 : 320,
+      refLines: [{ y: 1, dash: '4 4', label: 'капзатраты = амортизация' }], aria: 'Капзатраты к амортизации у угольных компаний',
+      dateOf: (t) => String(Math.floor(t)), yFmt: (v) => nf(1).format(v) + '×',
+      extra: (t) => { const m = med.find((x) => Math.floor(x.t) === Math.floor(t)); return m ? 'компаний в выборке: ' + m.n : null; } });
+    let sp = el('span', null, lg); el('i', { class: 'key', style: 'background:var(--s-au)' }, sp); sp.appendChild(document.createTextNode('медиана по ' + CO.length + ' компаниям'));
+    sp = el('span', null, lg); el('i', { class: 'key', style: 'background:var(--muted);height:1px' }, sp); sp.appendChild(document.createTextNode('отдельные компании: ' + CO.map((c) => c.company).join(', ')));
+    const last = med.filter((m) => m.v != null).slice(-1)[0], first = med.filter((m) => m.v != null)[0];
+    const lo = med.filter((m) => m.v != null).reduce((a, b) => (b.v < a.v ? b : a));
+    note.textContent = last ? 'Медиана в ' + Math.floor(last.t) + ' году — ' + nf(2).format(last.v) + '× (' + last.n + ' компаний). Минимум — ' + nf(2).format(lo.v) + '× в ' + Math.floor(lo.t) + ' году. ' +
+      (last.v < 1 ? 'Отрасль инвестирует меньше, чем амортизирует: при прочих равных предложение будет сжиматься.' : last.v > 1.5 ? 'Капитал вернулся в отрасль: через несколько лет предложение вырастет.' : 'Инвестиции примерно на уровне воспроизводства.') +
+      ' Соотношение считается в валюте отчётности каждой компании, поэтому сравнимы траектории, а не абсолютные суммы. Выбросы выше 6× обрезаны.' : '';
+  }
 
   // ---------- рейтинг типов событий ----------
   let typeOpen = null;
@@ -1419,6 +1493,7 @@ const DATA = /*__DATA__*/null;
   function drawTab(id) {
     if (id === 'coal') { drawMain(); drawLinks(); drawTypes(); drawLong(); drawPhases(); if (!drawn.ct) { drawCycleTable(); drawn.ct = 1; } }
     if (id === 'map') { drawMap(); drawSD(); if (!drawn.mt) { drawTable(); drawn.mt = 1; } }
+    if (id === 'research') { drawSignals(); drawCapex(); drawLong('-r'); }
   }
   let active = 'coal';
   function openTab(id, push) {

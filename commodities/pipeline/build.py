@@ -733,6 +733,12 @@ def build():
     event_types['from'] = events[0]['date'][:4] if events else None
     event_types.pop('from_', None)
 
+    sig_file = ROOT / 'data' / 'signals.json'
+    signals = json.loads(sig_file.read_text(encoding='utf-8')) if sig_file.exists() else []
+    capex_file = ROOT / 'data' / 'capex.json'
+    capex = json.loads(capex_file.read_text(encoding='utf-8')) if capex_file.exists() else []
+    print('сигналы:', len(signals), '· компании с капзатратами:', len(capex))
+
     payload = dict(
         meta=dict(
             built=pd.Timestamp.now().strftime('%Y-%m-%d'),
@@ -753,6 +759,8 @@ def build():
         links=coal_links(real),
         turns=turns,
         event_types=event_types,
+        signals=signals,
+        capex=capex,
         events=events,
         deals=deals,
     )

@@ -3,56 +3,1666 @@
   "key": "coal_au",
   "name": "Уголь Newcastle (Австралия)",
   "as_of": "2026-10",
-  "horizon": "2027–2031",
+  "horizon": "2027–2030",
   "supply": {
    "score": -1,
-   "summary": "Морское предложение энергетического угля медленно сжимается: Индонезия и Россия сокращают экспорт, Австралия держит около 200 млн т.",
+   "summary": "Предложение морского энергоугля плоско-вниз: Индонезия режет квоты (экспорт 557 → ~495 Мт за 2024–2026), Колумбия падает, Австралия держится на ~210–216 Мт. Новых шахт мало: ввод мощностей в 2025 — десятилетний минимум, NSW закрыл новые greenfield; пайплайн GEM велик, но ~70% ещё до стройки и в основном Китай/Индия для внутреннего рынка.",
    "facts": [
     {
-     "fact": "Экспорт Индонезии",
-     "value": "517,5 млн т в 2025 → 475 в 2027 → 465 в 2031",
+     "fact": "Индонезия: экспорт энергоугля (IEA, пересказ страницы Trade)",
+     "value": "557 Мт (2024) → 517 (2025) → ~495 (2026); в 2027 ожидается наибольшее снижение, цифры нет",
      "date": "2026-09",
-     "source": "https://www.industry.gov.au/publications/resources-and-energy-quarterly-september-2026"
+     "source": "https://www.iea.org/reports/coal-mid-year-update-2026/trade"
     },
     {
-     "fact": "Экспорт Австралии",
-     "value": "209,3 млн т в 2025 → 204 в 2027 → 198,5 в 2031",
-     "date": "2026-09",
-     "source": "https://www.industry.gov.au/publications/resources-and-energy-quarterly-september-2026"
+     "fact": "Индонезия: цель добычи 2026 после урезания квот RKAB",
+     "value": "~600 Мт против ~790 Мт в 2025; жёсткого потолка правительство не вводило, итог может отличаться",
+     "date": "2026-04",
+     "source": "https://www.petromindo.com/news/article/indonesia-cuts-2026-coal-output-to-about-600-mt-adjust-nickel-quotas-to-industrial-demand"
     },
     {
-     "fact": "Экспорт России",
-     "value": "145,1 млн т в 2025 → 139,2 в 2027 → 128,4 в 2031",
+     "fact": "Индонезия: оценка экспортных объёмов 2026 (SX Coal, по сообщению APBI-ICMA)",
+     "value": "~390–420 Мт, −18–24% к 2025; часть крупных производителей приостановила спотовые продажи",
+     "date": "2026-04",
+     "source": "https://apbi-icma.org/media-article/indonesian-coal-miners-receive-sharp-rkab-quota-cuts-for-2026-amid-pending-national-volume"
+    },
+    {
+     "fact": "Индонезия: экспорт идёт через госкомпанию Danantara Sumberdaya Indonesia (DSI)",
+     "value": "пробная фаза с июня 2026, полный запуск запланирован на сентябрь; правила экспорта и цели добычи остаются неопределёнными",
      "date": "2026-09",
-     "source": "https://www.industry.gov.au/publications/resources-and-energy-quarterly-september-2026"
+     "source": "https://www.iea.org/reports/coal-mid-year-update-2026/trade"
+    },
+    {
+     "fact": "Австралия: экспорт энергоугля",
+     "value": "209 Мт (2025) → ~216 (2026); в 2027 примерно стабильно",
+     "date": "2026-09",
+     "source": "https://www.iea.org/reports/coal-mid-year-update-2026/trade"
+    },
+    {
+     "fact": "Колумбия: экспорт энергоугля",
+     "value": "45 Мт в 2025 (минимум с 2003); в 2027 ожидается дальнейшее снижение, цифры нет",
+     "date": "2026-09",
+     "source": "https://www.iea.org/reports/coal-mid-year-update-2026/trade"
+    },
+    {
+     "fact": "Россия: экспорт энергоугля",
+     "value": "~130 Мт (2025) → ~132 (2026); в 2027 ожидается снижение, цифры нет",
+     "date": "2026-09",
+     "source": "https://www.iea.org/reports/coal-mid-year-update-2026/trade"
+    },
+    {
+     "fact": "GEM Global Coal Mine Tracker: заявленные (proposed) мощности добычи, весь мир",
+     "value": "2 521 Мтпа (+11% к 2024); Китай 1 321, Индия 638; ~70% pre-construction (1 297 pre-permit + 443 одобрено); Китай, Индия, Австралия, Россия, ЮАР — ~92% пайплайна",
+     "date": "2026-08",
+     "source": "https://globalenergymonitor.org/article/proposed-increase-coal-mine-capacity-out-step-market-demand"
+    },
+    {
+     "fact": "GEM: ввод новых мощностей добычи в 2025",
+     "value": "~113 Мтпа (−~40% к 185 в 2024); Китай −44%, Австралия −96%",
+     "date": "2026-08",
+     "source": "https://globalenergymonitor.org/article/proposed-increase-coal-mine-capacity-out-step-market-demand"
+    },
+    {
+     "fact": "NSW: политика угля 2026–2050 — новые greenfield-шахты не рассматриваются, расширения действующих — да",
+     "value": "нет новых шахт, расширения возможны",
+     "date": "2026-03",
+     "source": "https://carbon-pulse.com/495309/"
+    },
+    {
+     "fact": "IEA Coal 2025: мировая добыча угля до 2030",
+     "value": "слегка снижается после рекорда 2025; Индонезия в 2025 впервые с пандемии сократила добычу, экспорт упал почти на 50 Мт",
+     "date": "2025-12",
+     "source": "https://www.iea.org/reports/coal-2025/executive-summary"
     }
    ]
   },
   "demand": {
    "score": -1,
-   "summary": "Импорт энергетического угля снижается у всех крупных покупателей: OCE ждёт мировую морскую торговлю 1 169 млн т в 2025 → 1 017 в 2031.",
+   "summary": "В 2026 спрос на морской энергоуголь временно поддержан газом (Ормуз) и погодой, но на горизонте 3–5 лет импорт Китая и Индии вытесняется внутренней добычей, ЕС и Япония сокращают уголь; растёт в основном ЮВА (>4%/год).",
    "facts": [
     {
-     "fact": "Мировая морская торговля",
-     "value": "1 168,6 млн т в 2025 → 1 076 в 2027 → 1 016,6 в 2031",
+     "fact": "IEA: мировой спрос на уголь",
+     "value": "8,84 Гт (2025, рекорд) → 8,94 (2026, +1,2%) → 8,91 (2027, −0,4%, если напряжённость на Ближнем Востоке спадёт)",
      "date": "2026-09",
-     "source": "https://www.industry.gov.au/publications/resources-and-energy-quarterly-september-2026"
+     "source": "https://www.iea.org/reports/coal-mid-year-update-2026/demand"
     },
     {
-     "fact": "Импорт Китая",
-     "value": "371,9 млн т в 2025 → 341,5 в 2027 → 311,7 в 2031",
-     "date": "2026-09",
-     "source": "https://www.industry.gov.au/publications/resources-and-energy-quarterly-september-2026"
+     "fact": "IEA Coal 2025: спрос к 2030 и импорт Китая",
+     "value": "спрос к 2030 ~−3% от 2025; импорт Китая −~2,5%/год до 2030, в основном энергоуголь",
+     "date": "2025-12",
+     "source": "https://www.iea.org/reports/coal-2025/executive-summary"
     },
     {
-     "fact": "Импорт Индии",
-     "value": "180 млн т в 2025 → 171,2 в 2027 → 166,9 в 2031",
+     "fact": "Китай: спрос на уголь и морской импорт энергоугля",
+     "value": "спрос ~5 Гт в 2026 (+1%), в 2027 чуть ниже; морской импорт энергоугля 325 Мт (2025) → ~310 (2026)",
      "date": "2026-09",
-     "source": "https://www.industry.gov.au/publications/resources-and-energy-quarterly-september-2026"
+     "source": "https://www.iea.org/reports/coal-mid-year-update-2026/trade"
+    },
+    {
+     "fact": "Индия: морской импорт энергоугля",
+     "value": "167 Мт (2025) → ~160 (2026); 2027 примерно стабильно, при росте спроса на уголь до 1 353 Мт (+4,2%) в 2026",
+     "date": "2026-09",
+     "source": "https://www.iea.org/reports/coal-mid-year-update-2026/trade"
+    },
+    {
+     "fact": "Индия: импорт угля ТЭС в FY26 и цель по замещению",
+     "value": "45,4 Мт против 62,5 Мт (−27%); цель — сократить импорт угля в энергетике не менее чем на 30% в 2026 (по сообщению Reuters)",
+     "date": "2026-07",
+     "source": "https://www.constructionworld.in/energy-infrastructure/coal-and-mining/thermal-power-coal-imports-drop-27-per-cent-in-fy26/95342"
+    },
+    {
+     "fact": "Юго-Восточная Азия: спрос и импорт",
+     "value": "спрос ~574 Мт в 2026; импорт 156 → ~164 Мт, Вьетнам 55 → 62; рост спроса >4%/год до 2030",
+     "date": "2026-09",
+     "source": "https://www.iea.org/reports/coal-mid-year-update-2026/trade"
+    },
+    {
+     "fact": "Япония, Корея, ЕС: спрос на уголь 2026",
+     "value": "Япония 161 Мт (−1%), Корея 119 Мт (+6%, во 2027 снижение), ЕС 276 Мт (структурный спад продолжается)",
+     "date": "2026-09",
+     "source": "https://www.iea.org/reports/coal-mid-year-update-2026/demand"
+    },
+    {
+     "fact": "Китай: 15-я пятилетка — потребление угля",
+     "value": "«выход на пик» в 2026–2030, год и уровень не заданы; мощности угольной генерации 1 285 ГВт к июлю 2026",
+     "date": "2026-08",
+     "source": "https://www.carbonbrief.org/qa-what-does-chinas-15th-five-year-plan-for-coal-mean-for-climate-action"
+    },
+    {
+     "fact": "DBX: морская торговля энергоуглём",
+     "value": "1 027 Мт (2026) → 1 001 (2027) → 954 (2028)",
+     "date": "2026-08",
+     "source": "https://thecoalhub.com/?p=18740"
     }
    ]
   },
-  "balance_note": "OCE (сентябрь 2026): спот Newcastle 6000 ккал/кг около $130 в 2026, $119 в 2027 и $116–123 в 2028–2031 в номинале — плато после отскока.",
-  "confidence": "high"
+  "balance_note": "Количественного публичного прогноза профицита/дефицита не нашёл. DBX (авг. 2026): морская торговля энергоуглём сжимается 1 027 → 1 001 → 954 Мт в 2026–2028 (https://thecoalhub.com/?p=18740); NEFT Research по сообщению ТАСС ждёт структурный профицит в 2027–2028 после стабилизации добычи в Китае и адаптации Индонезии (https://tass.com/economy/2187905).",
+  "confidence": "medium"
+ },
+ {
+  "key": "coal_za",
+  "name": "Уголь Richards Bay (ЮАР)",
+  "as_of": "2026-10",
+  "horizon": "2027–2030",
+  "supply": {
+   "score": 0,
+   "summary": "Атлантическая сторона почти плоская: ЮАР восстанавливается за счёт железной дороги Transnet (56,5 → ~60–62 Мт в 2026, цель коридора 70 Мт к 2028–29), но Колумбия сокращается, Россия стагнирует, Индонезия режет квоты. Цели Transnet — план, не факт.",
+   "facts": [
+    {
+     "fact": "RBCT: экспорт и прогноз 2026",
+     "value": "56,5 Мт (2025); прогноз 2026 ~60 Мт, оптимистично ~62 Мт; в 1П 2026 чуть больше 30 Мт; номинал терминала 91 Мт/год",
+     "date": "2026-07",
+     "source": "https://www.miningmx.com/news/energy/65964-sa-coal-exports-could-rise-10-in-2026-says-terminal/"
+    },
+    {
+     "fact": "Transnet: цель по угольному коридору (по сообщению S&P Global через Hellenic Shipping News)",
+     "value": "61 Мт в ф.г. 2026–27 и 70 Мт в 2028–29; ожидает ~57 Мт экспорта через RBCT; два плановых ремонтных останова в год вместо одного",
+     "date": "2026-07",
+     "source": "https://www.hellenicshippingnews.com/?p=1143060"
+    },
+    {
+     "fact": "ЮАР: экспорт энергоугля (IEA)",
+     "value": "~71 Мт в 2026; в 2027 примерно стабильно",
+     "date": "2026-09",
+     "source": "https://www.iea.org/reports/coal-mid-year-update-2026/trade"
+    },
+    {
+     "fact": "Колумбия: экспорт энергоугля (IEA)",
+     "value": "45 Мт в 2025 (минимум с 2003); в 2027 дальнейшее снижение",
+     "date": "2026-09",
+     "source": "https://www.iea.org/reports/coal-mid-year-update-2026/trade"
+    },
+    {
+     "fact": "Колумбия: операционные риски 2026 (по данным Mysteel)",
+     "value": "экспорт июнь 2026 −12,9% г/г (3,67 Мт), июль −13,6% (4,1 Мт); Cerrejón 16,8 Мт (2025) против 19,2 (2024), пятая атака на инфраструктуру в 2026",
+     "date": "2026-08",
+     "source": "https://www.mysteel.net/news/5136114-colombias-june-coal-exports-fall-after-cerrejon-disruption"
+    },
+    {
+     "fact": "Колумбия: новое правительство (де ла Эсприэлья) настроено в пользу добычи углеводородов",
+     "value": "конкретных мер по углю нет; запрет касался продаж в Израиль",
+     "date": "2026-08",
+     "source": "https://www.swp-berlin.org/10.18449/2026A30/"
+    },
+    {
+     "fact": "Россия: экспорт энергоугля (IEA) и железнодорожный экспорт в Китай",
+     "value": "~132 Мт в 2026, в 2027 снижение; ж/д экспорт в Китай 5,8 Мт в 1П 2026 (−29,5%)",
+     "date": "2026-09",
+     "source": "https://thecoalhub.com/?p=18393"
+    },
+    {
+     "fact": "Индонезия: свинг-поставщик — квоты RKAB",
+     "value": "добыча 2026 ~600 Мт против ~790 в 2025",
+     "date": "2026-04",
+     "source": "https://www.petromindo.com/news/article/indonesia-cuts-2026-coal-output-to-about-600-mt-adjust-nickel-quotas-to-industrial-demand"
+    },
+    {
+     "fact": "GEM: ЮАР входит в топ-5 стран по заявленным мощностям добычи",
+     "value": "числа по ЮАР в источнике нет; пайплайн в целом 2 521 Мтпа, ~70% до стройки",
+     "date": "2026-08",
+     "source": "https://globalenergymonitor.org/article/proposed-increase-coal-mine-capacity-out-step-market-demand"
+    }
+   ]
+  },
+  "demand": {
+   "score": -1,
+   "summary": "Спрос на уголь Richards Bay держат Индия и Европа: ЕС структурно сокращает уголь, Индия замещает импорт собственной добычей (экспорт ЮАР в Индию во 2 кв. 2026 упал до 7,2 Мт). Газовый шок 2026 — временная поддержка.",
+   "facts": [
+    {
+     "fact": "ЮАР: экспорт в Индию",
+     "value": "7,2 Мт во 2 кв. 2026 против 9,1 в 1 кв. и 8,8 годом ранее; индийские производители DRI перешли на местный уголь",
+     "date": "2026-07",
+     "source": "https://www.miningmx.com/news/energy/65964-sa-coal-exports-could-rise-10-in-2026-says-terminal/"
+    },
+    {
+     "fact": "Индия: импорт энергоугля",
+     "value": "ТЭС FY26 45,4 Мт против 62,5 (−27%); янв–май 2026 ~65 Мт, −12% г/г — четырёхлетний минимум (по Reuters/BigMint)",
+     "date": "2026-07",
+     "source": "https://www.petromindo.com/news/article/india-s-thermal-coal-imports-drop-to-four-year-low"
+    },
+    {
+     "fact": "Индия: морской импорт энергоугля (IEA)",
+     "value": "167 Мт (2025) → ~160 (2026); 2027 примерно стабильно",
+     "date": "2026-09",
+     "source": "https://www.iea.org/reports/coal-mid-year-update-2026/trade"
+    },
+    {
+     "fact": "ЕС и Турция (IEA)",
+     "value": "спрос ЕС 276 Мт в 2026, структурный спад продолжается; импорт энергоугля Турции −8 Мт до 30 Мт",
+     "date": "2026-09",
+     "source": "https://www.iea.org/reports/coal-mid-year-update-2026/trade"
+    },
+    {
+     "fact": "IEA: мировой спрос на уголь",
+     "value": "8,94 Гт (2026, +1,2%) → 8,91 (2027, −0,4%) при смягчении на Ближнем Востоке; газовый шок даёт временное переключение газ → уголь",
+     "date": "2026-09",
+     "source": "https://www.iea.org/reports/coal-mid-year-update-2026/demand"
+    },
+    {
+     "fact": "IEA Coal 2025: Индия — главный источник роста спроса",
+     "value": "+~3%/год до 2030 (>200 Мт), но рост закрывается внутренней добычей",
+     "date": "2025-12",
+     "source": "https://www.iea.org/reports/coal-2025/executive-summary"
+    },
+    {
+     "fact": "DBX: морская торговля энергоуглём",
+     "value": "1 027 Мт (2026) → 1 001 (2027) → 954 (2028)",
+     "date": "2026-08",
+     "source": "https://thecoalhub.com/?p=18740"
+    }
+   ]
+  },
+  "balance_note": "Количественного публичного прогноза профицита/дефицита не нашёл. DBX (авг. 2026): морская торговля энергоуглём сжимается 1 027 → 1 001 → 954 Мт в 2026–2028 (https://thecoalhub.com/?p=18740); NEFT Research по сообщению ТАСС ждёт структурный профицит в 2027–2028 после стабилизации добычи в Китае и адаптации Индонезии (https://tass.com/economy/2187905). Отдельного прогноза для атлантической стороны нет.",
+  "confidence": "medium"
+ },
+ {
+  "key": "met_us",
+  "name": "Уголь коксующийся",
+  "as_of": "2026-10",
+  "horizon": "2027–2030",
+  "supply": {
+   "score": 1,
+   "summary": "Предложение растёт умеренно: Австралия ~142 → >150 Мт в 2026 (IEA), Монголия быстро наращивает сухопутный экспорт в Китай и вытесняет морской уголь; США и Россия стагнируют. Новых коксующихся greenfield мало, разбивки coking/thermal у GEM нет.",
+   "facts": [
+    {
+     "fact": "Австралия: экспорт коксующегося угля (IEA, пересказ страницы Trade)",
+     "value": "~142 Мт (2025) → >150 (2026); основной прирост 2027 приходится на Австралию",
+     "date": "2026-09",
+     "source": "https://www.iea.org/reports/coal-mid-year-update-2026/trade"
+    },
+    {
+     "fact": "IEA Coal 2025: экспорт коксующегося угля Австралии (по сообщению S&P Global; база 2025 отличается от Mid-Year Update)",
+     "value": "149 Мт (2025) → 155 (2027) → 152 (2030)",
+     "date": "2025-12",
+     "source": "https://www.spglobal.com/energy/en/news-research/latest-news/metals/121925-australias-met-coal-exports-seen-rising-before-2030-decline-amid-demand-shifts"
+    },
+    {
+     "fact": "Монголия: экспорт в Китай по железной дороге (IEA)",
+     "value": "рост >50% до ~91 Мт в 2026",
+     "date": "2026-09",
+     "source": "https://www.iea.org/reports/coal-mid-year-update-2026/trade"
+    },
+    {
+     "fact": "Монголия: коксующийся уголь в Китай (китайская таможня через Mysteel)",
+     "value": "40,58 Мт в 1П 2026, +64% г/г, 60,7% импорта Китая — Монголия обогнала Австралию как поставщика",
+     "date": "2026-07",
+     "source": "https://www.mysteel.net/analysis/5136568-mysteel-three-forces-propel-mongolia-to-chinas-top-coking-coal-supplier"
+    },
+    {
+     "fact": "Монголия: добыча угля (Argus)",
+     "value": "46,45 Мт за янв–май 2026 (+54% г/г); план ~90 Мт на 2026 (весь уголь)",
+     "date": "2026-06",
+     "source": "https://www.argusmedia.com/news-and-insights/latest-market-news/2841386-mongolia-coal-output-surges-54pc-on-year-in-jan-may"
+    },
+    {
+     "fact": "Монголия: трансграничная ж/д Гашуунсухайт–Ганцмод (19,5 км) снимает ограничение погранперехода",
+     "value": "ввод — цель 2027; провозная способность ~30 Мт/год",
+     "date": "2026-06",
+     "source": "https://www.constructionbriefing.com/news/mongolia-and-china-to-build-195km-cross-border-railway-by-2028/8055134.article"
+    },
+    {
+     "fact": "Россия: ж/д экспорт угля в Китай (весь уголь, коксующийся отдельно не выделен)",
+     "value": "5,8 Мт в 1П 2026 (−29,5% г/г); ограничения пропускной способности БАМ и Транссиба",
+     "date": "2026-07",
+     "source": "https://thecoalhub.com/?p=18393"
+    },
+    {
+     "fact": "США: экспорт угля 2026 (EIA, по пересказу)",
+     "value": "102 млн коротких тонн; коксующийся поддержан новыми и вновь открытыми шахтами",
+     "date": "2026-08",
+     "source": "https://thecoalhub.com/?p=18611"
+    },
+    {
+     "fact": "США: добыча угля (S&P Global)",
+     "value": "дешёвый газ и высокие запасы сдерживают добычу до 2027; слабый мировой спрос на сталь давит на внутренний спрос на коксующийся",
+     "date": "2026-09",
+     "source": "https://www.spglobal.com/market-intelligence/en/news-insights/research/2026/09/us-coal-production-is-trending-lower-year-over-year"
+    },
+    {
+     "fact": "GEM: ввод новых мощностей добычи в 2025 (все угли)",
+     "value": "~113 Мтпа (−~40% г/г); Австралия −96%",
+     "date": "2026-08",
+     "source": "https://globalenergymonitor.org/article/proposed-increase-coal-mine-capacity-out-step-market-demand"
+    }
+   ]
+  },
+  "demand": {
+   "score": 1,
+   "summary": "Рост даёт Индия (цель 300 Мт стали к 2030, ~64% новых мощностей — доменные печи, импорт коксующегося 81 → 115–160 Мт); Китай и развитые страны снижаются, китайские сталевары уходят на монгольский уголь. Мировая сталь 2026 плоско, 2027 +1,7%.",
+   "facts": [
+    {
+     "fact": "Индия: цель по мощностям стали",
+     "value": "300 Мт к 2030 при текущих ~168 Мт (Минстали, апрель 2026); ~64% расширения — доменные печи",
+     "date": "2026-04",
+     "source": "https://www.outlookbusiness.com/industry/india-steel-capacity-300-mn-tonnes-coking-coal-dependence"
+    },
+    {
+     "fact": "Индия: импорт коксующегося угля к 2030 (EY-Parthenon / Indian Steel Association)",
+     "value": "81 Мт (FY25) → 115 Мт к 2030; ~90% потребности в коксующемся покрывается импортом",
+     "date": "2025-09",
+     "source": "https://ey.com/en_in/newsroom/2025/09/india-s-coking-coal-imports-set-to-rise"
+    },
+    {
+     "fact": "Индия: импорт коксующегося угля к 2030 (заявление секретаря Минстали, по сообщению Reuters)",
+     "value": "до 160 Мт к 2030",
+     "date": "2025-04",
+     "source": "https://www.miningweekly.com/article/indias-steel-secretary-says-coking-coal-imports-to-accelerate-2025-04-25"
+    },
+    {
+     "fact": "World Steel Short Range Outlook, октябрь 2026 (по сообщению SteelOrbis; сам отчёт worldsteel.org не открывал)",
+     "value": "мир 1,722 млрд т (2026, ~0) → 1,752 (2027, +1,7%); Китай −2% до 780,1 Мт и −1% до 772,3 Мт; Индия +7,9% до 172,4 Мт и ~+8% до 186,2 Мт",
+     "date": "2026-10",
+     "source": "https://www.steelorbis.com/steel-news/latest-news/worldsteel-lowers-global-steel-demand-outlook-as-chinas-downturn-delays-recovery-1482953.htm"
+    },
+    {
+     "fact": "IEA: мировой спрос на коксующийся уголь",
+     "value": "1 174 Мт (2025), в 2026 примерно стабильно: Индия растёт, Китай −<1%, развитые страны снижаются",
+     "date": "2026-09",
+     "source": "https://www.iea.org/reports/coal-mid-year-update-2026/demand"
+    },
+    {
+     "fact": "IEA: морская торговля коксующимся углём",
+     "value": "304 Мт (2025) → +16 Мт в 2026, за счёт Индии и Индонезии",
+     "date": "2026-09",
+     "source": "https://www.iea.org/reports/coal-mid-year-update-2026/trade"
+    },
+    {
+     "fact": "IEA Coal 2025: экспортёры коксующегося угля (во главе с Австралией) имеют лучшие перспективы, чем экспортёры энергоугля",
+     "value": "качественная оценка, числа нет",
+     "date": "2025-12",
+     "source": "https://www.iea.org/reports/coal-2025/executive-summary"
+    },
+    {
+     "fact": "Китай: авария на шахте в Шаньси (май 2026), провинция даёт больше половины коксующегося угля страны",
+     "value": "краткосрочная поддержка импорта; числа нет",
+     "date": "2026-09",
+     "source": "https://www.iea.org/reports/coal-mid-year-update-2026/trade"
+    }
+   ]
+  },
+  "balance_note": "Явного прогноза профицита/дефицита не нашёл. DBX (авг. 2026): морская торговля коксующимся ~391 → 393 → 389 Мт в 2026–2028, т.е. плоско при структурном росте монгольского сухопутного экспорта (https://thecoalhub.com/?p=18740).",
+  "confidence": "medium"
+ },
+ {
+  "key": "brent",
+  "name": "Нефть Brent",
+  "as_of": "2026-10",
+  "horizon": "2027–2030",
+  "supply": {
+   "score": 1,
+   "summary": "Мощности добычи растут примерно на 5 млн б/с к 2030 г. (США, Бразилия, Гайана, Канада, Аргентина), но в 2026 г. добыча обвалилась из-за закрытия Ормузского пролива; отскок +8 млн б/с в 2027 г. — возврат потерянного, а не рост сверх уровня 2025 г.",
+   "facts": [
+    {
+     "fact": "IEA: мировые мощности добычи вырастут более чем на 5 млн б/с к 2030 г. (докризисный Oil 2025; среднесрочный Oil 2026 найти не удалось)",
+     "value": "+5 млн б/с, до 114,7 млн б/с",
+     "date": "2025-06",
+     "source": "https://www.iea.org/news/amid-rising-geopolitical-strains-oil-markets-face-new-uncertainties-as-the-drivers-of-supply-and-demand-growth-shift"
+    },
+    {
+     "fact": "IEA OMR: мировая добыча 2026 и отскок в 2027",
+     "value": "2026: 100,7 млн б/с (−5,7 г/г); 2027: +8 млн б/с",
+     "date": "2026-09",
+     "source": "https://www.iea.org/reports/oil-market-report-september-2026"
+    },
+    {
+     "fact": "IEA OMR: добыча стран Америки вне ОПЕК+ (США, Бразилия, Гайана, Канада, Аргентина) совокупно",
+     "value": "+1,4 млн б/с в 2026; +1,0 млн б/с в 2027",
+     "date": "2026-09",
+     "source": "https://www.iea.org/reports/oil-market-report-september-2026"
+    },
+    {
+     "fact": "IEA OMR: ОПЕК+ добыча в августе против июля; устойчивая мощность Саудовской Аравии; эффективный резерв ОПЕК+",
+     "value": "33,11 против 34,57 млн б/с; Саудовская Аравия 5,97 млн б/с при мощности 12,11; резерв 0,22 млн б/с",
+     "date": "2026-09",
+     "source": "https://www.iea.org/reports/oil-market-report-september-2026"
+    },
+    {
+     "fact": "EIA STEO: добыча сырой нефти США",
+     "value": "13,9 млн б/с (2026); 14,3 млн б/с (2027)",
+     "date": "2026-10",
+     "source": "https://www.eia.gov/outlooks/steo/"
+    },
+    {
+     "fact": "Гайана (Exxon): рост добычи; Whiptail (250 тыс. б/с) к концу 2027; Hammerhead (~150 тыс. б/с) в 2028 или 2029 — источники расходятся. По сообщению oilnow.gy; дата публикации не подтверждена, указана по упоминанию мартовского отчёта",
+     "value": "~0,9 млн б/с сейчас → 1,3 к концу 2027 → 1,7 млн б/с к 2030",
+     "date": "2026-03",
+     "source": "https://oilnow.gy/news/a-timeline-of-exxonmobils-guyana-oil-development-projects/"
+    },
+    {
+     "fact": "Канада, нефтепески (оценка S&P Global, по сообщению OGJ)",
+     "value": "3,5 млн б/с в 2026; ~3,9 млн б/с в начале 2030-х, затем плато",
+     "date": "2026-09",
+     "source": "https://www.ogj.com/general-interest/economics-markets/news/55408418/sp-global-canadian-oil-sands-output-set-for-record-35-million-b-d-in-2026"
+    },
+    {
+     "fact": "Аргентина (Vaca Muerta) и Бразилия, прогноз на 2027 г. на базе EIA (через API); дата публикации не подтверждена, указана дата сбора",
+     "value": "Аргентина >1 млн б/с; Бразилия ~5,2 млн б/с",
+     "date": "2026-10",
+     "source": "https://www.api.org/energy-insights/charts-analysis/central-and-south-america-to-account-for-10-percent"
+    }
+   ]
+  },
+  "demand": {
+   "score": 0,
+   "summary": "Спрос в 2026 г. падает (−2,5 млн б/с по IEA) и в 2027 г. возвращается (+2,6); к 2030 г. IEA видит плато около 105,5 млн б/с (пик ~2029–30, Китай ~2027, электромобили вытесняют 5,4 млн б/с), тогда как ОПЕК ждёт рост до ~113 млн б/с — прогнозы расходятся.",
+   "facts": [
+    {
+     "fact": "IEA OMR: изменение мирового спроса на нефть",
+     "value": "2026: −2,5 млн б/с г/г; 2027: +2,6 млн б/с",
+     "date": "2026-09",
+     "source": "https://www.iea.org/reports/oil-market-report-september-2026"
+    },
+    {
+     "fact": "IEA Oil 2025: пик спроса и прирост к 2024 г. (докризисный прогноз)",
+     "value": "~105,5 млн б/с к концу десятилетия; 2030 к 2024: +2,5 млн б/с",
+     "date": "2025-06",
+     "source": "https://www.iea.org/news/amid-rising-geopolitical-strains-oil-markets-face-new-uncertainties-as-the-drivers-of-supply-and-demand-growth-shift"
+    },
+    {
+     "fact": "IEA Oil 2025: электромобили вытеснят нефтяной спрос к 2030 г.; нефтехимия — главный источник роста с 2026 г.; пик спроса в Китае",
+     "value": "5,4 млн б/с; нефтехимия 1 из 6 баррелей к 2030; Китай — 2027",
+     "date": "2025-06",
+     "source": "https://www.iea.org/news/amid-rising-geopolitical-strains-oil-markets-face-new-uncertainties-as-the-drivers-of-supply-and-demand-growth-shift"
+    },
+    {
+     "fact": "ОПЕК MOMR октябрь 2026: рост мирового спроса, по сообщению The Star",
+     "value": "2026: ~+0,2 млн б/с (было +0,4); 2027: +2,6 млн б/с",
+     "date": "2026-10",
+     "source": "https://www.thestar.com.my/news/world/2026/10/14/global-oil-demand-to-see-slower-growth-in-2026-opec-report"
+    },
+    {
+     "fact": "ОПЕК World Oil Outlook 2026: спрос на нефть без пика",
+     "value": "124 млн б/с к 2050",
+     "date": "2026-06",
+     "source": "https://www.opec.org/pr-detail/1854607-18-june-2026.html"
+    },
+    {
+     "fact": "ОПЕК WOO 2026, траектория спроса по сообщению energynewsbeat (вторичный источник)",
+     "value": "105,1 (2025) → 113,3 млн б/с (2030)",
+     "date": "2026-06",
+     "source": "https://energynewsbeat.co/crude-oil/world-oil-outlook-2050-opecs-woo-2026-robust-growth-to-124-mb-d-no-peak-in-sight/"
+    },
+    {
+     "fact": "Спрос Китая и Индии по годам до 2030, авиация (число)",
+     "value": "нет данных",
+     "date": "2026-10",
+     "source": "https://www.iea.org/reports/oil-market-report-september-2026"
+    }
+   ]
+  },
+  "balance_note": "IEA: при возобновлении потока через Ормуз возможен избыток до 4 млн б/с с 4 кв. 2026 (по сообщению Hydrocarbon Engineering, https://www.hydrocarbonengineering.com/refining/02092026/iea-continued-hormuz-disruptions-strain-global-oil-supplies-and-inventories/); докризисный Oil 2025: мощности 114,7 против спроса ~105,5 млн б/с к 2030 г. (разрыв ~9 млн б/с — расчёт по цифрам IEA, https://www.iea.org/news/amid-rising-geopolitical-strains-oil-markets-face-new-uncertainties-as-the-drivers-of-supply-and-demand-growth-shift). Среднесрочный Oil 2026 не найден.",
+  "confidence": "medium"
+ },
+ {
+  "key": "gas_eu",
+  "name": "Газ, Европа (TTF)",
+  "as_of": "2026-10",
+  "horizon": "2027–2030",
+  "supply": {
+   "score": 0,
+   "summary": "Краткосрочно дефицит: катарский СПГ остановлен, хранилища ЕС ~65% на конец августа. Структурно уходят российские объёмы (СПГ с 1 янв. 2027, трубопровод с осени 2027) и снижается Норвегия после плато 2027 г.; замещают их СПГ США и мировая волна сжижения — в сумме около нуля.",
+   "facts": [
+    {
+     "fact": "IEA GMR Q3-2026: выпуск СПГ Катара и ОАЭ в 2026 г.; новые проекты Северной Америки, Африки и Австралии; мировая торговля СПГ",
+     "value": "−45% г/г (−54 млрд м³); новые проекты +~50 млрд м³; торговля примерно на уровне 2025",
+     "date": "2026-07",
+     "source": "https://www.iea.org/reports/gas-market-report-q3-2026/executive-summary"
+    },
+    {
+     "fact": "IEA GMR Q3-2026: накопленные потери предложения СПГ 2026–2030, сосредоточены в 2026–2027",
+     "value": "140 млрд м³ (15% нового мирового предложения)",
+     "date": "2026-07",
+     "source": "https://www.iea.org/reports/gas-market-report-q3-2026/executive-summary"
+    },
+    {
+     "fact": "Запасы газа ЕС на конец августа 2026 (минимум за 15+ лет) и цена TTF на 1 сентября, по аналитике OSW",
+     "value": "~65%; >70 €/МВт·ч",
+     "date": "2026-09",
+     "source": "https://www.osw.waw.pl/en/publikacja/34299/pdf"
+    },
+    {
+     "fact": "ENTSOG Summer Supply Outlook: СПГ, нужный для 90% заполнения хранилищ в апр.–сен. 2026",
+     "value": "~943 ТВт·ч (≈86 млрд м³)",
+     "date": "2026-04",
+     "source": "https://www.entsog.eu/sites/default/files/2026-04/SO0069-26_Summer%20Supply%20Outlook%202026.pdf"
+    },
+    {
+     "fact": "ЕС: запрет российского газа — СПГ по долгосрочным контрактам с 1 января 2027; трубопроводный газ с 30 сентября 2027 (1 ноября, если отстают запасы); Венгрия и Словакия против. По сообщению прессы",
+     "value": "СПГ — 2027-01-01; трубопровод — 2027-09-30/11-01",
+     "date": "2026-06",
+     "source": "https://gasprocessingnews.com/news/2026/06/eu-commission-clarifies-all-russian-lng-trade-is-banned-from-2027-for-eu-operators/"
+    },
+    {
+     "fact": "Доля России в импорте газа ЕС в 2025 г. (по сообщению energynewsbeat; дата публикации не подтверждена, указана дата сбора)",
+     "value": "12–14%",
+     "date": "2026-10",
+     "source": "https://energynewsbeat.co/?p=227946"
+    },
+    {
+     "fact": "Норвегия (Norwegian Offshore Directorate, по Reuters): плато до 2027 г., затем спад; добыча нефти и газа; газ в 2026 г.",
+     "value": "~4,1 → <3,5 млн б.н.э./сут к 2030; газ 123,1 млрд м³ в 2026",
+     "date": "2026-01",
+     "source": "https://www.marketscreener.com/news/norway-s-oil-and-gas-output-will-fall-towards-2030-regulator-says-ce7e59dddb8cf52c"
+    },
+    {
+     "fact": "Ormen Lange (Норвегия): ограничение добычи продлено до 1 февраля 2027 (по OPIS; дата публикации не подтверждена, указан сентябрь)",
+     "value": "~1 млрд м³ газа за зиму",
+     "date": "2026-09",
+     "source": "https://www.opis.com/resources/energy-market-news-from-opis/europe-faces-mounting-gas-supply-risks-ahead-of-winter/"
+    },
+    {
+     "fact": "IEA Gas 2025 (докризисный): новые мировые мощности сжижения к 2030 г. (часть вводов теперь сдвигается)",
+     "value": "~300 млрд м³/год",
+     "date": "2025-12",
+     "source": "https://www.iea.org/reports/gas-2025"
+    }
+   ]
+  },
+  "demand": {
+   "score": -1,
+   "summary": "Спрос ЕС структурно снижается из-за ВИЭ, тепловых насосов и электрификации: −2% в 2026 г., по национальным планам ~302 млрд м³ к 2030 г. против 326 в 2023 г. (−7%); в сценарии выполнения целей по ВИЭ — до −25%. Данных по промышленности и генерации на 2030 г. нет.",
+   "facts": [
+    {
+     "fact": "IEA GMR Q3-2026: спрос на газ в Европе в 2026 г. (рост ВИЭ и высокие цены)",
+     "value": "снижение более 2%",
+     "date": "2026-07",
+     "source": "https://www.iea.org/reports/gas-market-report-q3-2026/executive-summary"
+    },
+    {
+     "fact": "Ember: спрос ЕС на газ по национальным планам (NECP); доля электрификации. Дата публикации не подтверждена, указана ориентировочно",
+     "value": "404 (2021) → 326 (2023) → 302 млрд м³ к 2030; электрификация 23% → 30%",
+     "date": "2026-01",
+     "source": "https://ember-energy.org/latest-updates/eu-gas-demand-set-to-drop-7-by-2030-making-new-gas-investments-risky/"
+    },
+    {
+     "fact": "IEEFA (сценарий, не прогноз): при 4 млн тепловых насосов, 75 ГВт солнца и 22 ГВт ветра в год спрос на газ в ЕС снизится",
+     "value": "~−25% к 2030",
+     "date": "2026-07",
+     "source": "https://www.euronews.com/my-europe/2026/07/28/wind-solar-and-heat-pumps-offer-eu-escape-from-lng-dependence-by-2030-study-says"
+    },
+    {
+     "fact": "IEEFA: снижение потребления газа в ЕС 2021–2024 по секторам",
+     "value": "домохозяйства −24%, промышленность −20%, услуги −19%, генерация −18%",
+     "date": "2026-07",
+     "source": "https://www.euronews.com/my-europe/2026/07/28/wind-solar-and-heat-pumps-offer-eu-escape-from-lng-dependence-by-2030-study-says"
+    },
+    {
+     "fact": "Прогноз спроса ЕС на 2030 г. по промышленности и генерации отдельно",
+     "value": "нет данных",
+     "date": "2026-10",
+     "source": "https://ember-energy.org/latest-updates/eu-gas-demand-set-to-drop-7-by-2030-making-new-gas-investments-risky/"
+    }
+   ]
+  },
+  "balance_note": "IEA GMR Q3-2026: рынок может оставаться жёстче ожидаемого ближайшие два года, потери СПГ 140 млрд м³ в 2026–2030 сдвигают «волну СПГ» вправо (https://www.iea.org/reports/gas-market-report-q3-2026/executive-summary); докризисный прогноз IEA — избыток СПГ ~65 млрд м³ в 2030 г. (https://www.worldports.org/?p=653772).",
+  "confidence": "medium"
+ },
+ {
+  "key": "lng_jp",
+  "name": "СПГ, Япония",
+  "as_of": "2026-10",
+  "horizon": "2027–2030",
+  "supply": {
+   "score": 2,
+   "summary": "Крупнейшая волна сжижения в истории: ~300 млрд м³/год новых мощностей к 2030 г. (докризисная оценка IEA), главным образом США (Plaquemines, Corpus Christi 3, Golden Pass, Rio Grande) и Катар. Кризис 2026 г. сдвигает часть вводов (потери 140 млрд м³ за 2026–2030; ~17% мощностей Катара выбыло на 3–5 лет), но рост остаётся сильным.",
+   "facts": [
+    {
+     "fact": "IEA Gas 2025 (докризисный): новые мощности экспорта СПГ к 2030 г., в основном США и Катар",
+     "value": "~300 млрд м³/год",
+     "date": "2025-12",
+     "source": "https://www.iea.org/reports/gas-2025"
+    },
+    {
+     "fact": "Shell LNG Outlook 2026: новые мощности к 2030 г. и дополнительная потребность в 2030–2040-х",
+     "value": "~180 млн т/год к 2030; ещё ~200 млн т/год потребуется позже",
+     "date": "2026-06",
+     "source": "https://www.giignl.org/news/shell-says-global-lng-demand-to-rise-65-percent-by-2050"
+    },
+    {
+     "fact": "IEA GMR Q3-2026: накопленные потери предложения СПГ 2026–2030 из-за конфликта на Ближнем Востоке",
+     "value": "140 млрд м³ (15% нового предложения), в основном 2026–2027",
+     "date": "2026-07",
+     "source": "https://www.iea.org/reports/gas-market-report-q3-2026/executive-summary"
+    },
+    {
+     "fact": "IEA: одобренные проекты США — CP2 фаза 2 (пик 40 млрд м³/год, с 2П 2030), Delfin FLNG (6 млрд м³/год, 2030), Commonwealth (13 млрд м³/год, 2030)",
+     "value": "6–13 млрд м³/год на проект; ввод 2030",
+     "date": "2026-07",
+     "source": "https://www.iea.org/reports/gas-market-report-q3-2026/executive-summary"
+    },
+    {
+     "fact": "США, состояние на сентябрь 2026 (EIA и отраслевая пресса): Plaquemines ~28 млн т/год на полной мощности; Corpus Christi Stage 3 +10 млн т/год, седьмая нитка передана в конце августа; Golden Pass — первая партия 22 апреля 2026, T2 в 2П 2026, T3 в 1П 2027; Rio Grande — первый СПГ в 1П 2027 (сроки компаний, ранее сдвигались)",
+     "value": "Plaquemines + CC3 ≈ 4 Bcf/d; экспорт США 17,4 (2026) → 18,6 Bcf/d (2027)",
+     "date": "2026-09",
+     "source": "https://www.eia.gov/todayinenergy/detail.php?id=67564"
+    },
+    {
+     "fact": "Катар: повреждены две нитки (12,8 млн т/год, ~17% мощностей), ремонт 3–5 лет. По сообщению прессы со ссылкой на QatarEnergy",
+     "value": "−12,8 млн т/год на 3–5 лет",
+     "date": "2026-09",
+     "source": "https://www.oedigital.com/news/543123-qatarenergy-s-lng-expansion-faces-delays-from-hormuz-crisis"
+    },
+    {
+     "fact": "Катар North Field East (32 млн т/год): первая нитка 1П 2027, остальные зависят от Ормуза; North Field South — 2028",
+     "value": "32 млн т/год; 1П 2027 / 2028",
+     "date": "2026-09",
+     "source": "https://www.oedigital.com/news/543123-qatarenergy-s-lng-expansion-faces-delays-from-hormuz-crisis"
+    },
+    {
+     "fact": "Wood Mackenzie: катарский СПГ остановлен с 2 марта 2026",
+     "value": "~80 млн т/год (~19% мирового СПГ)",
+     "date": "2026-03",
+     "source": "https://www.hydrocarbonengineering.com/tanks-terminals/20032026/wood-mackenzie-ras-laffan-attacks-fundamentally-reshape-global-lng-outlook/"
+    }
+   ]
+  },
+  "demand": {
+   "score": 1,
+   "summary": "Азия остаётся центром роста СПГ (Shell: +65% к 2050, Южная и Юго-Восточная Азия до ~40% импорта), но 2026 г. просел из-за цен (импорт Китая −12%, переход на уголь). Япония и Корея — зрелые рынки: плато, рестарты АЭС ограничивают рост, дата-центры и замена истекающих контрактов поддерживают.",
+   "facts": [
+    {
+     "fact": "Shell LNG Outlook 2026: мировая торговля СПГ; 2026 г. на уровне 2025, рост с 2027 г.",
+     "value": "422 млн т (2025) → ~700 млн т к 2050 (+65%)",
+     "date": "2026-06",
+     "source": "https://www.giignl.org/news/shell-says-global-lng-demand-to-rise-65-percent-by-2050"
+    },
+    {
+     "fact": "Shell: доля Южной и Юго-Восточной Азии в мировом импорте СПГ к 2050 г. (зависит от регазификации и трубопроводов)",
+     "value": "~40%",
+     "date": "2026-06",
+     "source": "https://www.giignl.org/news/shell-says-global-lng-demand-to-rise-65-percent-by-2050"
+    },
+    {
+     "fact": "IEA GMR Q3-2026: спрос на газ в Азии в 2026 г. (газ → уголь); Китай март–июнь",
+     "value": "Азия −0,5%; Китай −4%, импорт СПГ Китая −12% (~3 млрд м³)",
+     "date": "2026-07",
+     "source": "https://www.iea.org/reports/gas-market-report-q3-2026/executive-summary"
+    },
+    {
+     "fact": "Wood Mackenzie: Ормуз останавливает прогнозный рост спроса на СПГ в Северо-Восточной Азии в 2026 г., часть потери спроса сохранится после перемирия (дата ориентировочная)",
+     "value": "4,4 млн т (2,2%)",
+     "date": "2026-04",
+     "source": "https://woodmac.com/press-releases/me-conflicts-impact-on-nea-gas-market"
+    },
+    {
+     "fact": "Kpler: спрос Японии на СПГ в 2026 г. (газ в энергетике), рестарт Kashiwazaki-Kariwa-6 ограничивает рост (дата публикации ориентировочная)",
+     "value": "64,9 млн т (+0,6 к прошлой оценке)",
+     "date": "2026-05",
+     "source": "https://www.kpler.com/blog/japan-lng-demand-raised-on-lower-gas-fired-efficiency-hormuz-disruption-reinforces-bullish-bias"
+    },
+    {
+     "fact": "JERA: потребность в новых долгосрочных контрактах на СПГ в 2030-х",
+     "value": "16 млн т/год",
+     "date": "2025-06",
+     "source": "https://www.spglobal.com/energy/en/news-research/latest-news/lng/062725-jera-sees-need-to-secure-16-mil-mtyear-long-term-lng-contracts-in-2030s-global-ceo"
+    },
+    {
+     "fact": "Спрос Индии и Кореи на СПГ 2027–2030 в числах",
+     "value": "нет данных",
+     "date": "2026-10",
+     "source": "https://www.giignl.org/news/shell-says-global-lng-demand-to-rise-65-percent-by-2050"
+    }
+   ]
+  },
+  "balance_note": "IEA (докризисно, Gas 2025/WEO): при недостаточном спросе покупателей избыток предложения СПГ ~65 млрд м³ в 2030 г. (https://www.worldports.org/?p=653772); после кризиса 2026 г. IEA ждёт более жёсткий рынок в 2026–2027 и сдвиг «волны» вправо, потери 140 млрд м³ (https://www.iea.org/reports/gas-market-report-q3-2026/executive-summary).",
+  "confidence": "medium"
+ },
+ {
+  "key": "gas_us",
+  "name": "Газ, США (Henry Hub)",
+  "as_of": "2026-10",
+  "horizon": "2027–2030",
+  "supply": {
+   "score": 1,
+   "summary": "Добыча растёт (EIA: 107,6 → 116,0 Bcf/d за 2025–2027), но темп замедляется: вывоз из Пермского бассейна упирается в трубопроводы (Waha уходил в минус), новые трубы — с 2П 2026 до 2027. Данных по Хейнсвиллу и Перми на 2028–2030 нет.",
+   "facts": [
+    {
+     "fact": "EIA STEO август 2026: сухая добыча газа США (по сообщению Gas Processing News)",
+     "value": "107,6 (2025) → 111,2 (2026) → 116,0 Bcf/d (2027)",
+     "date": "2026-08",
+     "source": "https://gasprocessingnews.com/news/2026/08/eia-us-natural-gas-output-demand-to-hit-record-highs-in-2026/"
+    },
+    {
+     "fact": "EIA STEO август 2026: запасы газа на конец октября (рекордная добыча и сниженная загрузка СПГ), по сообщению Hydrocarbon Engineering",
+     "value": "3 985 млрд куб. футов — максимум за 10 лет",
+     "date": "2026-08",
+     "source": "https://www.hydrocarbonengineering.com/tanks-terminals/13082026/eia-expects-highest-natural-gas-inventories-in-a-decade-heading-into-winter/"
+    },
+    {
+     "fact": "Waha (Пермь): отрицательные цены 25 дней подряд из-за нехватки вывозных мощностей (по сообщению PGJ)",
+     "value": "25 дней подряд, март 2026",
+     "date": "2026-03",
+     "source": "https://pgjonline.com/news/2026/march/permian-pipeline-constraints-push-waha-gas-prices-negative-for-25th-straight-day"
+    },
+    {
+     "fact": "Новые трубопроводы из Пермского бассейна (по сообщению Oilprice); точные мощности и сроки не проверены",
+     "value": "ввод с 2П 2026, давление сохранится до 2027",
+     "date": "2026-10",
+     "source": "https://oilprice.com/Energy/Natural-Gas/New-Pipelines-Set-To-Ease-Permian-Natural-Gas-Glut.amp.html"
+    },
+    {
+     "fact": "EIA STEO: добыча сырой нефти США (источник попутного газа)",
+     "value": "13,9 (2026) → 14,3 млн б/с (2027)",
+     "date": "2026-10",
+     "source": "https://www.eia.gov/outlooks/steo/"
+    },
+    {
+     "fact": "Прогноз добычи Permian и Haynesville на 2028–2030 (первичные цифры EIA/AEO)",
+     "value": "нет данных",
+     "date": "2026-10",
+     "source": "https://www.eia.gov/outlooks/steo/"
+    }
+   ]
+  },
+  "demand": {
+   "score": 2,
+   "summary": "Сильный рост спроса: экспорт СПГ растёт с 15,1 Bcf/d (2025) до 18,6 (2027), в строю Plaquemines, Corpus Christi 3, Golden Pass, затем Rio Grande, Plaquemines-2 и проекты 2030 г.; к этому добавляется рекордный расход газа на генерацию и рост электропотребления от дата-центров.",
+   "facts": [
+    {
+     "fact": "EIA STEO октябрь 2026: экспорт СПГ США",
+     "value": "17,6 (2026) → 18,6 Bcf/d (2027)",
+     "date": "2026-10",
+     "source": "https://www.eia.gov/outlooks/steo/"
+    },
+    {
+     "fact": "EIA STEO август 2026: экспорт СПГ в 2025 г. (по сообщению Gas Processing News)",
+     "value": "15,1 Bcf/d",
+     "date": "2026-08",
+     "source": "https://gasprocessingnews.com/news/2026/08/eia-us-natural-gas-output-demand-to-hit-record-highs-in-2026/"
+    },
+    {
+     "fact": "EIA: экспорт СПГ в 1П 2026 г. и прирост мощностей Plaquemines + Corpus Christi 3",
+     "value": "17,4 Bcf/d (+23% г/г); ≈ +4 Bcf/d мощности",
+     "date": "2026-09",
+     "source": "https://www.eia.gov/todayinenergy/detail.php?id=67564"
+    },
+    {
+     "fact": "Plaquemines, фаза 2 (расширение >30 млн т/год) — от середины 2027 (по сообщению отраслевой прессы); CP2 фаза 2, Delfin, Commonwealth — 2030 (IEA)",
+     "value": "2027 / 2030",
+     "date": "2026-07",
+     "source": "https://www.iea.org/reports/gas-market-report-q3-2026/executive-summary"
+    },
+    {
+     "fact": "EIA STEO май 2026: расход газа на генерацию летом 2027 г., рекорд (по сообщению Power Engineering)",
+     "value": "+6% (+2,4 Bcf/d) до 46,1 Bcf/d",
+     "date": "2026-05",
+     "source": "https://www.power-eng.com/?p=135973"
+    },
+    {
+     "fact": "EIA STEO январь 2026: электропотребление США (по сообщению DCD); дата-центры и коммерческие потребители",
+     "value": "+1% (2026), +3% (2027); дата-центры и коммерческие +2,4% / +4,3%",
+     "date": "2026-01",
+     "source": "https://www.datacenterdynamics.com/en/news/eia-us-electricity-use-to-see-largest-four-year-growth-period-since-2000-driven-primarily-by-data-center-demand/"
+    },
+    {
+     "fact": "Оценка спроса на газ от дата-центров к 2030 г. (оценки вне EIA; первоисточник в сводке не уточнён, дата публикации не подтверждена)",
+     "value": "3–6 Bcf/d",
+     "date": "2026-10",
+     "source": "https://jpt.spe.org/comments-how-ais-power-appetite-is-opening-a-new-market-for-natural-gas"
+    }
+   ]
+  },
+  "balance_note": "EIA STEO август 2026: рекордная добыча и сниженная загрузка СПГ ведут запасы к 10-летнему максимуму к октябрю; Henry Hub 3,31 USD/MMBtu в 2027 (авг.), 3,16 (окт.) — дефицит не прогнозируется (https://gasprocessingnews.com/news/2026/08/eia-us-natural-gas-output-demand-to-hit-record-highs-in-2026/, https://www.eia.gov/outlooks/steo/).",
+  "confidence": "medium"
+ },
+ {
+  "key": "copper",
+  "name": "Медь",
+  "as_of": "2026-10",
+  "horizon": "2027–2030",
+  "supply": {
+   "score": 1,
+   "summary": "Добыча растёт умеренно (ICSG: +1,6% в 2026 и +2,3% в 2027), но ряд ключевых проектов сдвигается или режется (Kamoa-Kakula, Grasberg, Reko Diq), а рост держат Oyu Tolgoi и Udokan. IEA: долгосрочный дефицит предложения к 2035 около 25%, краткосрочно хуже из-за нехватки серной кислоты.",
+   "facts": [
+    {
+     "fact": "ICSG: прогноз роста мировой добычи меди, снижен из-за аварий 2025 года на Grasberg и Kamoa (по пересказу отраслевого издания)",
+     "value": "2026: +1,6% (24,2 Мт); 2027: +2,3% (25,8 Мт); ранее на 2026 было +2,3%",
+     "date": "2026-04",
+     "source": "https://www.e-mj.com/departments/markets/icsg-forecasts-growth-in-copper-usage/"
+    },
+    {
+     "fact": "Kamoa-Kakula (Ivanhoe/Zijin, ДР Конго): гайденс урезан после пересмотра модели запасов (содержание меди в запасах −28%). Месяц публикации не установлен (по пересказу Skillings)",
+     "value": "2026: 290–330 кт (было 380–420 кт); 2027: 380–420 кт (было 500–540 кт)",
+     "date": "2026",
+     "source": "https://skillings.net/ivanhoe-stuns-market-kamoa-kakula-production-guidance-slashed-for-2026-2027"
+    },
+    {
+     "fact": "Grasberg (Freeport, Индонезия): восстановление после аварии 2025 года, по гайденсу компании (по пересказу SMM; месяц публикации не установлен)",
+     "value": "~65% мощности во 2П 2026, ~80% к середине 2027, около полной к концу 2027; 2026–2030 суммарно ~6,8 млрд фунтов (~1,4 млрд фунтов/год)",
+     "date": "2026",
+     "source": "https://news.metal.com/en/newscontent/104021474"
+    },
+    {
+     "fact": "Oyu Tolgoi (Rio Tinto, Монголия): подземка выходит на проектный режим; гайденс Rio по меди — по группе в целом, не по руднику",
+     "value": "группа 2026: 800–870 кт; Oyu Tolgoi в среднем ~500 кт/год в 2028–2036 (по пересказу); +31% к добыче меди Rio в 1П 2026",
+     "date": "2026-07",
+     "source": "https://www.fastmarkets.com/insights/rio-tinto-raises-copper-output-target-amid-oyu-tolgoi-mine-ramp-up"
+    },
+    {
+     "fact": "Udokan (Россия): катодный передел запущен после пожара, проект под санкциями США",
+     "value": "1-я очередь ~150 кт меди/год; ~50 кт катодов в 2026 (Норникель); после 2-й очереди до 550 кт/год",
+     "date": "2026-09",
+     "source": "https://www.kitco.com/news/off-the-wire/2026-09-02/russias-udokan-launches-copper-cathode-production-after-fire-related"
+    },
+    {
+     "fact": "Reko Diq (Barrick, Пакистан): Barrick в апреле 2026 предупредила о сдвиге сроков и росте бюджета; Resolution (Rio/BHP, США): record of decision и обмен земли в марте 2026, ~$500 млн на подготовительные работы, добыча — около десятилетия после FID",
+     "value": "Reko Diq: первая продукция вероятно позже конца 2028, капекс >$8,83 млрд; Resolution: нет данных о годе первой продукции",
+     "date": "2026-04",
+     "source": "https://www.miningweekly.com/article/reko-diq-coppergold-project-pakistan-update-2026-04-10"
+    },
+    {
+     "fact": "IEA Global Critical Minerals Outlook 2026 (выпуск 16.07.2026, по пересказу Skillings/Mining.com): долгосрочный дефицит первичного предложения меди к 2035 улучшен, ближний и средний срок ухудшен из-за нехватки серной кислоты",
+     "value": "дефицит ~25% к 2035 (было 30%); +650 кт мощностей в ДР Конго и Замбии к 2035",
+     "date": "2026-07",
+     "source": "https://www.mining.com/?p=1210690"
+    },
+    {
+     "fact": "Mercuria: сделка с Kazakhmys. По Minex Asia (09.01.2026) это кредит $1,2 млрд на выкуп Kazakhmys, без доли в капитале; по Forbes.kz (18.03.2026) — восьмилетнее соглашение с правом закупать 200 кт катодов/год в первые 4 года, конкретное месторождение и доля не названы. Тезис о $1,5 млрд в месторождение два года назад не подтверждён",
+     "value": "$1,2 млрд (не $1,5 млрд); 2026, а не 2024",
+     "date": "2026-03",
+     "source": "https://forbes.kz/articles/mercuria-investiruet-12-mlrd-v-kazakhmys-e80d38"
+    }
+   ]
+  },
+  "demand": {
+   "score": 1,
+   "summary": "Спрос растёт на ~1,6–2% в год (ICSG), драйверы — сети, электрификация и дата-центры; Китай всё ещё главный потребитель, но стройка тормозит. Оценки спроса от ИИ сильно расходятся (0,3–0,7 Мт в 2026 по стройке ДЦ, ~1 Мт накопленно к 2030).",
+   "facts": [
+    {
+     "fact": "ICSG: прогноз потребления рафинированной меди (снижен с 2,1% на 2026)",
+     "value": "2026: +1,6% (28,9 Мт); 2027: +2,0% (29,2 Мт)",
+     "date": "2026-04",
+     "source": "https://newsletter-mw.creamermedia.com/article/global-refined-copper-market-to-swing-to-surplus-in-2026-group-says-2026-04-23"
+    },
+    {
+     "fact": "ICSG: Китай растёт быстрее остального мира; ЕС и Япония вялые (по пересказу)",
+     "value": "Китай 2026: +1,9%; остальной мир: +1,3%",
+     "date": "2026-04",
+     "source": "https://dev.petromindo.com/news/article/global-copper-market-seen-in-surplus-through-2027-icsg-says"
+    },
+    {
+     "fact": "Дата-центры и ИИ: Wood Mackenzie оценивает добавочный спрос к 2030 году; отдельный анализ оценивает медь в стройке ДЦ 2026 года (по пересказу Hellenic Shipping News)",
+     "value": "~1 Мт накопленно к 2030 (WoodMac); 0,3–0,7 Мт в 2026 (центр ~0,5 Мт)",
+     "date": "2026",
+     "source": "https://www.hellenicshippingnews.com/?p=1141902"
+    },
+    {
+     "fact": "Сети: аналитик Wood Mackenzie называет расширение и усиление сетей главным долгосрочным драйвером спроса на медь (количественной оценки в источнике нет)",
+     "value": "качественно: главный драйвер на 10–20 лет; нет данных по тоннам",
+     "date": "2026-06",
+     "source": "https://www.miningweekly.com/article/grid-investment-emerging-as-biggest-driver-of-future-copper-demand-says-analyst-2026-06-04"
+    },
+    {
+     "fact": "Электромобили: отдельный свежий прогноз спроса на медь от EV не найден (данные IEA — в Data Explorer, не открывался)",
+     "value": "нет данных",
+     "date": "2026-07",
+     "source": "https://iea.org/reports/global-critical-minerals-outlook-2026"
+    }
+   ]
+  },
+  "balance_note": "ICSG, апрель 2026: профицит рафинированной меди 96 кт в 2026 и 377 кт в 2027 (в октябре 2025 ждали дефицит 150 кт на 2026); октябрьский прогноз ICSG 2026 на 16.10.2026 не найден (https://newsletter-mw.creamermedia.com/article/global-refined-copper-market-to-swing-to-surplus-in-2026-group-says-2026-04-23).",
+  "confidence": "medium"
+ },
+ {
+  "key": "iron_ore",
+  "name": "Железная руда",
+  "as_of": "2026-10",
+  "horizon": "2027–2030",
+  "supply": {
+   "score": 2,
+   "summary": "Simandou выходит на проектные 120 Мтг (Rio: полная мощность за 30 месяцев), BHP и Vale наращивают добычу к 2028–2030, Rio держится у нижней границы гайденса. Новое предложение крупное относительно морского рынка руды.",
+   "facts": [
+    {
+     "fact": "Simandou: отгрузки через порт Морибая (по сообщениям СМИ), май 2026 — рекорд; Q1 2026 в среднем ~0,6 Мт/мес",
+     "value": "май 2026: 2,2 Мт; номинал проекта 120 Мтг; базовый сценарий WoodMac на 2026 ~16 Мт (оптимисты 20+ Мт)",
+     "date": "2026-06",
+     "source": "https://miningmx.com/news/ferrous-metals/2026-06-03-simandou-iron-ore-exports-surge-in-ramp-up-milestone/"
+    },
+    {
+     "fact": "SimFer (Rio Tinto): отгрузки в Китай; Rio официально целится в полную мощность за 30 месяцев (часть аналитиков ждёт дольше)",
+     "value": "Q2 2026: 1,6 Мт; 1П 2026: 2,2 Мт",
+     "date": "2026-07",
+     "source": "https://riotintoguinee.com/en/media/press-release/simfer-advances-the-simandou-project-at-pace-reaching-new-operational-milestones/"
+    },
+    {
+     "fact": "Rio Tinto: гайденс по отгрузкам Pilbara на 2026 (100%); по пересказу, ожидается нижняя часть диапазона",
+     "value": "323–338 Мт; глобальные продажи 343–366 Мт",
+     "date": "2026-04",
+     "source": "https://www.sec.gov/Archives/edgar/data/0000863064/000086306426000022/ex1d21rt1q26results.htm"
+    },
+    {
+     "fact": "BHP: рекордная добыча WAIO в ФГ2026; план роста к ФГ2028",
+     "value": "ФГ2026: 264,7 Мт; ФГ2027: 253–264 Мт (286–298 Мт при 100%); >305 Мтг (100%) к концу ФГ2028",
+     "date": "2026-08",
+     "source": "https://www.zacks.com/stock/news/2955023/bhp-reports-record-fy26-iron-ore-output-on-strong-waio-performance"
+    },
+    {
+     "fact": "Vale: гайденс на 2026 снижен относительно прежнего (340–360 Мт), но выше уровня 2025; долгосрочная цель сохранена",
+     "value": "2026: 335–345 Мт; 2030: 360 Мт",
+     "date": "2026",
+     "source": "https://new.aisusteel.org/archives/3518"
+    }
+   ]
+  },
+  "demand": {
+   "score": -1,
+   "summary": "Мировой спрос на сталь в 2026 стоит на месте и растёт лишь на 1,7% в 2027 (worldsteel, октябрь 2026), Китай в спаде из-за недвижимости, выпуск стали в Китае падает ~3%. Индия растёт на ~8% в год, но не компенсирует Китай по объёму руды.",
+   "facts": [
+    {
+     "fact": "World Steel Short Range Outlook, 12.10.2026: мировой спрос на сталь; прогноз снижен (в апреле было +0,3% на 2026 и +2,2% на 2027), причина — Китай (недвижимость, инфраструктура не дала поддержки)",
+     "value": "2026: без изменений, 1,722 млрд т; 2027: +1,7%, 1,752 млрд т",
+     "date": "2026-10",
+     "source": "https://www.hellenicshippingnews.com/worldsteel-cuts-global-steel-demand-forecast-for-2026-as-iran-war-takes-its-toll/"
+    },
+    {
+     "fact": "World Steel: вне Китая и Индия (по пересказу)",
+     "value": "вне Китая: +1,5% (2026), +4% (2027); Индия: +7,9% (2026), +8,0% (2027)",
+     "date": "2026-10",
+     "source": "https://gmk.center/en/news/worldsteel-forecasts-that-global-demand-for-steel-will-remain-unchanged-in-2026/"
+    },
+    {
+     "fact": "Китай: выпуск стали (данные NBS по пересказу SteelOrbis); в июле −3,6% г/г, прогноз SteelHome на 2026 — 950 Мт (−1,2%)",
+     "value": "янв–июнь 2026: 499,95 Мт (−3,0%); янв–июль: −3,1%",
+     "date": "2026-08",
+     "source": "https://www.steelorbis.com/steel-news/latest-news/chinas-crude-steel-output-down-three-percent-in-h1-2026-1464773.htm"
+    }
+   ]
+  },
+  "balance_note": "",
+  "confidence": "medium"
+ },
+ {
+  "key": "aluminum",
+  "name": "Алюминий",
+  "as_of": "2026-10",
+  "horizon": "2027–2030",
+  "supply": {
+   "score": 1,
+   "summary": "Китай упёрся в потолок 45 Мт, новые мощности уходят в Индонезию (рост до 2,9 Мт в 2027 по Goldman) и Индию (Vedanta до 3,1 Мтг к ФГ2028, Hindalco +360 кт); Персидский залив после ударов 2026 года восстанавливается к 2027.",
+   "facts": [
+    {
+     "fact": "Китай: выплавка близка к самоустановленному потолку 45 Мт; в июле 2026 ING отмечает высокую загрузку и малый запас роста",
+     "value": "потолок 45 Мтг",
+     "date": "2026-07",
+     "source": "https://think.ing.com/articles/aluminium-retreats-as-middle-east-supply-risks-ease/"
+    },
+    {
+     "fact": "Индонезия: рост китайских инвестиций (по пересказу Fastmarkets/Goldman в выдаче; конкретная страница-источник цифр Goldman не проверялась)",
+     "value": "мощность 1,5–1,8 Мтг к концу 2026 (Fastmarkets); выпуск 1,7 Мт в 2026 и 2,9 Мт в 2027 (Goldman)",
+     "date": "2026",
+     "source": "https://www.fastmarkets.com/insights/key-talking-points-ahead-of-fastmarkets-international-aluminium-conference-in-budapest-2026/"
+    },
+    {
+     "fact": "Индия, Vedanta: план расширения мощности алюминия",
+     "value": "с 2,4 до 3,1 Мтг к ФГ2028 (инвестиции ₹13 226 крор)",
+     "date": "2025-10",
+     "source": "https://www.bigmint.co/insights/detail/india-vedanta-to-invest-inr-13226-cr-to-expand-aluminium-capacity-to-3-1-mnt-per-annum-by-fy28-686114"
+    },
+    {
+     "fact": "Индия, Hindalco: расширение плавильни Aditya (Одиша); срок ввода в источнике не указан",
+     "value": "+360 кт/год; ₹21 000 крор",
+     "date": "2026-01",
+     "source": "https://www.kitco.com/news/off-the-wire/2026-01-27/hindalco-unveils-23-billion-aluminum-smelter-expansion-plan"
+    }
+   ]
+  },
+  "demand": {
+   "score": 1,
+   "summary": "Потребление растёт около 2,7% в 2026, главные секторы — транспорт (28%), стройка (22%), упаковка (16%), электротехника (15%); сети и ЭВ добавляют структурный спрос, к 2030 электротехника даёт около +3,2 Мт (старое исследование).",
+   "facts": [
+    {
+     "fact": "Мировое потребление алюминия (AL Circle); структура 2025: транспорт 28%, стройка 22%, упаковка 16%, электро/электроника 15%",
+     "value": "2025: ~104,0 Мт; 2026: ~106,8 Мт (+2,7%)",
+     "date": "2026",
+     "source": "https://www.alcircle.com/news/as-global-aluminium-consumption-heads-towards-106-8-mt-in-2026-whats-driving-the-growth-and-which-regions-lead-the-way-117360"
+    },
+    {
+     "fact": "Рост по секторам на 2026 (AL Circle): транспорт и упаковка",
+     "value": "транспорт +2,76%; упаковка +2,75%",
+     "date": "2026",
+     "source": "https://www.alcircle.com/news/as-global-aluminium-consumption-heads-towards-106-8-mt-in-2026-whats-driving-the-growth-and-which-regions-lead-the-way-117360"
+    },
+    {
+     "fact": "Добавка спроса к 2030 по секторам (исследование на базе 2021 года; цифры не сопоставимы с AL Circle)",
+     "value": "транспорт +7,4 Мт; электротехника +3,2 Мт; стройка +2,3 Мт; упаковка +2,0 Мт; всего 64,2 → 83,8 Мт (2021→2030)",
+     "date": "нет данных",
+     "source": "https://lists.sidf.gov.sa/en/MediaCenter/Industrial_reports/KSA%20Aluminum%20Value%20Chain.pdf"
+    }
+   ]
+  },
+  "balance_note": "Публичного баланса IAI не найдено. Банки: Goldman (июнь 2026) дефицит 720 кт в 2026 и профицит 590 кт в 2027; ING (июль 2026) дефицит ~1,2 Мт в 2026 и небольшой профицит в 2027 (https://think.ing.com/articles/aluminium-retreats-as-middle-east-supply-risks-ease/).",
+  "confidence": "medium"
+ },
+ {
+  "key": "nickel",
+  "name": "Никель",
+  "as_of": "2026-10",
+  "horizon": "2027–2030",
+  "supply": {
+   "score": 0,
+   "summary": "Индонезия урезала квоты RKAB на 2026 год (260–270 Мт руды против 379 Мт), возможен пересмотр вверх; рост HPAL/RKEF сдерживается политикой квот. INSG ждёт небольшой дефицит в 2026.",
+   "facts": [
+    {
+     "fact": "Индонезия: квота RKAB на добычу никелевой руды на 2026 год (месяц публикации не установлен)",
+     "value": "260–270 Мт (в 2025 одобрено 379 Мт)",
+     "date": "2026",
+     "source": "https://source.benchmarkminerals.com/article/indonesia-announces-significantly-lower-nickel-rkab-quotas"
+    },
+    {
+     "fact": "Индонезия обсуждает пересмотр квоты 2026 года вверх (не подтверждено; окончательной цифры не найдено); импорт руды Индонезией по оценке аналитиков",
+     "value": "до ~360 Мт (не подтверждено); импорт руды до ~50 Мт в 2026 против 15 Мт в 2025",
+     "date": "2026",
+     "source": "https://www.hellenicshippingnews.com/?p=1139482"
+    },
+    {
+     "fact": "INSG, апрель 2026: первичное производство и потребление рафинированного никеля; после профицита 283 кт в 2025",
+     "value": "производство ~3,715 Мт, потребление ~3,747 Мт: дефицит ~32 кт в 2026",
+     "date": "2026-04",
+     "source": "https://www.petromindo.com/news/article/global-nickel-market-seen-shifting-to-deficit-in-2026-insg-says"
+    }
+   ]
+  },
+  "demand": {
+   "score": 1,
+   "summary": "Нержавеющая сталь продолжает расти (INSG), а рост спроса со стороны аккумуляторов медленнее ожидаемого: LFP отбирает долю у никелевых химий, гибриды растут быстрее чистых электромобилей.",
+   "facts": [
+    {
+     "fact": "INSG: нержавеющая сталь расширялась в 2025 и ждётся рост в 2026; спрос аккумуляторного сегмента слабее ожиданий из-за LFP и гибридов (по пересказу)",
+     "value": "качественно; числовых данных по секторам нет",
+     "date": "2026-04",
+     "source": "https://www.petromindo.com/news/article/global-nickel-market-seen-shifting-to-deficit-in-2026-insg-says"
+    }
+   ]
+  },
+  "balance_note": "INSG, апрель 2026: дефицит ~32 кт в 2026 (после профицита 283 кт в 2025); октябрьский прогноз INSG 2026 не найден (https://www.petromindo.com/news/article/global-nickel-market-seen-shifting-to-deficit-in-2026-insg-says). Другие оценки, более ранние: профицит ~261 кт (ING), 324 кт (BMI).",
+  "confidence": "medium"
+ },
+ {
+  "key": "zinc",
+  "name": "Цинк",
+  "as_of": "2026-10",
+  "horizon": "2027–2030",
+  "supply": {
+   "score": 0,
+   "summary": "Рост рудного предложения почти нулевой (ILZSG +0,3% в 2026; WoodMac +0,1%): Kipushi растёт, но вне Китая другие рудники сокращаются; Ozernoye ограничен санкциями.",
+   "facts": [
+    {
+     "fact": "ILZSG: добыча цинка и выпуск рафинированного цинка в 2026 (прогноз апреля)",
+     "value": "добыча +0,3% до 12,55 Мт; рафинированный +1,4% до 13,99 Мт",
+     "date": "2026-04",
+     "source": "https://www.kitco.com/news/off-the-wire/2026-04-23/ilzsg-sees-world-lead-market-surplus-zinc-market-deficit-2026"
+    },
+    {
+     "fact": "Kipushi (Ivanhoe, ДР Конго): добыча цинка в концентрате; риск — нестабильная энергосистема",
+     "value": "2024: 50,3 кт; 2025: 203 кт; цель 2026: 240–290 кт",
+     "date": "2026-01",
+     "source": "https://www.ecofinagency.com/news-industry/1601-51973-ivanhoe-targets-higher-zinc-output-in-drc-after-kipushi-surge-in-2025"
+    },
+    {
+     "fact": "Wood Mackenzie (по пересказу SMM): рост рудной добычи цинка в мире в 2026, вне Китая ожидается снижение",
+     "value": "+0,1% до ~12,8 Мт",
+     "date": "2026",
+     "source": "https://news.metal.com/en/newscontent/103800794-growth-in-zinc-concentrate-production-outside-china-is-set-to-slow-sharply-in-2026"
+    },
+    {
+     "fact": "Ozernoye (Россия): запуск в 2024, выход на мощность ограничен санкциями (замена оборудования); свежих цифр на 2026 по проверенному источнику нет",
+     "value": "проектная мощность до 600 кт концентрата; факт 2026: нет данных",
+     "date": "2024-10",
+     "source": "https://www.mining.com/web/sanctions-delay-to-russian-zinc-mine-causes-supply-miscalculation/"
+    }
+   ]
+  },
+  "demand": {
+   "score": 0,
+   "summary": "Спрос растёт около 1,3% (ILZSG); в Китае цинкование в стройке слабое (недвижимость), поддержка — солнечная энергетика и автомобили.",
+   "facts": [
+    {
+     "fact": "ILZSG: потребление рафинированного цинка в 2026",
+     "value": "+1,3% до 14,00 Мт",
+     "date": "2026-04",
+     "source": "https://www.kitco.com/news/off-the-wire/2026-04-23/ilzsg-sees-world-lead-market-surplus-zinc-market-deficit-2026"
+    },
+    {
+     "fact": "Китай, цинкование (SMM): стройка около 30% оцинкованного листа и сжимается; солнечные установки и автопром растут",
+     "value": "доля стройки ~30%; PV янв–ноя 2025: 274,9 ГВт (+33%); авто 34,5 млн (+10,4%)",
+     "date": "2026-01",
+     "source": "https://news.metal.com/newscontent/103738865-tổng-quan-ngành-mạ-kẽm-năm-2025-và-triển-vọng-năm-2026-phân-tích-smm"
+    }
+   ]
+  },
+  "balance_note": "ILZSG, апрель 2026: дефицит рафинированного цинка 19 кт в 2026 (в октябре 2025 ждали профицит 271 кт); октябрьский релиз ILZSG 2026 и прогноз на 2027 не найдены (https://www.kitco.com/news/off-the-wire/2026-04-23/ilzsg-sees-world-lead-market-surplus-zinc-market-deficit-2026).",
+  "confidence": "medium"
+ },
+ {
+  "key": "lead",
+  "name": "Свинец",
+  "as_of": "2026-10",
+  "horizon": "2027–2030",
+  "supply": {
+   "score": 0,
+   "summary": "Предложение почти плоское (ILZSG: добыча +1,2%, рафинированный +1,3%); две трети рафинированного свинца даёт переработка, и в Китае она упирается в нехватку лома батарей.",
+   "facts": [
+    {
+     "fact": "ILZSG, апрель 2026: добыча и выпуск рафинированного свинца в 2026",
+     "value": "добыча +1,2% до 4,60 Мт; рафинированный +1,3% до 13,83 Мт",
+     "date": "2026-04",
+     "source": "https://www.kitco.com/news/off-the-wire/2026-04-23/ilzsg-sees-world-lead-market-surplus-zinc-market-deficit-2026"
+    },
+    {
+     "fact": "Вторичный свинец (SMM): доля в мировом выпуске рафинированного свинца",
+     "value": ">8,3 Мт в 2025, ~66%",
+     "date": "2026-01",
+     "source": "https://news.metal.com/en/newscontent/103739802-smm-analysis-asia-dominates-global-secondary-lead-production-africa-to-become-fastest-growing-emerging-market"
+    },
+    {
+     "fact": "Китай, вторичный свинец (SMM): выпуск упал из-за дефицита лома и маржи",
+     "value": "май 2026: −45 кт м/м; загрузка на многолетнем минимуме",
+     "date": "2026-06",
+     "source": "https://news.metal.com/newscontent/103946225-원자재-비용-상승-+-소비-부진-2차-납-공급-및-가격-압박"
+    }
+   ]
+  },
+  "demand": {
+   "score": 0,
+   "summary": "Спрос растёт ~1% (ILZSG); Китай ослабевает (−0,7%, меньше нетто-экспорт свинцово-кислотных батарей), рост в Бразилии, Индии, Корее и Мексике. Основной потребитель — аккумуляторы.",
+   "facts": [
+    {
+     "fact": "ILZSG, апрель 2026: потребление рафинированного свинца в 2026; Китай снижается, Бразилия, Индия, Корея, Мексика растут, Япония без изменений",
+     "value": "мир: +1,1% до 13,72 Мт; Китай: −0,7%",
+     "date": "2026-04",
+     "source": "https://www.ilzsg.org/wp-content/uploads/3.PRESS%20RELEASES/20260423_ILZSG%20April%202026%20Press%20Release.pdf"
+    }
+   ]
+  },
+  "balance_note": "ILZSG, апрель 2026: профицит рафинированного свинца 109 кт в 2026 (в октябре 2025 ждали 102 кт); октябрьский релиз ILZSG 2026 не найден (https://www.kitco.com/news/off-the-wire/2026-04-23/ilzsg-sees-world-lead-market-surplus-zinc-market-deficit-2026).",
+  "confidence": "medium"
+ },
+ {
+  "key": "tin",
+  "name": "Олово",
+  "as_of": "2026-10",
+  "horizon": "2027–2030",
+  "supply": {
+   "score": 0,
+   "summary": "Предложение плоское: Ва (Мьянма) восстановлен лишь на 40–50% доковидной добычи, Индонезия ужесточает экспорт и лицензии, Бисие (ДР Конго) даёт ~6%. По ITA новых проектов к 2030 около 11, финансируемых жёстких рудников до 1П 2029 нет.",
+   "facts": [
+    {
+     "fact": "Мьянма, штат Ва: после запрета августа 2023 и разрешений июля 2025 мощность восстановлена лишь частично; BMI на сентябрь 2026 не нашёл подтверждения новых отгрузок",
+     "value": "40–50% от уровня до запрета",
+     "date": "2026-09",
+     "source": "https://www.businesstoday.com.my/2026/09/14/ai-boom-drives-tin-prices-higher-forecast-to-reach-us51500-in-2026/"
+    },
+    {
+     "fact": "Индонезия: экспорт рафинированного олова упал из-за ужесточения лицензий и разрешений на добычу (по SMM)",
+     "value": "май 2026: 3 246 т (−40% г/г); апрель −53,7% г/г",
+     "date": "2026-07",
+     "source": "https://news.metal.com/newscontent/103999487-smm-analysis-resource-tight-balance-meets-computing-power-revaluation-in-depth-review-of-tin-prices-in-h1-2026-and-outlo"
+    },
+    {
+     "fact": "ITA (по пересказу): новые проекты к 2030",
+     "value": "~11 проектов; нет финансируемого жёсткого рудника до 1П 2029",
+     "date": "2026",
+     "source": "https://www.miningvisuals.com/post/charted-tin-supply-demand-forecast-from-the-international-tin-association"
+    },
+    {
+     "fact": "ДР Конго, Бисие (Alphamin): доля в мировом предложении; перебои из-за M23 в 2025, мирное соглашение 4 декабря ослабило риск (по SMM)",
+     "value": "~6% мирового предложения",
+     "date": "2026",
+     "source": "https://news.metal.com/newscontent/103999487-smm-analysis-resource-tight-balance-meets-computing-power-revaluation-in-depth-review-of-tin-prices-in-h1-2026-and-outlo"
+    }
+   ]
+  },
+  "demand": {
+   "score": 1,
+   "summary": "Более половины спроса — пайка; ИИ-серверы растут быстро (SMM: >50%), но их доля пока мала, а традиционная потребительская электроника слаба. Рост ИИ-спроса ожидается к 2030, оценки отраслевых игроков не проверены.",
+   "facts": [
+    {
+     "fact": "Fastmarkets: пайка в оборудовании для ИИ (оценка подверженности)",
+     "value": "~10,2 кт в 2026 (≈89% биржевых запасов LME+SHFE)",
+     "date": "2026",
+     "source": "https://www.fastmarkets.com/insights/ai-hardware-demand-increases-tins-exposure-to-supply-disruption/"
+    },
+    {
+     "fact": "Игроки рынка (не опубликованный прогноз): спрос на олово от ИИ-серверов к 2030",
+     "value": "могут утроиться (не проверено)",
+     "date": "2026",
+     "source": "https://enkiai.com/critical-minerals/tin-solder-ai-data-centers/"
+    },
+    {
+     "fact": "PT Timah (по пересказу): мировое потребление и производство за 1П 2026",
+     "value": "потребление 179 кт против производства ~173 кт (дефицит ~3%)",
+     "date": "2026-06",
+     "source": "https://www.businesstoday.com.my/2026/09/14/ai-boom-drives-tin-prices-higher-forecast-to-reach-us51500-in-2026/"
+    }
+   ]
+  },
+  "balance_note": "ITA (по пересказу): физического дефицита сейчас нет, биржевые запасы росли; разрыв предложения и спроса появляется после 2027 (https://www.miningvisuals.com/post/charted-tin-supply-demand-forecast-from-the-international-tin-association). Вторичные оценки: дефицит ~3% в 2026 (PT Timah).",
+  "confidence": "medium"
+ },
+ {
+  "key": "gold",
+  "name": "Золото",
+  "as_of": "2026-10",
+  "horizon": "2027–2030",
+  "supply": {
+   "score": 0,
+   "summary": "Добыча почти плоская с лёгким приростом: в Q2 2026 +2% г/г (966 т, новые объёмы в Канаде и Чили), WGC ждёт в 2026 лишь небольшого роста из-за операционных ограничений и долгих сроков проектов; переработка растёт умеренно.",
+   "facts": [
+    {
+     "fact": "Общее предложение золота в Q2 2026 (по сообщению WGC, цифры из выдачи поиска, страница пресс-релиза не открывалась)",
+     "value": "1 269 т, без изменений г/г",
+     "date": "2026-07",
+     "source": "https://www.gold.org/news-and-events/press-releases/gold-market-shows-resilience-price-momentum-cools-q2"
+    },
+    {
+     "fact": "Добыча золота в Q2 2026 (рост за счёт новых объёмов в Канаде и Чили; цифра из выдачи поиска)",
+     "value": "966 т, +2% г/г",
+     "date": "2026-07",
+     "source": "https://www.gold.org/news-and-events/press-releases/gold-market-shows-resilience-price-momentum-cools-q2"
+    },
+    {
+     "fact": "Вторичное золото (переработка) в Q2 2026 (цифра из выдачи поиска)",
+     "value": "−6% г/г",
+     "date": "2026-07",
+     "source": "https://www.gold.org/news-and-events/press-releases/gold-market-shows-resilience-price-momentum-cools-q2"
+    },
+    {
+     "fact": "Прогноз WGC на 2026 по добыче: чуть выше при высоких ценах и маржах, рост ограничен операционными лимитами и долгими сроками проектов; переработка вырастет лишь умеренно",
+     "value": "рост без числа (формулировка WGC: edge higher)",
+     "date": "2026-07",
+     "source": "https://www.gold.org/goldhub/research/gold-demand-trends/gold-demand-trends-q2-2026/outlook"
+    }
+   ]
+  },
+  "demand": {
+   "score": 1,
+   "summary": "Центробанки остаются крупными покупателями (Q2 2026: 289 т, +62% г/г; 45% опрошенных ЦБ планируют наращивать резервы), но WGC ждёт в 2026 покупок ЦБ ниже итога 2025; ювелирка падает (−17% г/г, Китай под наибольшим давлением), ETF в оттоке — рост спроса идёт за счёт инвестиций (ОТС, Азия).",
+   "facts": [
+    {
+     "fact": "Чистые покупки золота центробанками и официальными институтами в Q2 2026 (по пересказу WAM о данных WGC)",
+     "value": "289 т, +62% г/г",
+     "date": "2026-07",
+     "source": "https://www.wam.ae/en/article/c1hd5ku-global-gold-demand-remains-stable-q2-world-gold"
+    },
+    {
+     "fact": "Доля центробанков из опроса WGC, планирующих увеличить золотые резервы в ближайшие 12 месяцев (по пересказу WAM)",
+     "value": "45%",
+     "date": "2026-07",
+     "source": "https://www.wam.ae/en/article/c1hd5ku-global-gold-demand-remains-stable-q2-world-gold"
+    },
+    {
+     "fact": "Ювелирный спрос в Q2 2026 (цифра из выдачи поиска): высокая цена, переход на более лёгкие изделия",
+     "value": "−17% г/г",
+     "date": "2026-07",
+     "source": "https://www.gold.org/news-and-events/press-releases/gold-market-shows-resilience-price-momentum-cools-q2"
+    },
+    {
+     "fact": "Q2 2026: чистый отток из золотых ETF; инвестиции в ETF, слитки и монеты в целом (цифры из выдачи поиска)",
+     "value": "отток ETF 45 т; ETF+слитки+монеты 262 т",
+     "date": "2026-07",
+     "source": "https://www.gold.org/news-and-events/press-releases/gold-market-shows-resilience-price-momentum-cools-q2"
+    },
+    {
+     "fact": "Прогноз WGC на 2026: покупки ЦБ сильные, но ниже итога 2025; главный источник роста спроса — инвестиции (ОТС и азиатские покупатели), слитки и монеты после сильного старта года замедлятся; ETF Северной Америки давят реальные доходности",
+     "value": "без чисел",
+     "date": "2026-07",
+     "source": "https://www.gold.org/goldhub/research/gold-demand-trends/gold-demand-trends-q2-2026/outlook"
+    },
+    {
+     "fact": "Ювелирка по странам: Китай — наибольшее давление (предпочтение слиткам и монетам, изменения НДС откладывают восстановление); Индия устойчивее (лёгкие изделия, инвестиционные продукты)",
+     "value": "без чисел",
+     "date": "2026-07",
+     "source": "https://www.gold.org/goldhub/research/gold-demand-trends/gold-demand-trends-q2-2026/outlook"
+    }
+   ]
+  },
+  "balance_note": "",
+  "confidence": "medium"
+ },
+ {
+  "key": "silver",
+  "name": "Серебро",
+  "as_of": "2026-10",
+  "horizon": "2027–2030",
+  "supply": {
+   "score": 0,
+   "summary": "Добыча плоская (серебро в основном побочный продукт), общее предложение 2026 около −2%; данных о крупных новых проектах не найдено.",
+   "facts": [
+    {
+     "fact": "World Silver Survey 2026 (Silver Institute / Metals Focus, вышел 15 апреля): мировая добыча в 2026 — по пересказу Crux Investor, без изменений; общее предложение снизится примерно на 2%",
+     "value": "добыча ≈ плоская; предложение ≈ −2%",
+     "date": "2026-04",
+     "source": "https://www.cruxinvestor.com/posts/silver-demand-falls-19-yet-a-46-3moz-deficit-keeps-supply-tight"
+    },
+    {
+     "fact": "Прогноз дефицита рынка серебра на 2026 против 2025 (по пересказу Crux Investor)",
+     "value": "46,3 Moz против 40,3 Moz",
+     "date": "2026-04",
+     "source": "https://www.cruxinvestor.com/posts/silver-demand-falls-19-yet-a-46-3moz-deficit-keeps-supply-tight"
+    }
+   ]
+  },
+  "demand": {
+   "score": 0,
+   "summary": "Спрос в 2026 снижается (−2% до 1,11 млрд унций): промышленный около −3% из-за экономии серебра в солнечных панелях при продолжающемся росте установок; дефицит закрывается больше падением спроса, чем ростом предложения. Данных по электронике и другим отраслям на 2027–2030 нет.",
+   "facts": [
+    {
+     "fact": "Общий спрос на серебро в 2026 (по пересказу Crux Investor о WSS 2026)",
+     "value": "≈1,11 млрд унций, −2%",
+     "date": "2026-04",
+     "source": "https://www.cruxinvestor.com/posts/silver-demand-falls-19-yet-a-46-3moz-deficit-keeps-supply-tight"
+    },
+    {
+     "fact": "Промышленный спрос в 2026 — Silver Institute ждёт снижения, главным образом из-за фотоэлектрики (по пересказу)",
+     "value": "≈ −3%",
+     "date": "2026-04",
+     "source": "https://www.cruxinvestor.com/posts/silver-demand-falls-19-yet-a-46-3moz-deficit-keeps-supply-tight"
+    },
+    {
+     "fact": "Расход серебра в солнечных модулях в 2026 и доля фотоэлектрики в спросе (производители снижают содержание пасты или заменяют материал; по пересказу)",
+     "value": "−19%; доля 14% против 18%",
+     "date": "2026-04",
+     "source": "https://www.cruxinvestor.com/posts/silver-demand-falls-19-yet-a-46-3moz-deficit-keeps-supply-tight"
+    },
+    {
+     "fact": "Серия дефицитов: 2026 — шестой дефицит подряд, а не пятый (по заголовку Mexico Business News; текст не открывался)",
+     "value": "6-й год подряд",
+     "date": "2026-10",
+     "source": "https://mexicobusiness.news/mining/news/silver-heads-sixth-deficit-year-liquidity-risk-persists"
+    }
+   ]
+  },
+  "balance_note": "Silver Institute / Metals Focus, World Silver Survey 2026 (15.04.2026): дефицит 2026 — 46,3 Moz (2025 — 40,3 Moz), шестой год подряд; по вторичному пересказу https://www.cruxinvestor.com/posts/silver-demand-falls-19-yet-a-46-3moz-deficit-keeps-supply-tight",
+  "confidence": "low"
+ },
+ {
+  "key": "platinum",
+  "name": "Платина",
+  "as_of": "2026-10",
+  "horizon": "2027–2030",
+  "supply": {
+   "score": 0,
+   "summary": "Добыча 2026 без изменений (5,551 Moz), ЮАР всего +1% за год (рост H1 +19% — восстановление Амандельбульта после наводнения 2025, H2 слабее); переработка +8% до 1,802 Moz с пиком в 2027–2028, общее предложение +2% — WPIC называет рост «не трансформационным».",
+   "facts": [
+    {
+     "fact": "Мировая добыча платины 2026 по Platinum Quarterly Q2 2026 (WPIC, 9 сентября; по отчёту Miningmx)",
+     "value": "5,551 Moz, без изменений",
+     "date": "2026-09",
+     "source": "https://www.miningmx.com/news/platinum/67161-platinum-deficit-beckons-in-second-half-as-etf-selling-eases/"
+    },
+    {
+     "fact": "Добыча в ЮАР: H1 2026 вырос на 19% г/г (Амандельбульт вернулся после затопления 2025), по итогам года — около +1%",
+     "value": "H1 +19%; год ≈ +1%",
+     "date": "2026-09",
+     "source": "https://www.miningmx.com/news/platinum/67161-platinum-deficit-beckons-in-second-half-as-etf-selling-eases/"
+    },
+    {
+     "fact": "H2 2026: добыча ЮАР ожидается ниже — Valterra перенесла техобслуживание на H2, чтобы избежать высоких зимних тарифов на электроэнергию",
+     "value": "без числа",
+     "date": "2026-09",
+     "source": "https://www.miningmx.com/news/platinum/67161-platinum-deficit-beckons-in-second-half-as-etf-selling-eases/"
+    },
+    {
+     "fact": "Переработка платины 2026; WPIC ждёт пика в следующем году или через год",
+     "value": "1,802 Moz, +8%",
+     "date": "2026-09",
+     "source": "https://www.miningmx.com/news/platinum/67161-platinum-deficit-beckons-in-second-half-as-etf-selling-eases/"
+    },
+    {
+     "fact": "Общее предложение платины 2026",
+     "value": "≈7,35 Moz, +2%",
+     "date": "2026-09",
+     "source": "https://www.miningmx.com/news/platinum/67161-platinum-deficit-beckons-in-second-half-as-etf-selling-eases/"
+    }
+   ]
+  },
+  "demand": {
+   "score": -1,
+   "summary": "Спрос 2026 падает на 18% до 7,089 Moz: автокатализаторы −4%, ювелирка −15%, промышленный +5% (электротехника, стекло); инвестиционный спрос резко урезан (отток ETF, слитки и монеты −71% г/г). Водородный спрос в найденных материалах не упоминается.",
+   "facts": [
+    {
+     "fact": "Суммарный спрос на платину в 2026 (WPIC, Q2 2026)",
+     "value": "7,089 Moz, −18%",
+     "date": "2026-09",
+     "source": "https://www.miningmx.com/news/platinum/67161-platinum-deficit-beckons-in-second-half-as-etf-selling-eases/"
+    },
+    {
+     "fact": "Спрос автокатализаторов 2026",
+     "value": "2,904 Moz, −4%",
+     "date": "2026-09",
+     "source": "https://www.miningmx.com/news/platinum/67161-platinum-deficit-beckons-in-second-half-as-etf-selling-eases/"
+    },
+    {
+     "fact": "Ювелирный спрос 2026",
+     "value": "1,883 Moz, −15%",
+     "date": "2026-09",
+     "source": "https://www.miningmx.com/news/platinum/67161-platinum-deficit-beckons-in-second-half-as-etf-selling-eases/"
+    },
+    {
+     "fact": "Промышленный спрос 2026 (электротехника +19%, стекло +23%)",
+     "value": "2,385 Moz, +5%",
+     "date": "2026-09",
+     "source": "https://www.miningmx.com/news/platinum/67161-platinum-deficit-beckons-in-second-half-as-etf-selling-eases/"
+    },
+    {
+     "fact": "Инвестиционный спрос: Q2 2026 — отток, ETF сократили запасы; прогноз инвестиционного спроса урезан на 601 koz",
+     "value": "Q2 отток 121 koz; ETF −234 koz; слитки и монеты −71% г/г",
+     "date": "2026-09",
+     "source": "https://www.miningmx.com/news/platinum/67161-platinum-deficit-beckons-in-second-half-as-etf-selling-eases/"
+    },
+    {
+     "fact": "Дефицит 2025 по оценке WPIC (отчёт Q4 2025, март 2026; по пресс-релизу в перепечатке)",
+     "value": "≈1,1 Moz",
+     "date": "2026-03",
+     "source": "https://www.kitco.com/news/article/2026-03-04/platinum-market-set-fourth-consecutive-annual-deficit-tight-supply-supports"
+    }
+   ]
+  },
+  "balance_note": "WPIC Platinum Quarterly Q2 2026 (09.09.2026): профицит 2026 около 265 koz (прогноз мая — дефицит 297 koz); H1 +548 koz, H2 −283 koz; пересмотр почти целиком из-за инвестиционного спроса. По отчёту Miningmx: https://www.miningmx.com/news/platinum/67161-platinum-deficit-beckons-in-second-half-as-etf-selling-eases/",
+  "confidence": "medium"
+ },
+ {
+  "key": "potash",
+  "name": "Калий хлористый",
+  "as_of": "2026-10",
+  "horizon": "2027–2030",
+  "supply": {
+   "score": 1,
+   "summary": "Новое крупное предложение: BHP Jansen (первая очередь около 4,35 Мт/год) стартует в 2027 (раньше называли 2026), удвоение к 2031; белорусский калий возвращается на рынок США (первая партия 30 кт в октябре 2026), но ограничен логистикой и контрактами. Данных по экспорту России и Беларуси в Мт, по Nutrien и USGS не найдено.",
+   "facts": [
+    {
+     "fact": "BHP Jansen (Саскачеван): начало добычи, по сообщению Fertilizer Daily со ссылкой на Northern Miner (раньше называли 2026)",
+     "value": "2027",
+     "date": "2026-10",
+     "source": "https://www.fertilizerdaily.com/20261006-us-potash-prices-belarus-bhp-jansen/"
+    },
+    {
+     "fact": "Стоимость проекта Jansen (по Northern Miner в пересказе Fertilizer Daily)",
+     "value": "$15,3 млрд",
+     "date": "2026-10",
+     "source": "https://www.fertilizerdaily.com/20261006-us-potash-prices-belarus-bhp-jansen/"
+    },
+    {
+     "fact": "Jansen: первая очередь 4,35 Мт/год, выход на удвоенный объём к 2031 (по сообщению Reuters за 2024 г. в перепечатке Engineering News; страница не открывалась, цифра из выдачи поиска)",
+     "value": "4,35 Мт/год; ≈8,7 Мт/год к 2031",
+     "date": "2024-03",
+     "source": "https://www.engineeringnews.co.za/article/bhp-inks-tentative-sales-deals-for-canadian-potash-2024-03-04"
+    },
+    {
+     "fact": "Беларусь: первая партия калия в США (Новый Орлеан); предложение ограничено логистикой и контрактами",
+     "value": "≈30 кт, октябрь 2026",
+     "date": "2026-10",
+     "source": "https://www.fertilizerdaily.com/20261006-us-potash-prices-belarus-bhp-jansen/"
+    },
+    {
+     "fact": "21 сентября 2026 Трамп заявил о работе над крупной сделкой по закупке белорусского калия вместо канадского; акции Nutrien −3,3%, Mosaic −1,4% за день; аналитики ждут давления на цены в США от этой сделки и нового канадского производителя",
+     "value": "политический фактор, объёмов нет",
+     "date": "2026-09",
+     "source": "https://www.fertilizerdaily.com/20261006-us-potash-prices-belarus-bhp-jansen/"
+    }
+   ]
+  },
+  "demand": {
+   "score": 0,
+   "summary": "По спросу Бразилии, Китая, Индии и контрактам 2026 данных не найдено. Из найденного: сильный спрос в США пока поддерживает маржу Nutrien и Mosaic.",
+   "facts": [
+    {
+     "fact": "Спрос Бразилии, Китая, Индии, контракты 2026 с Китаем и Индией",
+     "value": "нет данных",
+     "date": "2026-10",
+     "source": "https://www.fertilizerdaily.com/20261006-us-potash-prices-belarus-bhp-jansen/"
+    },
+    {
+     "fact": "Расположение в Саскачеване и сильный спрос в США поддерживают здоровую маржу Nutrien и Mosaic (качественно, без чисел)",
+     "value": "без числа",
+     "date": "2026-10",
+     "source": "https://www.fertilizerdaily.com/20261006-us-potash-prices-belarus-bhp-jansen/"
+    }
+   ]
+  },
+  "balance_note": "",
+  "confidence": "low"
+ },
+ {
+  "key": "phosrock",
+  "name": "Фосфорит",
+  "as_of": "2026-10",
+  "horizon": "2027–2030",
+  "supply": {
+   "score": 1,
+   "summary": "OCP (Марокко) наращивает мощности по фосфорным удобрениям: +4,5 Мт/год к концу 2026 и до 9 Мт/год к 2028 (SP2M); экспортные ограничения Китая действуют минимум по август 2026 и сдерживают китайское предложение. Это мощности по удобрениям, а не по руде; данных USGS и IFA не найдено.",
+   "facts": [
+    {
+     "fact": "OCP: прирост мощностей по фосфорным удобрениям (план SP2M); цель до 2028",
+     "value": "+4,5 Мт/год к концу 2026; +9 Мт/год к 2028",
+     "date": "2026-08",
+     "source": "https://www.fertilizerdaily.com/20260829-ocp-sp2m-phosphate-expansion-4-5-million-tonnes-2026/"
+    },
+    {
+     "fact": "Выпуск удобрений OCP",
+     "value": "≈12 Мт (2024) → 20 Мт к концу 2027",
+     "date": "2026-08",
+     "source": "https://www.fertilizerdaily.com/20260829-ocp-sp2m-phosphate-expansion-4-5-million-tonnes-2026/"
+    },
+    {
+     "fact": "Инвестиции OCP: 2026 год и программа 2025–2027",
+     "value": "$5,25 млрд в 2026; $14 млрд за 2025–2027",
+     "date": "2026-08",
+     "source": "https://www.fertilizerdaily.com/20260829-ocp-sp2m-phosphate-expansion-4-5-million-tonnes-2026/"
+    },
+    {
+     "fact": "Введены три гранулятора на Жорф-Лазфар, выпускают TSP",
+     "value": "3 × 1 Мт/год",
+     "date": "2026-08",
+     "source": "https://www.fertilizerdaily.com/20260829-ocp-sp2m-phosphate-expansion-4-5-million-tonnes-2026/"
+    },
+    {
+     "fact": "Экспортные ограничения Китая на фосфаты действуют минимум до августа 2026; по оценке одного вторичного источника, вывели около 30% мирового предложения (не проверено)",
+     "value": "≈30% мирового предложения (оценка)",
+     "date": "2026-08",
+     "source": "https://www.fertilizerdaily.com/20260829-ocp-sp2m-phosphate-expansion-4-5-million-tonnes-2026/"
+    },
+    {
+     "fact": "Торговля фосфоритом Китая в мае 2026 (SMM): экспорт вырос примерно на 190% м/м; рынок описан как напряжённый",
+     "value": "экспорт 32 кт; импорт 131 кт",
+     "date": "2026-06",
+     "source": "https://news.metal.com/en/newscontent/103989747-phosphorus-chemical-industry-june-sulfur-surges-phosphate-rock-holds-firm-fertilizers-struggle-new-materials-expand"
+    }
+   ]
+  },
+  "demand": {
+   "score": 1,
+   "summary": "Базовый спрос — удобрения; добавочный драйвер — LFP-катоды (поставки LFP из Китая около 1,61 Мт, +68%, по пересказу анализа сентября 2025). Данных по 2026 и прогноза до 2030 нет.",
+   "facts": [
+    {
+     "fact": "Поставки LFP-катодного материала из Китая за период в анализе (по пересказу в выдаче поиска, страница не открывалась; данные 2025 г.)",
+     "value": "≈1,61 Мт, +68%",
+     "date": "2025-09",
+     "source": "https://www.cnchemicals.com/Press/92314-Phosphate%20Chemicals%20Integrated%20Sulfur_Phosphate%20Advantage%20Endures%20.html"
+    },
+    {
+     "fact": "Спрос на фосфорит на LFP и прогноз потребления удобрений до 2030, данные USGS Mineral Commodity Summaries 2026",
+     "value": "нет данных",
+     "date": "2026-10",
+     "source": "https://www.fertilizerdaily.com/20260829-ocp-sp2m-phosphate-expansion-4-5-million-tonnes-2026/"
+    }
+   ]
+  },
+  "balance_note": "",
+  "confidence": "low"
+ },
+ {
+  "key": "urea",
+  "name": "Карбамид",
+  "as_of": "2026-10",
+  "horizon": "2027–2030",
+  "supply": {
+   "score": 1,
+   "summary": "Мощности растут (GlobalData: 241,9 → 307,5 Мтпа за 2023–2030; в Индии +2,5 Мтпа к FY2030), но реальный объём зависит от политики Китая (квота 2026 — 3,3 Мт против около 5 Мт отгрузок 2025, минимальные цены FOB) и от газа и Ормузского пролива (апрель 2026 — аварийная закупка Индии по $935–959/т).",
+   "facts": [
+    {
+     "fact": "Экспортная квота Китая на карбамид 2026 против отгрузок 2025; минимальные цены FOB: $430–440/т для большинства направлений, $500/т для Индии",
+     "value": "3,3 Мт против ≈5 Мт в 2025",
+     "date": "2026-09",
+     "source": "https://www.fertilizerdaily.com/20260918-china-urea-export-quota-2026-nitrogen-price-floor/"
+    },
+    {
+     "fact": "Другой отчёт Fertilizer Daily (по пересказу выдачи поиска) противоречит: квота 5–5,5 Мт, экспорт в июле около 403 кт против 7 кт в июне — размер квоты не подтверждён",
+     "value": "5–5,5 Мт (расхождение)",
+     "date": "2026-09",
+     "source": "https://www.fertilizerdaily.com/20260907-china-urea-india-tender-1-2-million-tonnes-2026/"
+    },
+    {
+     "fact": "Мировые мощности по карбамиду по оценке GlobalData (дата отчёта не указана, дата — сбор данных)",
+     "value": "241,92 Мтпа (2023) → 307,47 Мтпа (2030)",
+     "date": "2026-10",
+     "source": "https://www.globaldata.com/store/report/urea-capacity-and-capital-expenditure-market-analysis/"
+    },
+    {
+     "fact": "Новые мощности Индии по оценке ICRA (накопленно, FY2027–FY2030; дата отчёта не указана, дата — сбор данных)",
+     "value": "+2,5 Мтпа",
+     "date": "2026-10",
+     "source": "https://www.icra.in/Rating/DownloadResearchSpecialCommentReport?id=6772"
+    },
+    {
+     "fact": "Апрельская аварийная закупка Индии во время нарушения судоходства через Ормузский пролив (по пересказу Kotak Neo)",
+     "value": "2,5 Мт по $935–959/т",
+     "date": "2026-04",
+     "source": "https://www.kotakneo.com/news/commodities/india-urea-import-bids-fall-50-percent-china-exports-kharif-fertiliser-subsidy-bill/"
+    }
+   ]
+  },
+  "demand": {
+   "score": 0,
+   "summary": "Индия остаётся крупнейшим импортёром (карбамид около 45% потребления удобрений); тендеры 2026 набрали предложения в разы выше цели, зависимость от импорта сохранится минимум до FY2030, но собственные мощности Индии её снижают. По Бразилии и сезонности данных не найдено.",
+   "facts": [
+    {
+     "fact": "Тендер NFL в Индии, июнь 2026: предложено больше 6 Мт при цели 1,7 Мт; заявки ≈ $445–449/т (по пересказу Fertilizer Daily)",
+     "value": ">6 Мт предложено при цели 1,7 Мт",
+     "date": "2026-06",
+     "source": "https://www.fertilizerdaily.com/20260616-nfl-urea-tender-draws-bids-as-low-as-445t-more-than-half-april-levels/"
+    },
+    {
+     "fact": "Тендер RCF в Индии, июль 2026",
+     "value": "цель 1,7 Мт",
+     "date": "2026-07",
+     "source": "https://www.fertilizerdaily.com/20260918-china-urea-export-quota-2026-nitrogen-price-floor/"
+    },
+    {
+     "fact": "Индия — крупнейший импортёр карбамида; доля карбамида в потреблении удобрений (по пересказу ICRA в выдаче поиска; дата отчёта не указана)",
+     "value": "≈45%",
+     "date": "2026-10",
+     "source": "https://www.icra.in/Rating/DownloadResearchSpecialCommentReport?id=6772"
+    },
+    {
+     "fact": "Fertilizer Daily ожидает, что зависимость Индии от импорта сохранится минимум до FY2030; напряжённость баланса «не исправится быстро»",
+     "value": "до FY2030",
+     "date": "2026-09",
+     "source": "https://www.fertilizerdaily.com/20260918-china-urea-export-quota-2026-nitrogen-price-floor/"
+    }
+   ]
+  },
+  "balance_note": "Количественного публичного прогноза баланса не найдено. Fertilizer Daily (09.2026): напряжённость не исправится быстро, Индия зависима от импорта до FY2030 https://www.fertilizerdaily.com/20260918-china-urea-export-quota-2026-nitrogen-price-floor/ ; блог price-watch.ai: с 2027 новая волна мощностей (РФ, Индия, Катар, Центральная Азия) может сместить баланс к покупателям https://www.price-watch.ai/blog/urea-market-outlook/",
+  "confidence": "medium"
  }
 ]
