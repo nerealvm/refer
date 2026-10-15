@@ -20,6 +20,7 @@
   --s-met: #eb6834;       /* коксующийся */
   --s-za: #1baf7a;        /* ЮАР */
   --s-usst: #eda100;      /* экспорт США, энергетический */
+  --s-phcc: #8e44ad;      /* PHCC, годовой спот (OCE) */
   --s-usbit: #4a3aa7;     /* США, цена на шахте */
   --good: #0ca30c;
   --good-ink: #006300;
@@ -39,7 +40,7 @@
     --bg: #101211; --surface: #181a19; --ink: #f1f2ef; --ink-2: #c3c6c0; --muted: #8b908b;
     --grid: #282b29; --axis: #3a3e3b; --hair: rgba(255, 255, 255, 0.10);
     --wash-up: rgba(235, 130, 60, 0.085); --wash-down: rgba(90, 140, 210, 0.08);
-    --s-au: #3987e5; --s-met: #d95926; --s-za: #199e70; --s-usst: #c98500; --s-usbit: #9085e9;
+    --s-au: #3987e5; --s-met: #d95926; --s-za: #199e70; --s-usst: #c98500; --s-phcc: #b07cc6; --s-usbit: #9085e9;
     --good-ink: #3cc23c; --warn-ink: #f0955f;
     --chip-good: rgba(12, 163, 12, 0.18); --chip-warn: rgba(236, 131, 90, 0.20); --chip-neutral: rgba(139, 144, 139, 0.18);
     color-scheme: dark;
@@ -49,7 +50,7 @@
   --bg: #101211; --surface: #181a19; --ink: #f1f2ef; --ink-2: #c3c6c0; --muted: #8b908b;
   --grid: #282b29; --axis: #3a3e3b; --hair: rgba(255, 255, 255, 0.10);
   --wash-up: rgba(235, 130, 60, 0.085); --wash-down: rgba(90, 140, 210, 0.08);
-  --s-au: #3987e5; --s-met: #d95926; --s-za: #199e70; --s-usst: #c98500; --s-usbit: #9085e9;
+  --s-au: #3987e5; --s-met: #d95926; --s-za: #199e70; --s-usst: #c98500; --s-phcc: #b07cc6; --s-usbit: #9085e9;
   --good-ink: #3cc23c; --warn-ink: #f0955f;
   --chip-good: rgba(12, 163, 12, 0.18); --chip-warn: rgba(236, 131, 90, 0.20); --chip-neutral: rgba(139, 144, 139, 0.18);
   color-scheme: dark;
@@ -203,16 +204,25 @@ footer { color: var(--muted); font-size: 12.5px; padding-block: 0 40px; }
         </div>
         <div class="seg" role="group" aria-label="Период">
           <button data-range="all" aria-pressed="true">Всё</button>
+          <button data-range="50" aria-pressed="false">50 лет</button>
           <button data-range="30" aria-pressed="false">30 лет</button>
           <button data-range="10" aria-pressed="false">10 лет</button>
         </div>
+        <div class="seg" role="group" aria-label="Тренд">
+          <button id="trend-none" aria-pressed="false">Без тренда</button>
+          <button id="trend-ma" aria-pressed="true">Скользящие</button>
+          <button id="trend-fit" aria-pressed="false">Долгосрочный</button>
+          <button id="trend-chan" aria-pressed="false">Канал</button>
+        </div>
       </div>
       <div class="toggles" id="series-toggles"></div>
+      <p class="sub" id="series-spec" style="margin-top:6px"></p>
       <div class="chart" id="main-chart" style="margin-top:10px"></div>
       <div class="legend">
         <span><i class="sw" style="background:var(--wash-up)"></i>Подъём</span>
         <span><i class="sw" style="background:var(--wash-down)"></i>Спад</span>
         <span id="legend-median"><i class="key" style="background:var(--muted);height:1px"></i>Медиана Newcastle с 1970</span>
+        <span id="legend-trend" hidden></span>
         <span><i class="key" style="background:var(--ink);width:10px;height:10px;border-radius:2px"></i>Сделка (под осью)</span>
       </div>
       <div class="grid2" style="margin-top:14px;gap:6px 24px">
@@ -322,18 +332,25 @@ const DATA = /*__DATA__*/null;
 
   // ---------- серии угля ----------
   const SER = {
-    thermal_au: { name: 'Энергетический, Newcastle', short: 'Newcastle', color: '--s-au', on: true, q: false },
-    met_us: { name: 'Коксующийся, экспорт США', short: 'Коксующийся', color: '--s-met', on: true, q: true },
-    thermal_za: { name: 'Энергетический, ЮАР', short: 'ЮАР', color: '--s-za', on: false, q: false },
-    steam_us: { name: 'Энергетический, экспорт США', short: 'Экспорт США', color: '--s-usst', on: false, q: true },
+    thermal_au: { name: 'Энергетический · Newcastle', short: 'Newcastle', color: '--s-au', on: true, q: false,
+      spec: 'Австралия, FOB Newcastle, Всемирный банк. С 2015 года 6000 ккал/кг NAR; 2002–2014 — 6300 ккал/кг GAR; до 2002 — 6667 ккал/кг GAR.' },
+    thermal_za: { name: 'Энергетический · Richards Bay (API4)', short: 'Richards Bay', color: '--s-za', on: false, q: false,
+      spec: 'ЮАР, FOB Richards Bay, Всемирный банк. С 2015 года 6000 ккал/кг NAR; 2002–2005 — 6200; 1990–2001 — 6390 ккал/кг. Часть месяцев 2022–2024 — оценки Всемирного банка.' },
+    met_us: { name: 'Коксующийся · экспорт США (прокси)', short: 'Коксующийся США', color: '--s-met', on: false, q: true,
+      spec: 'Средняя цена экспорта металлургического угля из США, FAS, поквартально, EIA. Сглаженный прокси бенчмарка PHCC: на пиках 47–65% от него.' },
+    met_phcc: { name: 'Коксующийся · PHCC, спот, годовая', short: 'PHCC', color: '--s-phcc', on: false, a: true,
+      spec: 'Премиальный твёрдый коксующийся уголь, FOB Австралия, среднегодовая спотовая цена. OCE Resources and Energy Quarterly, сентябрь 2026.' },
+    steam_us: { name: 'Энергетический · экспорт США', short: 'Экспорт США', color: '--s-usst', on: false, q: true,
+      spec: 'Средняя цена экспорта энергетического угля из США, FAS, поквартально, EIA.' },
   };
   for (const k in SER) {
     const c = DATA.coal[k];
+    if (!c) { delete SER[k]; continue; }
     SER[k].pts = c.series.map((r) => ({ t: ymT(r[0]) + (SER[k].q ? 1.5 / 12 : 0), d: r[0], nom: r[1], real: r[2] }));
     SER[k].pos = c.position;
-    SER[k].phases = c.phases;
+    SER[k].phases = c.phases || [];
   }
-  const dateLbl = (k, d) => SER[k].q ? qLabel(d) : ymLabel(d);
+  const dateLbl = (k, d) => SER[k].q ? qLabel(d) : SER[k].a ? d.slice(0, 4) : ymLabel(d);
 
   // ---------- карточки вердикта ----------
   function stanceChip(parent, cls, label) {
@@ -352,7 +369,7 @@ const DATA = /*__DATA__*/null;
     el('small', null, pr, ' $/т' + (SER[k].q ? ' (реальная)' : ''));
     const chips = el('div', { class: 'chips' }, box);
     stanceChip(chips, p.stance === 'buy' ? 'buy' : p.stance === 'sell' ? 'sell' : '', p.stance_label);
-    el('span', { class: 'chip plain' }, chips, p.stage_label);
+    el('span', { class: 'chip plain' }, chips, p.stage_label + (p.stage === 'rebound' || p.stage === 'pullback' ? ' · не подтверждён' : ''));
     el('span', { class: 'chip plain' }, chips, p.level + ' · ' + Math.round(p.pct_all) + '-й перцентиль');
     const dl = el('dl', { class: 'facts' }, box);
     const fact = (dt, dd) => { const d = el('div', null, dl); el('dt', null, d, dt); el('dd', null, d, dd); };
@@ -361,6 +378,8 @@ const DATA = /*__DATA__*/null;
     if (ph.extreme_date) {
       fact((ph.kind === 'down' ? 'Минимум ' : 'Максимум ') + dateLbl(k, ph.extreme_date), fmtP(ph.extreme_price) + ' $/т, с тех пор ' + fmtPct(ph.since_extreme));
       fact(ph.kind === 'down' ? 'Разворот вверх подтвердится' : 'Разворот вниз подтвердится', (ph.kind === 'down' ? 'выше ' : 'ниже ') + fmtP(ph.confirm_level) + ' $/т');
+      if (p.stage === 'rebound') fact('Отскок отменится', 'при новом минимуме ниже ' + fmtP(ph.extreme_price) + ' $/т');
+      if (p.stage === 'pullback') fact('Откат отменится', 'при новом максимуме выше ' + fmtP(ph.extreme_price) + ' $/т');
     }
     const med = st[ph.kind];
     if (med) fact('Типичный ' + (ph.kind === 'down' ? 'спад' : 'подъём') + ' (медиана, ' + med.n + ' шт.)', mo(Math.round(med.median_months)) + ', ' + fmtPct(med.median_change));
@@ -374,8 +393,8 @@ const DATA = /*__DATA__*/null;
     el('span', null, sc, 'дёшево'); el('span', null, sc, '● с ' + p.hist_from.slice(0, 4) + ' · ○ за 20 лет'); el('span', null, sc, 'дорого');
     if (note) el('p', { class: 'note', style: 'margin:0' }, box, note);
   }
-  verdict('thermal_au', 'Энергетический уголь, Newcastle', 'Цены Всемирного банка: Австралия, FOB Newcastle, 6000 ккал/кг.');
-  verdict('met_us', 'Коксующийся уголь (прокси)', 'Средняя экспортная цена угля для металлургии из США, поквартально, с 2000 года. Сглажена: на пиках 47–65% от бенчмарка HCC, спад 2008–09 годов в ней не виден. Надёжность сигнала низкая: медианы по 2 фазам.');
+  verdict('thermal_au', 'Энергетический уголь · Newcastle', 'Всемирный банк, ряд «Coal, Australian»: Австралия, FOB Newcastle. С 2015 года 6000 ккал/кг NAR, в 2002–2014 — 6300 ккал/кг GAR, до 2002 — 6667 ккал/кг GAR.');
+  verdict('met_us', 'Коксующийся уголь · прокси США', 'Средняя экспортная цена угля для металлургии из США, поквартально, с 2000 года. Сглажена: на пиках 47–65% от бенчмарка HCC, спад 2008–09 годов в ней не виден. Надёжность сигнала низкая: медианы по 2 фазам.');
 
   // ---------- общий движок линейного графика ----------
   function niceLinTicks(lo, hi, n) {
@@ -468,6 +487,14 @@ const DATA = /*__DATA__*/null;
       const x0 = xv(Math.max(t0, b.t0)), x1 = xv(Math.min(t1, b.t1));
       if (x1 <= x0) continue;
       s('rect', { x: x0, y: m.t, width: x1 - x0, height: ih, fill: b.kind === 'up' ? 'var(--wash-up)' : 'var(--wash-down)' }, gb);
+    }
+    // полосы вокруг тренда
+    for (const ar of cfg.areas || []) {
+      const up = ar.pts.filter((p) => p.t >= t0 - 1 && p.t <= t1 + 1);
+      if (!up.length) continue;
+      const d = up.map((p, i) => (i ? 'L' : 'M') + xv(p.t).toFixed(1) + ',' + yv(p.hi).toFixed(1)).join('') +
+        [...up].reverse().map((p) => 'L' + xv(p.t).toFixed(1) + ',' + yv(p.lo).toFixed(1)).join('') + 'Z';
+      s('path', { d, fill: ar.fill, opacity: ar.opacity || 0.1, stroke: 'none' }, gb);
     }
     // сетка
     const gg = s('g', null, svg);
@@ -567,6 +594,7 @@ const DATA = /*__DATA__*/null;
       tip.textContent = '';
       el('div', { class: 't-date' }, tip, cfg.dateOf ? cfg.dateOf(t) : tLabel(t));
       vis.forEach((sr, i) => {
+        if (sr.noTip) { dots[i].setAttribute('visibility', 'hidden'); return; }
         const j = bisect(sr.pts, t);
         const p = sr.pts[j];
         if (!p || Math.abs(p.t - t) > (sr.tol || 0.13) || p.v == null) { dots[i].setAttribute('visibility', 'hidden'); return; }
@@ -622,7 +650,29 @@ const DATA = /*__DATA__*/null;
   }
 
   // ---------- главный график ----------
-  const st = { mode: 'real', log: true, range: 'all' };
+  const st = { mode: 'real', log: true, range: 'all', trend: 'ma' };
+  // скользящая средняя по n точкам; разрывы ряда сбрасывают окно
+  function movAvg(pts, n) {
+    const out = [], q = []; let sum = 0;
+    for (const p of pts) {
+      if (p.v == null) { q.length = 0; sum = 0; out.push({ t: p.t, v: null }); continue; }
+      q.push(p.v); sum += p.v; if (q.length > n) sum -= q.shift();
+      out.push({ t: p.t, v: q.length === n ? sum / n : null });
+    }
+    return out;
+  }
+  // прямая по логарифму цены, наименьшие квадраты; sigma — ст. отклонение остатков
+  function logFit(pts) {
+    const xs = [], ys = [];
+    for (const p of pts) if (p.v > 0) { xs.push(p.t); ys.push(Math.log(p.v)); }
+    const n = xs.length; if (n < 24) return null;
+    const mx = xs.reduce((a, b) => a + b, 0) / n, my = ys.reduce((a, b) => a + b, 0) / n;
+    let sxx = 0, sxy = 0;
+    for (let i = 0; i < n; i++) { sxx += (xs[i] - mx) ** 2; sxy += (xs[i] - mx) * (ys[i] - my); }
+    const b = sxy / sxx, a = my - b * mx;
+    let ss = 0; for (let i = 0; i < n; i++) ss += (ys[i] - (a + b * xs[i])) ** 2;
+    return { a, b, sigma: Math.sqrt(ss / (n - 2)), n };
+  }
   const tg = document.getElementById('series-toggles');
   for (const k in SER) {
     const b = el('button', { class: 'toggle', 'aria-pressed': SER[k].on ? 'true' : 'false' }, tg);
@@ -655,10 +705,47 @@ const DATA = /*__DATA__*/null;
   function drawMain() {
     const lastT = SER.thermal_au.pts[SER.thermal_au.pts.length - 1].t;
     const t0 = st.range === 'all' ? 1970 : lastT - (+st.range);
-    const series = Object.keys(SER).filter((k) => SER[k].on).map((k) => ({
-      key: k, name: SER[k].name, short: SER[k].short, color: SER[k].color, tol: SER[k].q ? 0.17 : 0.05,
-      pts: SER[k].pts.map((p) => ({ t: p.t, d: p.d, v: st.mode === 'real' ? p.real : p.nom })),
+    const val = (p) => st.mode === 'real' ? p.real : p.nom;
+    const on = Object.keys(SER).filter((k) => SER[k].on);
+    const series = on.map((k) => ({
+      key: k, name: SER[k].name, short: SER[k].short, color: SER[k].color, tol: SER[k].a ? 0.6 : SER[k].q ? 0.17 : 0.05,
+      pts: SER[k].pts.map((p) => ({ t: p.t, d: p.d, v: val(p) })),
     }));
+    // тренды поверх включённых рядов
+    const areas = [];
+    let trendTxt = '';
+    if (st.trend === 'ma') {
+      for (const sr of series.slice()) {
+        const S = SER[sr.key]; if (S.a) continue;
+        const w1 = S.q ? 4 : 12, w2 = S.q ? 20 : 60;
+        series.push({ key: sr.key + '_ma1', pts: movAvg(sr.pts, w1), color: sr.color, width: 1.1, opacity: 0.55, noTip: true, noEnd: true });
+        series.push({ key: sr.key + '_ma5', pts: movAvg(sr.pts, w2), color: sr.color, width: 1.4, dash: '7 4', opacity: 0.9, noTip: true, noEnd: true });
+      }
+      trendTxt = 'Тонкая линия — скользящая средняя за 12 месяцев, пунктир — за 5 лет (квартальные ряды: 4 и 20 кварталов).';
+    } else if (st.trend === 'fit') {
+      for (const sr of series.slice()) {
+        const f = logFit(sr.pts); if (!f) continue;
+        const line = (t) => Math.exp(f.a + f.b * t);
+        const span = [t0, lastT + 0.25];
+        series.push({ key: sr.key + '_fit', pts: span.map((t) => ({ t, v: line(t) })), color: sr.color, width: 1.4, dash: '2 4', noTip: true, noEnd: true });
+        if (sr.key === 'thermal_au') {
+          areas.push({ pts: span.map((t) => ({ t, lo: line(t) * Math.exp(-f.sigma), hi: line(t) * Math.exp(f.sigma) })), fill: `var(${sr.color})`, opacity: 0.09 });
+          const d0 = SER.thermal_au.pts[0].d.slice(0, 4), d1 = SER.thermal_au.pts[SER.thermal_au.pts.length - 1].d.slice(0, 4);
+          trendTxt = 'Долгосрочный тренд Newcastle: прямая по логарифму ' + (st.mode === 'real' ? 'реальной' : 'номинальной') + ' цены за ' + d0 + '–' + d1 + ', ' + fmtPct(Math.exp(f.b) - 1, 1) + ' в год. Полоса — ±1σ отклонений от тренда (' + fmtPct(Math.exp(f.sigma) - 1, 0) + ').';
+        }
+      }
+    } else if (st.trend === 'chan' && st.mode === 'real') {
+      for (const sr of series.slice()) {
+        const ph = (SER[sr.key].phases || []).filter((p) => p.complete);
+        const pk = ph.filter((p) => p.kind === 'up').map((p) => ({ t: ymT(p.end), v: p.p1 }));
+        const tr = ph.filter((p) => p.kind === 'down').map((p) => ({ t: ymT(p.end), v: p.p1 }));
+        if (pk.length > 1) series.push({ key: sr.key + '_pk', pts: pk, color: sr.color, width: 1.2, dash: '5 3', noTip: true, noEnd: true });
+        if (tr.length > 1) series.push({ key: sr.key + '_tr', pts: tr, color: sr.color, width: 1.2, dash: '5 3', noTip: true, noEnd: true });
+      }
+      trendTxt = 'Канал: пунктир соединяет пики завершённых подъёмов и минимумы завершённых спадов. Строится по реальным ценам.';
+    } else if (st.trend === 'chan') {
+      trendTxt = 'Канал пиков и дна строится по реальным ценам: переключите «Реальные».';
+    }
     const ph = SER.thermal_au.pos.phase;
     const markers = [];
     if (st.mode === 'real' && ph.extreme_date) {
@@ -666,21 +753,24 @@ const DATA = /*__DATA__*/null;
         hline: { v: ph.confirm_level, label: 'разворот: ' + fmtP(ph.confirm_level) } });
     }
     lineChart(document.getElementById('main-chart'), {
-      x: [t0, lastT + 0.25], log: st.log, series, endLabels: true, events: EV, deals: DL, markers,
+      x: [t0, lastT + 0.25], log: st.log, series, areas, endLabels: true, events: EV, deals: DL, markers,
       bands: SER.thermal_au.phases.map((p) => ({ t0: ymT(p.start), t1: ymT(p.end), kind: p.kind })),
       refLines: st.mode === 'real' ? [{ y: SER.thermal_au.pos.median_all, dash: '4 4' }] : [],
       aria: 'Цена угля с 1970 года, ' + (st.mode === 'real' ? 'реальная' : 'номинальная'),
       extra: (t) => { const p = phaseAt(t); return p ? (p.kind === 'up' ? 'Подъём ' : 'Спад ') + ymLabel(p.start) + ' – ' + (p.complete ? ymLabel(p.end) : 'сейчас') + ': ' + fmtPct(p.change) : null; },
     });
     document.getElementById('legend-median').hidden = st.mode !== 'real';
+    const lt = document.getElementById('legend-trend'); lt.hidden = !trendTxt; lt.textContent = trendTxt;
+    document.getElementById('series-spec').textContent = on.map((k) => SER[k].short + ' — ' + SER[k].spec).join(' ');
     document.getElementById('main-sub').textContent = (st.mode === 'real' ? 'Реальные цены, $/т ' + baseTxt + '.' : 'Номинальные цены, $/т.') +
-      ' Помесячно, коксующийся поквартально. Полосы — подъёмы и спады Newcastle. Кольцо и пунктир — текущее дно и уровень, выше которого разворот подтвердится.';
+      ' Помесячно; экспорт США поквартально, PHCC по годам. Полосы — подъёмы и спады Newcastle. Кольцо и пунктир — текущее дно и уровень, выше которого разворот подтвердится.';
   }
   function seg(ids, key, val) {
     ids.forEach(([id, v]) => { const b = document.getElementById(id); b.addEventListener('click', () => { st[key] = v; ids.forEach(([i2, v2]) => document.getElementById(i2).setAttribute('aria-pressed', v2 === v)); drawMain(); }); });
   }
   seg([['mode-real', 'real'], ['mode-nom', 'nom']], 'mode');
   seg([['scale-log', true], ['scale-lin', false]], 'log');
+  seg([['trend-none', 'none'], ['trend-ma', 'ma'], ['trend-fit', 'fit'], ['trend-chan', 'chan']], 'trend');
   document.querySelectorAll('[data-range]').forEach((b) => b.addEventListener('click', () => {
     st.range = b.dataset.range; document.querySelectorAll('[data-range]').forEach((x) => x.setAttribute('aria-pressed', x === b)); drawMain();
   }));
@@ -694,6 +784,7 @@ const DATA = /*__DATA__*/null;
     const series = [
       { name: 'Индекс Джекса', short: 'Индекс', color: '--s-usbit', pts: hist, tol: 0.6, noEnd: true },
       { name: 'Продление по Newcastle', short: 'Индекс (Newcastle)', color: '--s-usbit', pts: ext, tol: 0.6, dash: '5 4' },
+      { name: 'Скользящая 10 лет', short: 'MA10', color: '--s-usbit', pts: movAvg(L.jacks.map((r) => ({ t: r[0] + 0.5, v: r[1] })), 10), width: 1.3, dash: '8 4', opacity: 0.85, noTip: true, noEnd: true },
     ];
     const ph = L.jacks_phases;
     const val = (y) => (L.jacks.find((r) => r[0] === y) || [0, null])[1];
@@ -717,6 +808,7 @@ const DATA = /*__DATA__*/null;
     const lg = document.getElementById('long-legend'); lg.textContent = '';
     let sp = el('span', null, lg); el('i', { class: 'key', style: 'background:var(--s-usbit)' }, sp); sp.appendChild(document.createTextNode('Индекс Д. Джекса, 1850–' + ly));
     sp = el('span', null, lg); el('i', { class: 'key', style: 'background:repeating-linear-gradient(90deg,var(--s-usbit) 0 4px,transparent 4px 7px)' }, sp); sp.appendChild(document.createTextNode('продление по Newcastle, ' + (ly + 1) + '–' + L.jacks[L.jacks.length - 1][0]));
+    sp = el('span', null, lg); el('i', { class: 'key', style: 'background:repeating-linear-gradient(90deg,var(--s-usbit) 0 8px,transparent 8px 12px);height:1px' }, sp); sp.appendChild(document.createTextNode('скользящая средняя за 10 лет'));
     const au = Object.fromEntries(L.au.map((r) => [r[0], r[1]])), us = Object.fromEntries(L.us_bit.map((r) => [r[0], r[2]]));
     const auPre = Math.max(...L.au.filter((r) => r[0] < 2000).map((r) => r[1])), auPreY = L.au.find((r) => r[1] === auPre)[0];
     const usPre = Math.max(...L.us_bit.filter((r) => r[0] < 2000).map((r) => r[2])), usPreY = L.us_bit.find((r) => r[2] === usPre)[0];
@@ -847,7 +939,7 @@ const DATA = /*__DATA__*/null;
     const pts = C.map((c) => ({ c, x: xv(c.pct_all), y: yv(c.chg12) }));
     pts.forEach((p) => placed.push({ x0: p.x - 6, x1: p.x + 6, y0: p.y - 6, y1: p.y + 6 }));
     const tip = el('div', { class: 'tip', hidden: '' }, host);
-    const short = (n) => n.replace('Уголь энергетический, ', 'Уголь ').replace('Уголь коксующийся (экспорт США)', 'Уголь коксующ.').replace('Калий хлористый', 'Калий');
+    const short = (n) => n.replace('Уголь энергетический, ', 'Уголь ').replace(' (Австралия)', '').replace(' (ЮАР)', '').replace('Уголь коксующийся (экспорт США)', 'Уголь коксующ.').replace('Калий хлористый', 'Калий');
     for (const p of pts.sort((a, b) => (a.c.group === 'Уголь' ? -1 : 0) - (b.c.group === 'Уголь' ? -1 : 0))) {
       const g = s('g', { tabindex: 0, 'aria-label': p.c.name + ': ' + Math.round(p.c.pct_all) + '-й перцентиль, ' + fmtPct(p.c.chg12) + ' за 12 мес., ' + p.c.stance_label }, svg);
       const coal = p.c.group === 'Уголь';

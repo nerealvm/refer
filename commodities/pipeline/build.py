@@ -31,7 +31,7 @@ FRED_CPI = 'https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCNS'
 EIA_AER = 'https://www.eia.gov/totalenergy/data/annual/xls/stb0709.xls'
 EIA_API = 'https://api.eia.gov/v2/coal'
 # Д. Джекс, реальные цены коммодити 1850–2020 (1900 = 100). Страница SFU недоступна, берём копию из Web Archive.
-JACKS_URL = ('https://web.archive.org/web/20221007161341/http://www.sfu.ca/~djacks/data/boombust/'
+JACKS_URL = ('https://web.archive.org/web/2022id_/http://www.sfu.ca/~djacks/data/boombust/'  # id_ = сырой файл без обёртки Wayback
              'Real%20commodity%20prices,%201850-2020.xlsx')
 SHORT_TON = 0.90718474  # метрических тонн в короткой тонне
 
@@ -42,8 +42,8 @@ PCT_RECENT_YEARS = 20
 
 COMMODITIES = [
     # ключ, колонка Pink Sheet, название, группа, единица
-    ('coal_au', 'Coal, Australian', 'Уголь энергетический, Австралия', 'Уголь', '$/т'),
-    ('coal_za', 'Coal, South African **', 'Уголь энергетический, ЮАР', 'Уголь', '$/т'),
+    ('coal_au', 'Coal, Australian', 'Уголь Newcastle (Австралия)', 'Уголь', '$/т'),
+    ('coal_za', 'Coal, South African **', 'Уголь Richards Bay (ЮАР)', 'Уголь', '$/т'),
     ('brent', 'Crude oil, Brent', 'Нефть Brent', 'Энергия', '$/барр.'),
     ('gas_eu', 'Natural gas, Europe', 'Газ, Европа', 'Энергия', '$/млн БТЕ'),
     ('lng_jp', 'Liquefied natural gas, Japan', 'СПГ, Япония', 'Энергия', '$/млн БТЕ'),
@@ -93,14 +93,20 @@ def download_all():
     fetch(EIA_AER, RAW / 'eia_aer_0709.html')
     if not (RAW / 'jacks.xlsx').exists():  # исторический файл не меняется
         fetch(JACKS_URL, RAW / 'jacks.xlsx')
-    key = os.environ.get('EIA_API_KEY', 'DEMO_KEY')
-    fetch(f'{EIA_API}/price-by-rank/data/?api_key={key}&frequency=annual&data[]=price'
-          f'&facets[stateRegionId][]=US&facets[coalRankId][]=BIT&length=500', RAW / 'eia_price_bit.json')
-    for rank in ('MET', 'STM'):
-        fetch(f'{EIA_API}/exports-imports-quantity-price/data/?api_key={key}&frequency=quarterly'
-              f'&data[]=price&data[]=quantity&facets[exportImportType][]=Exports&facets[countryId][]=TOT'
-              f'&facets[customsDistrictId][]=TOT&facets[coalRankId][]={rank}&length=1000',
-              RAW / f'eia_exports_{rank}.json', tries=5)
+    key = os.environ.get('EIA_API_KEY')
+    if not key:
+        print('EIA_API_KEY не задан: ряды EIA берутся из data/*.csv прошлой сборки')
+        return
+    try:
+        fetch(f'{EIA_API}/price-by-rank/data/?api_key={key}&frequency=annual&data[]=price'
+              f'&facets[stateRegionId][]=US&facets[coalRankId][]=BIT&length=500', RAW / 'eia_price_bit.json')
+        for rank in ('MET', 'STM'):
+            fetch(f'{EIA_API}/exports-imports-quantity-price/data/?api_key={key}&frequency=quarterly'
+                  f'&data[]=price&data[]=quantity&facets[exportImportType][]=Exports&facets[countryId][]=TOT'
+                  f'&facets[customsDistrictId][]=TOT&facets[coalRankId][]={rank}&length=1000',
+                  RAW / f'eia_exports_{rank}.json', tries=5)
+    except Exception as e:  # API EIA недоступен: ниже сработает запасной путь через data/*.csv
+        print(f'EIA API недоступен ({e}): ряды EIA берутся из data/*.csv прошлой сборки')
 
 
 # ---------- чтение ----------
@@ -138,12 +144,17 @@ def read_us_bituminous():
                 rows[int(y)] = float(r.iloc[1])
             except ValueError:
                 pass
-    api = json.loads((RAW / 'eia_price_bit.json').read_text())['response']['data']
-    for x in api:  # данные API (2001+) свежее и с ревизиями — они главнее
-        if x.get('coalRankId') == 'BIT' and x.get('price') not in (None, ''):
-            rows[int(x['period'])] = float(x['price'])
-    s = pd.Series(rows).sort_index()
-    return s / SHORT_TON
+    api_file = RAW / 'eia_price_bit.json'
+    if api_file.exists():
+        api = json.loads(api_file.read_text())['response']['data']
+        for x in api:  # данные API (2001+) свежее и с ревизиями — они главнее
+            if x.get('coalRankId') == 'BIT' and x.get('price') not in (None, ''):
+                rows[int(x['period'])] = float(x['price'])
+        return pd.Series(rows).sort_index() / SHORT_TON
+    # запасной путь: номинальный ряд прошлой сборки (уже в метрических тоннах) поверх таблицы AER
+    prev = pd.read_csv(OUT / 'coal_us_bituminous_annual.csv', index_col='year')['nominal_usd_t']
+    s = pd.Series(rows).sort_index() / SHORT_TON
+    return prev.combine_first(s).sort_index()
 
 
 def read_jacks_coal():
@@ -155,9 +166,34 @@ def read_jacks_coal():
     return pd.Series(rows.iloc[:, 1].astype(float).values, index=rows.iloc[:, 0].astype(int).values)
 
 
+def read_oce_annual():
+    """OCE Resources and Energy Quarterly, historical data, таблица 6: годовые индикаторные цены, номинал $/т.
+    Сайт OCE рвёт соединение скриптам, файл кладётся в data/raw/oce_historical.xlsx вручную; без него ряд пропускается."""
+    f = RAW / 'oce_historical.xlsx'
+    if not f.exists():
+        return None
+    d = pd.read_excel(f, sheet_name='6', header=None)
+    is_year = lambda v: isinstance(v, (int, float)) and not pd.isna(v) and 1900 < v < 2100 and float(v).is_integer()
+    hdr = next(i for i in range(len(d)) if sum(is_year(v) for v in d.iloc[i].tolist()) >= 10)  # строка с годами
+    years = [(i, int(v)) for i, v in enumerate(d.iloc[hdr].tolist()) if is_year(v)]
+    lab_col = next(c for c in range(d.shape[1]) if d.iloc[:, c].astype(str).str.contains('Metallurgical coal').any())
+    labels = d.iloc[:, lab_col].astype(str).str.strip().str.lower()
+
+    def row(prefix, nth=0):
+        r = d[labels.str.startswith(prefix)].iloc[nth]
+        return pd.Series({y: float(r.iloc[i]) for i, y in years if isinstance(r.iloc[i], (int, float)) and not pd.isna(r.iloc[i])})
+    return dict(met_spot=row('metallurgical coal'), thermal_contract=row('thermal coal', 0), thermal_spot=row('thermal coal', 1))
+
+
 def read_us_exports(rank):
     """Средняя цена экспорта угля из США (FAS), $/т (метрич.), поквартально с 2000."""
-    data = json.loads((RAW / f'eia_exports_{rank}.json').read_text())['response']['data']
+    api_file = RAW / f'eia_exports_{rank}.json'
+    if not api_file.exists():  # запасной путь: номинальный ряд прошлой сборки
+        prev = pd.read_csv(OUT / 'coal_us_exports_quarterly.csv', index_col='quarter')
+        col = {'MET': 'met_nominal_usd_t', 'STM': 'steam_nominal_usd_t'}[rank]
+        idx = [pd.Timestamp(int(q[:4]), (int(q[-1]) - 1) * 3 + 1, 1) for q in prev.index]
+        return pd.Series(prev[col].values, index=idx).dropna().sort_index()
+    data = json.loads(api_file.read_text())['response']['data']
     s = {}
     for x in data:
         if x.get('price') in (None, ''):
@@ -448,6 +484,17 @@ def build():
             phases=[ser_phase(p) for p in ph],
             position=ser_position(position(rs, ph)),
         )
+
+    # годовой спот PHCC из OCE — ориентир для сглаженного прокси США; без файла пропускается
+    oce = read_oce_annual()
+    if oce is not None:
+        phcc_n = oce['met_spot']
+        phcc_r = phcc_n * (base / cpi_a.reindex(phcc_n.index))
+        coal['met_phcc'] = dict(freq='A', series=[[f'{int(y)}-07', rnd(phcc_n.loc[y], 1), rnd(phcc_r.loc[y], 1)] for y in phcc_n.index],
+                                phases=[], position=None,
+                                source='OCE Resources and Energy Quarterly, September 2026, historical data, table 6: premium hard coking coal spot')
+    else:
+        print('data/raw/oce_historical.xlsx нет: ряд PHCC пропущен')
 
     au_annual = au_r.groupby(au_r.index.year).mean()
     au_months = au_r.groupby(au_r.index.year).size()
