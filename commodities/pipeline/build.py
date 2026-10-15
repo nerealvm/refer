@@ -64,6 +64,30 @@ COMMODITIES = [
 ]
 
 
+# Фундаментальная связь с углём: знак и механизм. Задано вручную, обоснование повторено в методологии.
+# +1 — есть механизм, по которому ряд и уголь должны двигаться вместе; 0 — прямого механизма нет.
+FUND_LINKS = {
+    'coal_za': (1, 'Тот же морской рынок энергетического угля: арбитраж между Атлантикой и Азией.'),
+    'brent': (1, 'Общий энергетический цикл: нефть задаёт цену контрактов на СПГ, издержки добычи и фрахта.'),
+    'gas_eu': (1, 'Замещение в генерации: дорогой газ переключает электростанции Европы на уголь, дешёвый — обратно.'),
+    'lng_jp': (1, 'Замещение в генерации Азии: СПГ и уголь конкурируют за место в энергобалансе.'),
+    'gas_us': (0, 'Неоднозначно: дешёвый сланцевый газ вытесняет уголь внутри США, но выталкивает американский уголь на экспорт.'),
+    'iron_ore': (1, 'Сталь: спрос на коксующийся уголь идёт вместе со спросом на руду.'),
+    'copper': (1, 'Промышленный цикл Китая: один и тот же спрос на металлы и электроэнергию.'),
+    'aluminum': (1, 'Энергоёмкий металл: выплавка в Китае и Индии идёт на угольной генерации.'),
+    'nickel': (1, 'Промышленный цикл; никелевая выплавка Индонезии работает на угле.'),
+    'zinc': (1, 'Промышленный цикл Китая.'),
+    'lead': (1, 'Промышленный цикл Китая.'),
+    'tin': (1, 'Промышленный цикл и электроника.'),
+    'gold': (0, 'Защитный актив: связь с углём только через доллар и инфляцию.'),
+    'silver': (0, 'Защитный актив и промышленный металл: прямого механизма нет.'),
+    'platinum': (0, 'Автокатализаторы и добыча в ЮАР: прямого механизма нет.'),
+    'potash': (0, 'Удобрения: общий сырьевой цикл, прямого механизма нет.'),
+    'phosrock': (0, 'Удобрения: общий сырьевой цикл, прямого механизма нет.'),
+    'urea': (1, 'Карбамид в Китае делают из угля: уголь — сырьё и издержки производителя.'),
+}
+
+
 # ---------- загрузка ----------
 
 def fetch(url, dest, timeout=150, tries=3):
@@ -336,6 +360,39 @@ def phases_from(series, outliers=None):
     return phases
 
 
+def coal_links(real):
+    """Связь Newcastle с другими рядами: корреляция 12-месячных логарифмических изменений реальных цен.
+    Лаг: x.shift(k) при k>0 ставит прошлое значение x против текущего угля, то есть x опережает уголь на k месяцев."""
+    lr = np.log(real.where(real > 0)).diff(12)
+    base = lr['Coal, Australian']
+    out = []
+    for key, col, name, group, unit in COMMODITIES:
+        if col == 'Coal, Australian':
+            continue
+        x = lr[col]
+        df = pd.concat([base.rename('c'), x.rename('x')], axis=1).dropna()
+        df = df[df.index >= PCT_FROM]
+        if len(df) < 60:
+            continue
+        c_all = float(df.c.corr(df.x))
+        d10 = df[df.index > df.index[-1] - pd.DateOffset(years=10)]
+        c_10 = float(d10.c.corr(d10.x))
+        best_k, best_c = 0, c_all
+        for k in range(-12, 13):
+            if k == 0:
+                continue
+            cc = float(df.c.corr(x.shift(k).reindex(df.index)))
+            if abs(cc) > abs(best_c) + 0.03 and abs(cc) >= 0.3:  # лаг засчитываем, если он заметно лучше нуля и сама связь не шум
+                best_k, best_c = k, cc
+        roll = df.c.rolling(60).corr(df.x)
+        roll_y = roll.groupby(roll.index.year).mean().dropna()
+        sign, why = FUND_LINKS.get(key, (0, ''))
+        out.append(dict(key=key, name=name, group=group, unit=unit, from_year=int(df.index[0].year), n=len(df),
+                        corr_all=rnd(c_all, 2), corr_10y=rnd(c_10, 2), lead=best_k, corr_lead=rnd(best_c, 2),
+                        fund=sign, why=why, roll=[[int(y), rnd(v, 2)] for y, v in roll_y.items()]))
+    return out
+
+
 def phase_stats(phases):
     done = [p for p in phases if p['complete'] and not p['data_start']]
     res = {}
@@ -530,8 +587,10 @@ def build():
         outliers.extend((name, d, o, r) for d, o, r in found)
         pos = position(rs, ph)
         annual = rs[rs.index >= PCT_FROM].groupby(rs[rs.index >= PCT_FROM].index.year).mean()
+        since = rs[rs.index >= PCT_FROM]
         cmap.append(dict(key=key, name=name, group=group, unit=unit, freq='M', nominal=rnd(pink[col].dropna().iloc[-1], 2),
                          spark=[[int(y), rnd(v, 3)] for y, v in annual.items()],
+                         monthly=[[ym(d), rnd(v, 1) if v >= 10 else rnd(v, 3)] for d, v in since.items()],  # реальные, для наложения на график угля
                          cycles=sum(1 for p in ph if p['complete'] and not p['data_start']),
                          **ser_position(pos)))
     # коксующийся уголь (прокси) — отдельной строкой, история с 2000 года
@@ -563,6 +622,7 @@ def build():
         coal=coal,
         long_run=long_run,
         commodities=cmap,
+        links=coal_links(real),
         events=events,
         deals=deals,
     )

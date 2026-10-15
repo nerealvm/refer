@@ -132,6 +132,7 @@ h3 { font-size: 15px; font-weight: 600; margin: 0 0 6px; }
 .legend .sw { width: 14px; height: 10px; border-radius: 2px; display: inline-block; }
 
 /* события */
+select.pick { font: inherit; font-size: 13px; padding: 5px 8px; border-radius: 8px; border: 1px solid var(--hair); background: var(--surface); color: var(--ink); max-width: 100%; }
 ol.events { list-style: none; margin: 14px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 6px 18px; font-size: 13px; }
 ol.events li { display: grid; grid-template-columns: 22px 62px 1fr; gap: 6px; align-items: baseline; color: var(--ink-2); }
 ol.events .n { font-family: var(--font-data); font-size: 11px; color: var(--ink); background: var(--chip-neutral); border-radius: 50%; width: 20px; height: 20px; display: inline-grid; place-items: center; }
@@ -216,6 +217,7 @@ footer { color: var(--muted); font-size: 12.5px; padding-block: 0 40px; }
         </div>
       </div>
       <div class="toggles" id="series-toggles"></div>
+      <div class="toggles" style="align-items:center;gap:8px"><label class="sub" style="margin:0" for="overlay">Наложить другой ряд:</label><select class="pick" id="overlay" aria-label="Наложить другой ряд"></select></div>
       <p class="sub" id="series-spec" style="margin-top:6px"></p>
       <div class="chart" id="main-chart" style="margin-top:10px"></div>
       <div class="legend">
@@ -229,6 +231,19 @@ footer { color: var(--muted); font-size: 12.5px; padding-block: 0 40px; }
         <div><h3>События</h3><ol class="events" id="events" style="margin-top:6px;grid-template-columns:1fr"></ol></div>
         <div><h3>Сделки и банкротства</h3><ol class="events deals" id="deals" style="margin-top:6px;grid-template-columns:1fr"></ol></div>
       </div>
+    </div>
+
+    <div class="panel">
+      <h2>Что движется вместе с углём, а что против</h2>
+      <p class="sub" id="links-sub">Корреляция 12-месячных изменений реальных цен с Newcastle. Полоса — вся общая история, кружок — последние 10 лет. Справа — кто кого опережает по лучшей корреляции со сдвигом до 12 месяцев и есть ли фундаментальный механизм связи.</p>
+      <div class="chart" id="links-chart"></div>
+      <div class="legend">
+        <span><i class="key" style="background:var(--s-au)"></i>вместе с углём</span>
+        <span><i class="key" style="background:var(--s-met)"></i>против угля</span>
+        <span><i class="key" style="background:var(--surface);border:1.6px solid var(--ink);width:9px;height:9px;border-radius:50%"></i>последние 10 лет</span>
+        <span>«механизм +» — есть фундаментальная связь, «·» — прямого механизма нет</span>
+      </div>
+      <p class="note" id="links-note"></p>
     </div>
 
     <div class="grid2">
@@ -602,7 +617,7 @@ const DATA = /*__DATA__*/null;
         if (sr.noTip) return;
         const row = el('div', { class: 't-row' }, tip);
         el('i', { class: 'key', style: `background:var(${sr.color})` }, row);
-        el('b', null, row, fmtP(p.v));
+        el('b', null, row, fmtP(p.raw != null ? p.raw : p.v));
         el('span', null, row, sr.short || sr.name);
       });
       if (cfg.extra) { const ex = cfg.extra(t); if (ex) el('div', { class: 't-extra' }, tip, ex); }
@@ -650,7 +665,13 @@ const DATA = /*__DATA__*/null;
   }
 
   // ---------- главный график ----------
-  const st = { mode: 'real', log: true, range: 'all', trend: 'ma' };
+  const st = { mode: 'real', log: true, range: 'all', trend: 'ma', overlay: '' };
+  const shortName = (n) => n.replace('Уголь энергетический, ', 'Уголь ').replace(' (Австралия)', '').replace(' (ЮАР)', '').replace('Уголь коксующийся (экспорт США)', 'Уголь коксующ.').replace('Калий хлористый', 'Калий');
+  const OV = Object.fromEntries((DATA.commodities || []).filter((c) => c.monthly).map((c) => [c.key, c]));
+  const ovSel = document.getElementById('overlay');
+  el('option', { value: '' }, ovSel, 'нет');
+  for (const c of Object.values(OV)) el('option', { value: c.key }, ovSel, shortName(c.name) + ', ' + c.unit);
+  ovSel.addEventListener('change', () => { st.overlay = ovSel.value; drawMain(); });
   // скользящая средняя по n точкам; разрывы ряда сбрасывают окно
   function movAvg(pts, n) {
     const out = [], q = []; let sum = 0;
@@ -746,6 +767,23 @@ const DATA = /*__DATA__*/null;
     } else if (st.trend === 'chan') {
       trendTxt = 'Канал пиков и дна строится по реальным ценам: переключите «Реальные».';
     }
+    // наложение другого ряда: приводим к уровню Newcastle в начале окна, чтобы сравнивать форму движения
+    const ov = OV[st.overlay];
+    if (ov) {
+      if (st.mode !== 'real') {
+        trendTxt += (trendTxt ? ' ' : '') + 'Наложение работает для реальных цен: переключите «Реальные».';
+      } else {
+        const base = SER.thermal_au.pts;
+        const ovp = ov.monthly.map((r) => ({ t: ymT(r[0]), d: r[0], raw: r[1] })).filter((p) => p.t >= t0 - 0.01);
+        const first = ovp.find((p) => p.raw > 0 && base.some((b) => b.d === p.d && b.real > 0));
+        if (first) {
+          const k = base.find((b) => b.d === first.d).real / first.raw;
+          series.push({ key: 'overlay', name: shortName(ov.name), short: shortName(ov.name) + ', ' + ov.unit, color: '--ink-2', width: 1.6, opacity: 0.75, tol: 0.05, noEnd: true,
+            pts: ovp.map((p) => ({ t: p.t, d: p.d, v: p.raw > 0 ? p.raw * k : null, raw: p.raw })) });
+          trendTxt += (trendTxt ? ' ' : '') + 'Серая линия — ' + shortName(ov.name) + ', приведено к уровню Newcastle в ' + ymLabel(first.d) + ' (подсказка показывает настоящую цену, ' + ov.unit + ').';
+        }
+      }
+    }
     const ph = SER.thermal_au.pos.phase;
     const markers = [];
     if (st.mode === 'real' && ph.extreme_date) {
@@ -817,6 +855,68 @@ const DATA = /*__DATA__*/null;
       ' года он продлён по Newcastle через среднее соотношение ' + L.jacks_link_years.join('–') + ' годов; ' + L.jacks[L.jacks.length - 1][0] + ' — неполный год. Уровни до и после 2010 года напрямую не сравнимы: 2022 год в ценах Newcastle в ' + fx(au[2022] / auPre) + ' раза выше ' + auPreY +
       ' года, а по цене на шахтах США — ' + fx(us[2022] / usPre) + ' от уровня ' + usPreY + ' года. Даты пиков и спадов надёжнее уровней.';
   }
+
+  // ---------- связь с другими коммодити ----------
+  function drawLinks() {
+    const host = document.getElementById('links-chart'); if (!host) return;
+    host.textContent = '';
+    const rows = (DATA.links || []).slice().sort((a, b) => b.corr_all - a.corr_all);
+    if (!rows.length) return;
+    const W = Math.max(280, host.clientWidth), narrow = W < 560, rh = 24;
+    const m = { l: narrow ? 104 : 150, r: narrow ? 70 : 230, t: 24, b: 6 };
+    const H = m.t + rows.length * rh + m.b, iw = W - m.l - m.r;
+    const svg = s('svg', { viewBox: `0 0 ${W} ${H}`, height: H, role: 'img', 'aria-label': 'Корреляция рядов с углём Newcastle' }, host);
+    const xv = (c) => m.l + (Math.max(-1, Math.min(1, c)) + 1) / 2 * iw;
+    for (const c of [-1, -0.5, 0, 0.5, 1]) {
+      const x = xv(c);
+      s('line', { x1: x, x2: x, y1: m.t - 4, y2: H - m.b, stroke: c === 0 ? 'var(--axis)' : 'var(--grid)' }, svg);
+      s('text', { x, y: m.t - 9, 'text-anchor': 'middle', class: 'lbl' }, svg, (c > 0 ? '+' : c < 0 ? '−' : '') + nf(1).format(Math.abs(c)));
+    }
+    const tip = el('div', { class: 'tip', hidden: '' }, host);
+    const hide = () => { tip.hidden = true; };
+    rows.forEach((r, i) => {
+      const y = m.t + i * rh + rh / 2;
+      const lag = r.lead > 0 ? 'опережает уголь на ' + mo(r.lead) : r.lead < 0 ? 'отстаёт от угля на ' + mo(-r.lead) : 'без заметного лага';
+      const fund = r.fund > 0 ? '+' : r.fund < 0 ? '−' : '·';
+      const g = s('g', { tabindex: 0, 'aria-label': r.name + ': корреляция ' + r.corr_all + ', за 10 лет ' + r.corr_10y + ', ' + lag }, svg);
+      s('rect', { x: 0, y: y - rh / 2, width: W, height: rh, fill: 'transparent' }, g);
+      s('text', { x: m.l - 8, y: y + 4, 'text-anchor': 'end', class: 'lbl-strong' }, g, shortName(r.name));
+      const x0 = xv(0), x1 = xv(r.corr_all);
+      s('rect', { x: Math.min(x0, x1), y: y - 7, width: Math.max(1, Math.abs(x1 - x0)), height: 14, rx: 3, fill: r.corr_all >= 0 ? 'var(--s-au)' : 'var(--s-met)', opacity: 0.8 }, g);
+      s('circle', { cx: xv(r.corr_10y), cy: y, r: 4.5, fill: 'var(--surface)', stroke: 'var(--ink)', 'stroke-width': 1.6 }, g);
+      s('text', { x: m.l + iw + 8, y: y + 4, class: 'lbl' }, g, narrow ? 'механизм ' + fund : lag + ' · механизм ' + fund);
+      const on = () => {
+        tip.textContent = '';
+        el('div', { class: 't-date' }, tip, r.name + ' · с ' + r.from_year);
+        el('div', { style: 'font-weight:600' }, tip, 'Корреляция с Newcastle: ' + fmtCorr(r.corr_all) + ' за всё время, ' + fmtCorr(r.corr_10y) + ' за 10 лет');
+        el('div', null, tip, r.lead ? lag[0].toUpperCase() + lag.slice(1) + ': корреляция со сдвигом ' + fmtCorr(r.corr_lead) + '.' : 'Лучший сдвиг — ноль месяцев.');
+        if (r.why) el('div', { class: 't-extra' }, tip, (r.fund > 0 ? 'Механизм: ' : 'Механизма нет: ') + r.why);
+        if (r.roll && r.roll.length) {
+          const box = el('div', { class: 't-extra' }, tip, 'Скользящая корреляция за 5 лет, по годам:');
+          const w = 220, h = 36, bw = w / r.roll.length;
+          const sv = s('svg', { viewBox: `0 0 ${w} ${h}`, width: w, height: h, style: 'display:block;margin-top:4px' }, box);
+          s('line', { x1: 0, x2: w, y1: h / 2, y2: h / 2, stroke: 'var(--axis)' }, sv);
+          r.roll.forEach((rr, j) => {
+            const v = rr[1], yy = h / 2 - v * (h / 2 - 2);
+            s('rect', { x: j * bw, y: Math.min(yy, h / 2), width: Math.max(1, bw - 1), height: Math.max(1, Math.abs(yy - h / 2)), fill: v >= 0 ? 'var(--s-au)' : 'var(--s-met)' }, sv);
+          });
+          el('div', { style: 'display:flex;justify-content:space-between;font-size:11px;color:var(--muted)' }, box).append(el('span', null, null, String(r.roll[0][0])), el('span', null, null, String(r.roll[r.roll.length - 1][0])));
+        }
+        tip.hidden = false;
+        const hw = host.clientWidth, tw = tip.offsetWidth;
+        tip.style.left = Math.min(hw - tw, Math.max(0, xv(r.corr_all) * hw / W + 12)) + 'px';
+        tip.style.top = Math.max(0, y * hw / W - 10) + 'px';
+      };
+      g.addEventListener('pointerenter', on); g.addEventListener('focus', on);
+      g.addEventListener('pointerleave', hide); g.addEventListener('blur', hide);
+    });
+    const top10 = rows.slice().sort((a, b) => b.corr_10y - a.corr_10y).slice(0, 3);
+    const neg = rows.filter((r) => r.corr_all < -0.1);
+    document.getElementById('links-note').textContent = 'За последние 10 лет сильнее всего вместе с углём двигались: ' + top10.map((r) => shortName(r.name) + ' (' + fmtCorr(r.corr_10y) + ')').join(', ') + '. ' +
+      (neg.length ? 'Против угля за всю историю: ' + neg.map((r) => shortName(r.name)).join(', ') + '. ' : 'Устойчиво против угля не движется ни один ряд. ') +
+      'Корреляция говорит, что ряды ходят вместе, но не почему: причины движений — в событиях на графике выше.';
+  }
+  const fmtCorr = (c) => (c > 0 ? '+' : c < 0 ? '−' : '') + nf(2).format(Math.abs(c));
 
   // ---------- фазы: длительность × амплитуда ----------
   function drawPhases() {
@@ -939,7 +1039,7 @@ const DATA = /*__DATA__*/null;
     const pts = C.map((c) => ({ c, x: xv(c.pct_all), y: yv(c.chg12) }));
     pts.forEach((p) => placed.push({ x0: p.x - 6, x1: p.x + 6, y0: p.y - 6, y1: p.y + 6 }));
     const tip = el('div', { class: 'tip', hidden: '' }, host);
-    const short = (n) => n.replace('Уголь энергетический, ', 'Уголь ').replace(' (Австралия)', '').replace(' (ЮАР)', '').replace('Уголь коксующийся (экспорт США)', 'Уголь коксующ.').replace('Калий хлористый', 'Калий');
+    const short = shortName;
     for (const p of pts.sort((a, b) => (a.c.group === 'Уголь' ? -1 : 0) - (b.c.group === 'Уголь' ? -1 : 0))) {
       const g = s('g', { tabindex: 0, 'aria-label': p.c.name + ': ' + Math.round(p.c.pct_all) + '-й перцентиль, ' + fmtPct(p.c.chg12) + ' за 12 мес., ' + p.c.stance_label }, svg);
       const coal = p.c.group === 'Уголь';
@@ -1028,7 +1128,7 @@ const DATA = /*__DATA__*/null;
   const TABS = ['coal', 'map', 'research', 'method'];
   const drawn = {};
   function drawTab(id) {
-    if (id === 'coal') { drawMain(); drawLong(); drawPhases(); if (!drawn.ct) { drawCycleTable(); drawn.ct = 1; } }
+    if (id === 'coal') { drawMain(); drawLinks(); drawLong(); drawPhases(); if (!drawn.ct) { drawCycleTable(); drawn.ct = 1; } }
     if (id === 'map') { drawMap(); if (!drawn.mt) { drawTable(); drawn.mt = 1; } }
   }
   let active = 'coal';
