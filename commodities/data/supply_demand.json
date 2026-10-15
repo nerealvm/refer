@@ -1,0 +1,58 @@
+[
+ {
+  "key": "coal_au",
+  "name": "Уголь Newcastle (Австралия)",
+  "as_of": "2026-10",
+  "horizon": "2027–2031",
+  "supply": {
+   "score": -1,
+   "summary": "Морское предложение энергетического угля медленно сжимается: Индонезия и Россия сокращают экспорт, Австралия держит около 200 млн т.",
+   "facts": [
+    {
+     "fact": "Экспорт Индонезии",
+     "value": "517,5 млн т в 2025 → 475 в 2027 → 465 в 2031",
+     "date": "2026-09",
+     "source": "https://www.industry.gov.au/publications/resources-and-energy-quarterly-september-2026"
+    },
+    {
+     "fact": "Экспорт Австралии",
+     "value": "209,3 млн т в 2025 → 204 в 2027 → 198,5 в 2031",
+     "date": "2026-09",
+     "source": "https://www.industry.gov.au/publications/resources-and-energy-quarterly-september-2026"
+    },
+    {
+     "fact": "Экспорт России",
+     "value": "145,1 млн т в 2025 → 139,2 в 2027 → 128,4 в 2031",
+     "date": "2026-09",
+     "source": "https://www.industry.gov.au/publications/resources-and-energy-quarterly-september-2026"
+    }
+   ]
+  },
+  "demand": {
+   "score": -1,
+   "summary": "Импорт энергетического угля снижается у всех крупных покупателей: OCE ждёт мировую морскую торговлю 1 169 млн т в 2025 → 1 017 в 2031.",
+   "facts": [
+    {
+     "fact": "Мировая морская торговля",
+     "value": "1 168,6 млн т в 2025 → 1 076 в 2027 → 1 016,6 в 2031",
+     "date": "2026-09",
+     "source": "https://www.industry.gov.au/publications/resources-and-energy-quarterly-september-2026"
+    },
+    {
+     "fact": "Импорт Китая",
+     "value": "371,9 млн т в 2025 → 341,5 в 2027 → 311,7 в 2031",
+     "date": "2026-09",
+     "source": "https://www.industry.gov.au/publications/resources-and-energy-quarterly-september-2026"
+    },
+    {
+     "fact": "Импорт Индии",
+     "value": "180 млн т в 2025 → 171,2 в 2027 → 166,9 в 2031",
+     "date": "2026-09",
+     "source": "https://www.industry.gov.au/publications/resources-and-energy-quarterly-september-2026"
+    }
+   ]
+  },
+  "balance_note": "OCE (сентябрь 2026): спот Newcastle 6000 ккал/кг около $130 в 2026, $119 в 2027 и $116–123 в 2028–2031 в номинале — плато после отскока.",
+  "confidence": "high"
+ }
+]

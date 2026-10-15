@@ -698,7 +698,23 @@ def build():
                         cycles=sum(1 for p in ph if p['complete'] and not p['data_start']),
                         **ser_position(pos)))
 
+    # ---- слой предложения и спроса (собирается вручную по источникам, data/supply_demand.json) ----
+    sd_file = ROOT / 'data' / 'supply_demand.json'
+    sd = {x['key']: x for x in json.loads(sd_file.read_text(encoding='utf-8'))} if sd_file.exists() else {}
+    for c in cmap:
+        x = sd.get(c['key'])
+        if not x:
+            c['sd'] = None
+            continue
+        sup, dem = int(x['supply']['score']), int(x['demand']['score'])
+        c['sd'] = dict(supply=sup, demand=dem, net=dem - sup, horizon=x.get('horizon'), as_of=x.get('as_of'), confidence=x.get('confidence'),
+                       supply_summary=x['supply'].get('summary', ''), demand_summary=x['demand'].get('summary', ''),
+                       supply_facts=x['supply'].get('facts', []), demand_facts=x['demand'].get('facts', []), balance_note=x.get('balance_note', ''))
+    print('supply/demand:', sum(1 for c in cmap if c['sd']), 'из', len(cmap), 'рядов')
+
     events = json.loads((ROOT / 'data' / 'events.json').read_text(encoding='utf-8'))
+    for ev in events:
+        ev.pop('review', None)  # след проверки остаётся в events.json, в дашборд не идёт
     deals = json.loads((ROOT / 'data' / 'deals.json').read_text(encoding='utf-8'))
     # ---- развороты и события ----
     turns = []
