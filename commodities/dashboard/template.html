@@ -632,6 +632,7 @@ const DATA = /*__DATA__*/null;
       const above = tn.kind !== 'trough';
       const leftSide = x > m.l + iw - 60;
       s('circle', { cx: x, cy: y, r: 3.5, fill: 'var(--ink)', stroke: 'var(--surface)', 'stroke-width': 1.5 }, svg);
+      if (W < 520 && t1 - t0 > 35) continue;  // на телефоне при полном горизонте стрелки сливаются: только точки, список ниже
       tn.items.forEach((ev, i) => {
         const col = i % 3, row = Math.floor(i / 3);
         const ax = leftSide ? x - 10 - col * 13 : x + 10 + col * 13;
