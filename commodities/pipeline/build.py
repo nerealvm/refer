@@ -393,6 +393,102 @@ def coal_links(real):
     return out
 
 
+def qid(d):
+    """'ГГГГ-ММ' → 'ГГГГ-Qn'."""
+    y, m = int(d[:4]), int(d[5:7])
+    return f'{y}-Q{(m - 1) // 3 + 1}'
+
+
+def months_ym(a, b):
+    return (int(b[:4]) - int(a[:4])) * 12 + int(b[5:7]) - int(a[5:7])
+
+
+def turns_from(key, c):
+    """Развороты ряда: концы завершённых фаз, неподтверждённый экстремум текущей фазы и начало ряда.
+    id разворота — 'ГГГГ-ММ' для месячных рядов и 'ГГГГ-Qn' для квартальных; к нему привязываются события."""
+    q = c['freq'] == 'Q'
+    tid = (lambda d: qid(d)) if q else (lambda d: d)
+    phs = c['phases']
+    out = []
+    for i, p in enumerate(phs):
+        if not p['complete']:
+            continue
+        nxt = phs[i + 1] if i + 1 < len(phs) else None
+        out.append(dict(id=tid(p['end']), series=key, date=p['end'], kind='peak' if p['kind'] == 'up' else 'trough',
+                        price=p['p1'], unconfirmed=False,
+                        phase_in=dict(kind=p['kind'], change=p['change'], months=p['months']),
+                        phase_out=dict(kind=nxt['kind'], change=nxt['change'], months=nxt['months'], complete=nxt['complete']) if nxt else None))
+    cur = phs[-1]
+    if not cur['complete'] and cur.get('extreme_date'):
+        out.append(dict(id=tid(cur['extreme_date']), series=key, date=cur['extreme_date'],
+                        kind='trough' if cur['kind'] == 'down' else 'peak', price=cur['extreme_price'], unconfirmed=True,
+                        phase_in=dict(kind=cur['kind'], change=cur['extreme_change'], months=months_ym(cur['start'], cur['extreme_date'])),
+                        phase_out=dict(kind='up' if cur['kind'] == 'down' else 'down', change=cur['since_extreme'],
+                                       months=months_ym(cur['extreme_date'], cur['end']), complete=False)))
+    first = phs[0]
+    out.append(dict(id=tid(first['start']), series=key, date=first['start'], kind='start', price=first['p0'], unconfirmed=False,
+                    phase_in=None, phase_out=dict(kind=first['kind'], change=first['change'], months=first['months'], complete=first['complete'])))
+    return out
+
+
+def event_impact(ev, series_real):
+    """Фактический сдвиг реальной цены после события: лог-изменение через 3, 6 и 12 месяцев
+    (для квартального ряда — 1, 2 и 4 квартала). Считается по данным, не задаётся руками."""
+    out = {}
+    t = pd.Timestamp(ev['date'] + '-01')
+    for key in ev.get('series', []):
+        s, q = series_real.get(key, (None, False))
+        if s is None:
+            continue
+        s = s.dropna()
+        start = s[s.index >= t]
+        if start.empty:
+            continue
+        i0 = s.index.get_loc(start.index[0])
+        p0 = float(s.iloc[i0])
+        res = {}
+        for lab, steps in (('m3', 1 if q else 3), ('m6', 2 if q else 6), ('m12', 4 if q else 12)):
+            res[lab] = rnd(float(np.log(s.iloc[i0 + steps] / p0)), 3) if i0 + steps < len(s) else None
+        res['at'] = ym(start.index[0])
+        out[key] = res
+    return out
+
+
+def event_type_stats(events, real_series, key='thermal_au'):
+    """Рейтинг типов событий: медианный сдвиг реальной цены через 3/6/12 месяцев, взятый в ожидаемую сторону
+    (сдвиг × ожидаемое направление), доля совпадений знака через 12 месяцев, и базовая изменчивость ряда без событий."""
+    rows = {}
+    all_hit, all_n = 0, 0
+    for ev in events:
+        im = (ev.get('impact') or {}).get(key)
+        if not im:
+            continue
+        d = ev['expected_direction']
+        r = rows.setdefault(ev['type'], dict(type=ev['type'], n=0, ids=[], m3=[], m6=[], m12=[], hit12=0, n12=0))
+        r['n'] += 1
+        r['ids'].append(ev['n'])
+        for h in ('m3', 'm6', 'm12'):
+            if im.get(h) is not None:
+                r[h].append(im[h] * d)
+        if im.get('m12') is not None:
+            r['n12'] += 1
+            ok = int(np.sign(im['m12']) == d)
+            r['hit12'] += ok
+            all_hit += ok
+            all_n += 1
+    out = []
+    for r in rows.values():
+        med = lambda v: rnd(float(np.median(v)), 3) if v else None
+        out.append(dict(type=r['type'], n=r['n'], ids=r['ids'], n12=r['n12'], med_m3=med(r['m3']), med_m6=med(r['m6']), med_m12=med(r['m12']),
+                        hit12=rnd(r['hit12'] / r['n12'], 2) if r['n12'] else None))
+    out.sort(key=lambda r: -(r['med_m12'] if r['med_m12'] is not None else -9))
+    s = real_series.dropna()
+    lg = np.log(s)
+    base = {h: rnd(float((lg.diff(n).abs()).dropna().median()), 3) for h, n in (('med_abs3', 3), ('med_abs6', 6), ('med_abs12', 12))}
+    return dict(types=out, baseline=base, all=dict(n=sum(r['n'] for r in out), hit12=rnd(all_hit / all_n, 2) if all_n else None),
+                from_=None)
+
+
 def phase_stats(phases):
     done = [p for p in phases if p['complete'] and not p['data_start']]
     res = {}
@@ -604,6 +700,22 @@ def build():
 
     events = json.loads((ROOT / 'data' / 'events.json').read_text(encoding='utf-8'))
     deals = json.loads((ROOT / 'data' / 'deals.json').read_text(encoding='utf-8'))
+    # ---- развороты и события ----
+    turns = []
+    for key in ('thermal_au', 'met_us', 'thermal_za', 'steam_us'):
+        turns.extend(turns_from(key, coal[key]))
+    turn_ids = {(t['series'], t['id']) for t in turns}
+    series_real = {'thermal_au': (au_r, False), 'thermal_za': (za_r, False), 'met_us': (met_r, True), 'steam_us': (stm_r, True)}
+    for i, ev in enumerate(events):
+        ev['n'] = i + 1
+        lt = ev.get('linked_turn')
+        ev['turn_series'] = [k for k in ev.get('series', []) if (k, lt) in turn_ids] if lt else []
+        if lt and not ev['turn_series']:
+            print(f"  событие {ev['date']} «{ev['label']}»: разворот {lt} не найден у рядов {ev.get('series')}")
+        ev['impact'] = event_impact(ev, series_real)
+    event_types = event_type_stats(events, au_r)
+    event_types['from'] = events[0]['date'][:4] if events else None
+    event_types.pop('from_', None)
 
     payload = dict(
         meta=dict(
@@ -623,6 +735,8 @@ def build():
         long_run=long_run,
         commodities=cmap,
         links=coal_links(real),
+        turns=turns,
+        event_types=event_types,
         events=events,
         deals=deals,
     )

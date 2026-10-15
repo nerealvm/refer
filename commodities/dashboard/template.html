@@ -21,6 +21,8 @@
   --s-za: #1baf7a;        /* ЮАР */
   --s-usst: #eda100;      /* экспорт США, энергетический */
   --s-phcc: #8e44ad;      /* PHCC, годовой спот (OCE) */
+  --up: #1f9d61;          /* событие: ожидаемое влияние вверх */
+  --down: #d64545;        /* событие: ожидаемое влияние вниз */
   --s-usbit: #4a3aa7;     /* США, цена на шахте */
   --good: #0ca30c;
   --good-ink: #006300;
@@ -138,6 +140,16 @@ ol.events li { display: grid; grid-template-columns: 22px 62px 1fr; gap: 6px; al
 ol.events .n { font-family: var(--font-data); font-size: 11px; color: var(--ink); background: var(--chip-neutral); border-radius: 50%; width: 20px; height: 20px; display: inline-grid; place-items: center; }
 ol.events .d { font-family: var(--font-data); font-size: 12px; color: var(--muted); }
 ol.deals .n { border-radius: 4px; background: var(--ink); color: var(--surface); }
+ol.events .n.up { background: var(--up); color: #fff; }
+ol.events .n.down { background: var(--down); color: #fff; }
+.turns { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px 24px; margin-top: 8px; }
+.turn { border-top: 1px solid var(--hair); padding-top: 8px; }
+.turn-h { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; font-size: 13px; }
+.turn-h b { font-weight: 600; color: var(--ink); }
+.turn-h .d { font-family: var(--font-data); font-size: 12px; color: var(--muted); }
+.turn ol.events { margin-top: 4px; grid-template-columns: 1fr; }
+.turn ol.events li { grid-template-columns: 22px 60px 1fr; }
+ol.events a { color: var(--muted); text-decoration: none; border-bottom: 1px dotted var(--muted); font-size: 12px; margin-left: 4px; white-space: nowrap; }
 
 /* таблицы */
 .tbl-wrap { overflow-x: auto; margin: 0 -4px; padding: 0 4px; }
@@ -224,12 +236,18 @@ footer { color: var(--muted); font-size: 12.5px; padding-block: 0 40px; }
         <span><i class="sw" style="background:var(--wash-up)"></i>Подъём</span>
         <span><i class="sw" style="background:var(--wash-down)"></i>Спад</span>
         <span id="legend-median"><i class="key" style="background:var(--muted);height:1px"></i>Медиана Newcastle с 1970</span>
+        <span><i class="key" style="background:var(--up);width:9px;height:9px;clip-path:polygon(50% 0,100% 100%,0 100%)"></i><i class="key" style="background:var(--down);width:9px;height:9px;clip-path:polygon(0 0,100% 0,50% 100%);margin-left:-4px"></i>События у разворота: ожидаемое влияние</span>
         <span id="legend-trend" hidden></span>
         <span><i class="key" style="background:var(--ink);width:10px;height:10px;border-radius:2px"></i>Сделка (под осью)</span>
       </div>
-      <div class="grid2" style="margin-top:14px;gap:6px 24px">
-        <div><h3>События</h3><ol class="events" id="events" style="margin-top:6px;grid-template-columns:1fr"></ol></div>
+      <div style="margin-top:16px">
+        <h3>Развороты и их драйверы</h3>
+        <p class="sub" style="margin-top:2px">У каждого пика и дна — события, которые к нему вели или развернули цену. Стрелка — ожидаемое влияние по природе события, не по факту: ▲ вверх, ▼ вниз. Фактический ход цены после события показан в подсказке на графике.</p>
+        <div class="turns" id="events"></div>
+      </div>
+      <div class="grid2" style="margin-top:16px;gap:6px 24px">
         <div><h3>Сделки и банкротства</h3><ol class="events deals" id="deals" style="margin-top:6px;grid-template-columns:1fr"></ol></div>
+        <div><h3>Фоновые события</h3><p class="sub" style="margin-top:2px">Не привязаны к конкретному развороту: действовали против него или на длинном плече.</p><ol class="events" id="events-ctx" style="margin-top:6px;grid-template-columns:1fr"></ol></div>
       </div>
     </div>
 
@@ -244,6 +262,19 @@ footer { color: var(--muted); font-size: 12.5px; padding-block: 0 40px; }
         <span>«механизм +» — есть фундаментальная связь, «·» — прямого механизма нет</span>
       </div>
       <p class="note" id="links-note"></p>
+    </div>
+
+    <div class="panel">
+      <h2>Какие события двигают уголь сильнее</h2>
+      <p class="sub" id="types-sub"></p>
+      <div class="chart" id="types-chart"></div>
+      <div class="legend">
+        <span><i class="key" style="background:var(--s-au)"></i>медиана за 12 месяцев, в ожидаемую сторону</span>
+        <span><i class="key" style="background:var(--surface);border:1.6px solid var(--ink);width:9px;height:9px;border-radius:50%"></i>за 6 месяцев</span>
+        <span><i class="key" style="background:var(--ink);width:7px;height:7px;border-radius:50%"></i>за 3 месяца</span>
+      </div>
+      <div id="types-detail" style="margin-top:10px"></div>
+      <p class="note" id="types-note"></p>
     </div>
 
     <div class="grid2">
@@ -556,6 +587,24 @@ const DATA = /*__DATA__*/null;
       s('circle', { cx: x, cy: y, r: 5, fill: 'var(--surface)', stroke: 'var(--ink)', 'stroke-width': 2 }, svg);
       if (mk.label) s('text', { x: x - 8, y: y + 18, 'text-anchor': 'end', class: 'lbl' }, svg, mk.label);
     }
+    // события у разворотов: стрелки по ожидаемому влиянию
+    const turnHits = [];
+    for (const tn of cfg.turns || []) {
+      if (tn.t < t0 || tn.t > t1 || tn.v == null || !tn.items.length) continue;
+      const x = xv(tn.t), y = yv(tn.v);
+      const above = tn.kind !== 'trough';
+      const leftSide = x > m.l + iw - 60;
+      s('circle', { cx: x, cy: y, r: 3.5, fill: 'var(--ink)', stroke: 'var(--surface)', 'stroke-width': 1.5 }, svg);
+      tn.items.forEach((ev, i) => {
+        const col = i % 3, row = Math.floor(i / 3);
+        const ax = leftSide ? x - 10 - col * 13 : x + 10 + col * 13;
+        const ay = above ? y - 11 - row * 13 : y + 13 + row * 13;
+        const upv = ev.expected_direction > 0;
+        const d = upv ? `M${ax - 5},${ay + 4.5} L${ax},${ay - 4.5} L${ax + 5},${ay + 4.5} Z` : `M${ax - 5},${ay - 4.5} L${ax},${ay + 4.5} L${ax + 5},${ay - 4.5} Z`;
+        s('path', { d, fill: upv ? 'var(--up)' : 'var(--down)', stroke: 'var(--surface)', 'stroke-width': 0.8 }, svg);
+        turnHits.push({ x: ax, cy: ay, ev, tn, turn: true });
+      });
+    }
     // подписи на концах
     if (cfg.endLabels) {
       const ends = [];
@@ -628,6 +677,7 @@ const DATA = /*__DATA__*/null;
     }
     function hide() { tip.hidden = true; cross.setAttribute('visibility', 'hidden'); dots.forEach((d) => d.setAttribute('visibility', 'hidden')); }
     svg.addEventListener('pointermove', (e) => {
+      if (e.target && e.target.tagName === 'circle' && e.target.hasAttribute('aria-label')) return;  // над событием — его подсказка
       const r = svg.getBoundingClientRect();
       const x = (e.clientX - r.left) * W / r.width;
       if (x < m.l - 10 || x > m.l + iw + 10 || !prim) { hide(); return; }
@@ -644,17 +694,25 @@ const DATA = /*__DATA__*/null;
       show(i);
     });
     // подсказки событий
-    for (const p of evPos) {
-      const hit = s('circle', { cx: p.x, cy: p.cy, r: 11, fill: 'transparent', tabindex: 0, 'aria-label': p.ev.label }, svg);
+    for (const p of evPos.concat(turnHits)) {
+      const hit = s('circle', { cx: p.x, cy: p.cy, r: p.turn ? 7 : 11, fill: 'transparent', tabindex: 0, 'aria-label': p.ev.label }, svg);
       const on = () => {
         tip.textContent = '';
-        el('div', { class: 't-date' }, tip, p.n + ' · ' + ymLabel(p.ev.date) + (p.deal ? ' · сделка' : ''));
-        el('div', { style: 'font-weight:600' }, tip, p.ev.label);
-        el('div', { class: 't-extra', style: 'border:0;padding:0' }, tip, p.ev.note);
+        if (p.turn) {
+          const ev = p.ev, tn = p.tn;
+          el('div', { class: 't-date' }, tip, (ev.expected_direction > 0 ? '▲ ' : '▼ ') + ymLabel(ev.date) + ' · ' + (cfg.turnLabel ? cfg.turnLabel(tn) : ''));
+          el('div', { style: 'font-weight:600' }, tip, ev.label);
+          el('div', { class: 't-extra', style: 'border:0;padding:0' }, tip, ev.note);
+          if (cfg.eventExtra) { const ex = cfg.eventExtra(ev); if (ex) el('div', { class: 't-extra' }, tip, ex); }
+        } else {
+          el('div', { class: 't-date' }, tip, p.n + ' · ' + ymLabel(p.ev.date) + (p.deal ? ' · сделка' : ''));
+          el('div', { style: 'font-weight:600' }, tip, p.ev.label);
+          el('div', { class: 't-extra', style: 'border:0;padding:0' }, tip, p.ev.note);
+        }
         tip.hidden = false;
         const hw = host.clientWidth, tw = tip.offsetWidth;
         tip.style.left = Math.min(hw - tw, Math.max(0, p.x * hw / W - tw / 2)) + 'px';
-        tip.style.top = (p.deal ? Math.max(0, (m.t + ih) * hw / W - tip.offsetHeight - 6) : m.t + 6) + 'px';
+        tip.style.top = (p.deal ? Math.max(0, (m.t + ih) * hw / W - tip.offsetHeight - 6) : p.turn ? Math.max(0, Math.min((H2 - 10) * hw / W - tip.offsetHeight, p.cy * hw / W + 12)) : m.t + 6) + 'px';
       };
       hit.addEventListener('pointerenter', (e) => { e.stopPropagation(); on(); });
       hit.addEventListener('focus', on);
@@ -702,14 +760,47 @@ const DATA = /*__DATA__*/null;
     if (k === 'thermal_au') { b.disabled = true; b.title = 'Основной ряд'; }
     b.addEventListener('click', () => { SER[k].on = !SER[k].on; b.setAttribute('aria-pressed', SER[k].on); drawMain(); });
   }
+  const TYPE_RU = { demand: 'спрос', supply: 'предложение', geopolitics: 'геополитика и торговля', macro: 'макро и финансы', substitute: 'замещающие энергоносители', weather: 'погода и стихия', climate: 'климатическая политика' };
   const EV = DATA.events.map((e) => ({ ...e, t: ymT(e.date) }));
-  const evList = document.getElementById('events');
-  EV.forEach((e, i) => {
-    const li = el('li', null, evList);
-    el('span', { class: 'n' }, li, i + 1);
-    el('span', { class: 'd' }, li, ymLabel(e.date));
-    const tx = el('span', null, li); el('b', { style: 'font-weight:500;color:var(--ink)' }, tx, e.label + '. '); tx.appendChild(document.createTextNode(e.note));
-  });
+  const TURNS = (DATA.turns || []).slice().sort((a, b) => a.date.localeCompare(b.date));
+  const turnTitle = (tn) => (tn.kind === 'peak' ? 'Пик' : tn.kind === 'trough' ? 'Дно' : 'Начало ряда') + (tn.unconfirmed ? '?' : '') + ' ' + dateLbl(tn.series, tn.date) + ' · ' + fmtP(tn.price) + ' $/т · ' + SER[tn.series].short;
+  const eventExtra = (ev) => {
+    const parts = ['Тип: ' + (TYPE_RU[ev.type] || ev.type) + ' · ожидаемое влияние ' + (ev.expected_direction > 0 ? 'вверх' : 'вниз')];
+    for (const k of Object.keys(ev.impact || {})) {
+      const im = ev.impact[k]; if (!im || !SER[k]) continue;
+      const f = (v) => v == null ? '—' : fmtPct(Math.exp(v) - 1);
+      parts.push(SER[k].short + ' после события: ' + f(im.m3) + ' за 3 мес., ' + f(im.m6) + ' за 6, ' + f(im.m12) + ' за 12');
+    }
+    return parts.join('. ') + '.';
+  };
+  function renderEventLists() {
+    const host = document.getElementById('events'); host.textContent = '';
+    const ctx = document.getElementById('events-ctx'); ctx.textContent = '';
+    const item = (ol, e) => {
+      const li = el('li', null, ol);
+      el('span', { class: 'n ' + (e.expected_direction > 0 ? 'up' : 'down'), title: 'ожидаемое влияние ' + (e.expected_direction > 0 ? 'вверх' : 'вниз') }, li, e.expected_direction > 0 ? '▲' : '▼');
+      el('span', { class: 'd' }, li, ymLabel(e.date));
+      const tx = el('span', null, li);
+      el('b', { style: 'font-weight:500;color:var(--ink)' }, tx, e.label + '. ');
+      tx.appendChild(document.createTextNode(e.note + ' '));
+      el('i', { style: 'color:var(--muted);font-style:normal;font-size:12px' }, tx, TYPE_RU[e.type] || e.type);
+      if (e.sources && e.sources.length) el('a', { href: e.sources[0], target: '_blank', rel: 'noopener' }, tx, 'источник');
+    };
+    for (const tn of TURNS) {
+      if (tn.series !== 'thermal_au' && tn.series !== 'met_us') continue;
+      const items = EV.filter((e) => e.linked_turn === tn.id && e.turn_series.includes(tn.series));
+      if (!items.length) continue;
+      const card = el('div', { class: 'turn' }, host);
+      const h = el('div', { class: 'turn-h' }, card);
+      el('b', null, h, turnTitle(tn));
+      if (tn.phase_in) el('span', { class: 'd' }, h, (tn.phase_in.kind === 'up' ? 'подъём ' : 'спад ') + fmtPct(tn.phase_in.change) + ' за ' + mo(tn.phase_in.months));
+      if (tn.phase_out) el('span', { class: 'd' }, h, '→ ' + (tn.phase_out.kind === 'up' ? 'подъём ' : 'спад ') + fmtPct(tn.phase_out.change) + (tn.phase_out.complete ? ' за ' + mo(tn.phase_out.months) : ', идёт'));
+      const ol = el('ol', { class: 'events' }, card);
+      items.forEach((e) => item(ol, e));
+    }
+    EV.filter((e) => !e.linked_turn).forEach((e) => item(ctx, e));
+  }
+  renderEventLists();
   const LET = 'АБВГДЕЖИКЛМНПРСТ';
   const DL = (DATA.deals || []).map((d, i) => ({ ...d, t: ymT(d.date), letter: LET[i] }));
   const dlList = document.getElementById('deals');
@@ -790,8 +881,18 @@ const DATA = /*__DATA__*/null;
       markers.push({ t: ymT(ph.extreme_date), v: ph.extreme_price, label: (ph.kind === 'down' ? 'дно? ' : 'пик? ') + ymLabel(ph.extreme_date),
         hline: { v: ph.confirm_level, label: 'разворот: ' + fmtP(ph.confirm_level) } });
     }
+    const turnMarks = [];
+    for (const tn of TURNS) {
+      if (!SER[tn.series] || !SER[tn.series].on) continue;
+      const items = EV.filter((e) => e.linked_turn === tn.id && e.turn_series.includes(tn.series));
+      if (!items.length) continue;
+      const pt = SER[tn.series].pts.find((p) => p.d === tn.date);
+      turnMarks.push({ t: pt ? pt.t : ymT(tn.date), v: pt ? val(pt) : null, kind: tn.kind, items, tn });
+    }
+    const ctxEvents = EV.filter((e) => !e.linked_turn);
     lineChart(document.getElementById('main-chart'), {
-      x: [t0, lastT + 0.25], log: st.log, series, areas, endLabels: true, events: EV, deals: DL, markers,
+      x: [t0, lastT + 0.25], log: st.log, series, areas, endLabels: true, events: ctxEvents, deals: DL, markers, turns: turnMarks,
+      turnLabel: (tn) => turnTitle(tn.tn), eventExtra: eventExtra,
       bands: SER.thermal_au.phases.map((p) => ({ t0: ymT(p.start), t1: ymT(p.end), kind: p.kind })),
       refLines: st.mode === 'real' ? [{ y: SER.thermal_au.pos.median_all, dash: '4 4' }] : [],
       aria: 'Цена угля с 1970 года, ' + (st.mode === 'real' ? 'реальная' : 'номинальная'),
@@ -801,7 +902,7 @@ const DATA = /*__DATA__*/null;
     const lt = document.getElementById('legend-trend'); lt.hidden = !trendTxt; lt.textContent = trendTxt;
     document.getElementById('series-spec').textContent = on.map((k) => SER[k].short + ' — ' + SER[k].spec).join(' ');
     document.getElementById('main-sub').textContent = (st.mode === 'real' ? 'Реальные цены, $/т ' + baseTxt + '.' : 'Номинальные цены, $/т.') +
-      ' Помесячно; экспорт США поквартально, PHCC по годам. Полосы — подъёмы и спады Newcastle. Кольцо и пунктир — текущее дно и уровень, выше которого разворот подтвердится.';
+      ' Помесячно; экспорт США поквартально, PHCC по годам. Полосы — подъёмы и спады Newcastle. Стрелки у пиков и дна — события-драйверы, наведите, чтобы прочитать. Кольцо и пунктир — текущее дно и уровень, выше которого разворот подтвердится.';
   }
   function seg(ids, key, val) {
     ids.forEach(([id, v]) => { const b = document.getElementById(id); b.addEventListener('click', () => { st[key] = v; ids.forEach(([i2, v2]) => document.getElementById(i2).setAttribute('aria-pressed', v2 === v)); drawMain(); }); });
@@ -917,6 +1018,65 @@ const DATA = /*__DATA__*/null;
       'Корреляция говорит, что ряды ходят вместе, но не почему: причины движений — в событиях на графике выше.';
   }
   const fmtCorr = (c) => (c > 0 ? '+' : c < 0 ? '−' : '') + nf(2).format(Math.abs(c));
+
+  // ---------- рейтинг типов событий ----------
+  let typeOpen = null;
+  function drawTypes() {
+    const host = document.getElementById('types-chart'); if (!host) return;
+    host.textContent = '';
+    const ET = DATA.event_types || {};
+    const rows = (ET.types || []).slice();
+    if (!rows.length) return;
+    const W = Math.max(280, host.clientWidth), narrow = W < 560, rh = 30;
+    const m = { l: narrow ? 120 : 200, r: narrow ? 70 : 170, t: 24, b: 6 };
+    const H = m.t + rows.length * rh + m.b, iw = W - m.l - m.r;
+    const vals = rows.flatMap((r) => [r.med_m12, r.med_m6, r.med_m3]).filter((v) => v != null).map((v) => Math.exp(v) - 1);
+    const lo = Math.min(-0.1, ...vals) - 0.05, hi = Math.max(0.3, ...vals) + 0.05;
+    const svg = s('svg', { viewBox: `0 0 ${W} ${H}`, height: H, role: 'img', 'aria-label': 'Медианный сдвиг цены после событий по типам' }, host);
+    const xv = (v) => m.l + (v - lo) / (hi - lo) * iw;
+    for (const v of niceLinTicks(lo, hi, 5)) {
+      const x = xv(v);
+      s('line', { x1: x, x2: x, y1: m.t - 4, y2: H - m.b, stroke: v === 0 ? 'var(--axis)' : 'var(--grid)' }, svg);
+      s('text', { x, y: m.t - 9, 'text-anchor': 'middle', class: 'lbl' }, svg, fmtPct(v));
+    }
+    const pct = (v) => v == null ? '—' : fmtPct(Math.exp(v) - 1);
+    rows.forEach((r, i) => {
+      const y = m.t + i * rh + rh / 2, weak = r.n < 4;
+      const g = s('g', { tabindex: 0, role: 'button', 'aria-label': (TYPE_RU[r.type] || r.type) + ': ' + r.n + ' событий, медиана за 12 месяцев ' + pct(r.med_m12), style: 'cursor:pointer' }, svg);
+      s('rect', { x: 0, y: y - rh / 2, width: W, height: rh, fill: typeOpen === r.type ? 'var(--chip-neutral)' : 'transparent', rx: 4 }, g);
+      s('text', { x: m.l - 8, y: y + 4, 'text-anchor': 'end', class: 'lbl-strong', opacity: weak ? 0.55 : 1 }, g, TYPE_RU[r.type] || r.type);
+      if (r.med_m12 != null) {
+        const v = Math.exp(r.med_m12) - 1, x0 = xv(0), x1 = xv(v);
+        s('rect', { x: Math.min(x0, x1), y: y - 8, width: Math.max(1, Math.abs(x1 - x0)), height: 16, rx: 3, fill: v >= 0 ? 'var(--s-au)' : 'var(--s-met)', opacity: weak ? 0.4 : 0.85 }, g);
+      }
+      if (r.med_m6 != null) s('circle', { cx: xv(Math.exp(r.med_m6) - 1), cy: y, r: 4.5, fill: 'var(--surface)', stroke: 'var(--ink)', 'stroke-width': 1.6 }, g);
+      if (r.med_m3 != null) s('circle', { cx: xv(Math.exp(r.med_m3) - 1), cy: y, r: 3, fill: 'var(--ink)' }, g);
+      const hit = r.hit12 == null ? '' : ' · со знаком совпало ' + Math.round(r.hit12 * 100) + '%';
+      s('text', { x: m.l + iw + 8, y: y + 4, class: 'lbl' }, g, 'n = ' + r.n + (narrow ? '' : hit) + (weak ? ' · мало данных' : ''));
+      const toggle = () => { typeOpen = typeOpen === r.type ? null : r.type; drawTypes(); };
+      g.addEventListener('click', toggle);
+      g.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
+    });
+    const B = ET.baseline || {};
+    document.getElementById('types-sub').textContent = 'По каталогу событий с ' + (ET.from || '1970') + ' года: медианное изменение реальной цены Newcastle через 3, 6 и 12 месяцев после события, взятое в ожидаемую сторону. Для сравнения, без всяких событий цена за 12 месяцев меняется в медиане на ' + (B.med_abs12 != null ? fmtPct(Math.exp(B.med_abs12) - 1) : '—') + ' в любую сторону. Нажмите на тип, чтобы увидеть события.';
+    const det = document.getElementById('types-detail'); det.textContent = '';
+    if (typeOpen) {
+      const r = rows.find((x) => x.type === typeOpen);
+      el('h3', null, det, (TYPE_RU[r.type] || r.type) + ': события и фактический ход Newcastle');
+      const ol = el('ol', { class: 'events', style: 'grid-template-columns:1fr' }, det);
+      EV.filter((e) => e.type === r.type && e.impact && e.impact.thermal_au).forEach((e) => {
+        const im = e.impact.thermal_au;
+        const li = el('li', null, ol);
+        el('span', { class: 'n ' + (e.expected_direction > 0 ? 'up' : 'down') }, li, e.expected_direction > 0 ? '▲' : '▼');
+        el('span', { class: 'd' }, li, ymLabel(e.date));
+        const tx = el('span', null, li);
+        el('b', { style: 'font-weight:500;color:var(--ink)' }, tx, e.label + '. ');
+        tx.appendChild(document.createTextNode('Через 3 мес. ' + pct(im.m3) + ', 6 мес. ' + pct(im.m6) + ', 12 мес. ' + pct(im.m12) + '.'));
+      });
+    }
+    const all = ET.all || {};
+    document.getElementById('types-note').textContent = 'Это ориентир, не статистика: ' + (all.n || 0) + ' событий за полвека, в самых частых типах по ' + Math.max(...rows.map((r) => r.n)) + ' случаев. «Со знаком совпало» — доля событий, после которых цена через 12 месяцев ушла в ожидаемую сторону; по всем событиям — ' + (all.hit12 != null ? Math.round(all.hit12 * 100) + '%' : '—') + '. Типы с меньше чем 4 событиями показаны бледно. Тип события назначен вручную по источнику, ход цены посчитан из данных.';
+  }
 
   // ---------- фазы: длительность × амплитуда ----------
   function drawPhases() {
@@ -1128,7 +1288,7 @@ const DATA = /*__DATA__*/null;
   const TABS = ['coal', 'map', 'research', 'method'];
   const drawn = {};
   function drawTab(id) {
-    if (id === 'coal') { drawMain(); drawLinks(); drawLong(); drawPhases(); if (!drawn.ct) { drawCycleTable(); drawn.ct = 1; } }
+    if (id === 'coal') { drawMain(); drawLinks(); drawTypes(); drawLong(); drawPhases(); if (!drawn.ct) { drawCycleTable(); drawn.ct = 1; } }
     if (id === 'map') { drawMap(); if (!drawn.mt) { drawTable(); drawn.mt = 1; } }
   }
   let active = 'coal';

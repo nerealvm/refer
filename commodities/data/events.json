@@ -1,16 +1,724 @@
 [
-  {"date": "1973-10", "label": "Нефтяное эмбарго", "note": "ОАПЕК вводит эмбарго. Уголь дорожает с лагом 1–2 года как замена нефти."},
-  {"date": "1979-01", "label": "Второй нефтяной шок", "note": "Революция в Иране. Пик цен на уголь пришёлся на 1981–82 годы."},
-  {"date": "1986-01", "label": "Обвал нефти", "note": "Энергоносители дешевеют. Уголь падает вместе с нефтью."},
-  {"date": "1997-07", "label": "Азиатский кризис", "note": "Спрос в Азии падает. Бенчмарк на коксующийся уголь на 2000/01 финансовый год — $39,75/т, минимум за 25 лет."},
-  {"date": "2001-12", "label": "Китай в ВТО", "note": "Старт индустриального бума Китая. Эффект на цены — с лагом 2–3 года."},
-  {"date": "2008-09", "label": "Мировой кризис", "note": "Банкротство Lehman Brothers. Пик лета 2008 года сменяется обвалом к концу года."},
-  {"date": "2011-01", "label": "Паводки в Квинсленде", "note": "Затоплены шахты коксующегося угля. Контракт HCC во 2 кв. 2011 года — $330/т."},
-  {"date": "2016-04", "label": "Китай: 276 рабочих дней", "note": "Китай ограничивает работу шахт. Конец спада 2011–2016 годов, лимит смягчили в ноябре 2016."},
-  {"date": "2017-03", "label": "Циклон Debbie", "note": "Сбой поставок из Квинсленда. Коксующийся уголь — около $300/т в апреле 2017 года."},
-  {"date": "2020-04", "label": "COVID-19", "note": "Локдауны. Минимум Newcastle — август 2020 года, $50/т."},
-  {"date": "2020-10", "label": "Китай против угля из Австралии", "note": "Неформальный запрет на импорт. В январе 2023 года смягчён для четырёх госкомпаний, в марте 2023-го импорт разрешён всем."},
-  {"date": "2021-10", "label": "Энергокризис в Китае", "note": "Дефицит угля, отключения электроэнергии. Власти Китая вмешиваются в рынок."},
-  {"date": "2022-02", "label": "Война и санкции", "note": "Энергия резко дорожает. С 11.08.2022 действует эмбарго ЕС на уголь из России. Пик Newcastle — сентябрь 2022 года."},
-  {"date": "2026-03", "label": "Конфликт на Ближнем Востоке", "note": "Нефть и газ резко дорожают. IEA ждёт роста мирового спроса на уголь в 2026 году."}
+ {
+  "date": "1973-10",
+  "label": "Нефтяное эмбарго ОАПЭК",
+  "type": "substitute",
+  "expected_direction": 1,
+  "series": [
+   "thermal_au"
+  ],
+  "linked_turn": "1981-04",
+  "note": "Цена нефти выросла почти вчетверо за несколько месяцев; электростанции и экспортёры начали переходить на уголь. Это старт подъёма Newcastle от 1970-12.",
+  "sources": [
+   "https://en.wikipedia.org/wiki/1973_oil_crisis"
+  ],
+  "confidence": "medium"
+ },
+ {
+  "date": "1979-01",
+  "label": "Второй нефтяной шок",
+  "type": "substitute",
+  "expected_direction": 1,
+  "series": [
+   "thermal_au"
+  ],
+  "linked_turn": "1981-04",
+  "note": "Иранская революция сократила поставки нефти, цена выросла более чем вдвое; замещение нефти углём в энергетике довело ралли до пика апреля 1981.",
+  "sources": [
+   "https://en.wikipedia.org/wiki/1979_oil_crisis"
+  ],
+  "confidence": "medium"
+ },
+ {
+  "date": "1981-06",
+  "label": "Спад спроса на нефть, избыток",
+  "type": "substitute",
+  "expected_direction": -1,
+  "series": [
+   "thermal_au"
+  ],
+  "linked_turn": "1981-04",
+  "note": "Рецессия 1980–82 и энергосбережение остановили рост нефти (она дешевеет с 1981); исчезла основа угольного ралли, цены уходят вниз после пика.",
+  "sources": [
+   "https://en.wikipedia.org/wiki/1980s_oil_glut"
+  ],
+  "confidence": "medium"
+ },
+ {
+  "date": "1982-01",
+  "label": "Волна новых мощностей и рецессии",
+  "type": "supply",
+  "expected_direction": -1,
+  "series": [
+   "thermal_au"
+  ],
+  "linked_turn": "1981-04",
+  "note": "По Northern Miner, цены на энергетический и коксующийся уголь упали примерно на 30% в 1982–86 из-за падения мирового спроса и избытка предложения (версия про волну новых мощностей США, ЮАР, Австралии, Канады в доступной части статьи не подтверждена). Событие стоит сразу после пика 1981-04 (+9 мес), поэтому привязка перенесена с 2002-08 (вне окна). Ряд коксующегося США начинается с 2000, met_us из series убран.",
+  "sources": [
+   "https://northernminer.com/news/annual-coal-review/1000119955"
+  ],
+  "confidence": "medium"
+ },
+ {
+  "date": "1985-03",
+  "label": "Новые экспортёры: Колумбия, Индонезия",
+  "type": "supply",
+  "expected_direction": -1,
+  "series": [
+   "thermal_au"
+  ],
+  "linked_turn": "2002-08",
+  "note": "Cerrejón (Колумбия) начал коммерческий экспорт в 1985, за 1985–2016 отгрузил свыше 650 млн т; экспорт Индонезии вырос с 1 до 3 млн т в 1987–89, Kaltim Prima стартовала в 1991–92. Дешёвое предложение удерживало реальные цены низкими.",
+  "sources": [
+   "https://onemine.org/documents/cerrejon-north-block-project-is-making-colombia-a-major-coal-exporter",
+   "https://www.onemine.org/documents/indonesia-an-emerging-world-coal-supplier",
+   "https://gem.wiki/Kaltim_Prima_Coal"
+  ],
+  "confidence": "low"
+ },
+ {
+  "date": "1986-01",
+  "label": "Обвал нефти",
+  "type": "substitute",
+  "expected_direction": -1,
+  "series": [
+   "thermal_au"
+  ],
+  "linked_turn": "2002-08",
+  "note": "Нефть обвалилась более чем вдвое за полгода и не вернулась к прежним ценам до 1990; пропал стимул переходить с нефти на уголь, на рынке угля продолжился избыток.",
+  "sources": [
+   "https://www.brookings.edu/articles/lessons-from-the-1986-oil-price-collapse/",
+   "https://en.wikipedia.org/wiki/1980s_oil_glut",
+   "https://northernminer.com/news/annual-coal-review/1000119955"
+  ],
+  "confidence": "medium"
+ },
+ {
+  "date": "1997-07",
+  "label": "Азиатский финансовый кризис",
+  "type": "macro",
+  "expected_direction": -1,
+  "series": [
+   "thermal_au"
+  ],
+  "linked_turn": "2002-08",
+  "note": "Азиатский финансовый кризис (с июля 1997) обрушил спрос Японии и Азии на сталь и электроэнергию, контрактные цены 1999 года снижены. Цифры оригинала (коксующийся −30%, контракты −8–13%) не проверены. Ряд коксующегося США начинается с 2000, met_us из series убран. Привязка к 2002-08 вне окна (61 мес): событие — драйвер затяжного спада 1981–2002.",
+  "sources": [
+   "https://en.wikipedia.org/wiki/1997_Asian_financial_crisis",
+   "https://www.miningnews.net/capital-markets/news/1188186/outlook-2000-coal",
+   "https://journals.pan.pl/Content/120902"
+  ],
+  "confidence": "medium"
+ },
+ {
+  "date": "2002-04",
+  "label": "Контракт Япония–Австралия минус 7,7%",
+  "type": "demand",
+  "expected_direction": -1,
+  "series": [
+   "thermal_au"
+  ],
+  "linked_turn": "2002-08",
+  "note": "Референтная цена Япония–Австралия на FY2002 снижена на 7,7% ($31,85 против $34,5; арифметика сходится, первоисточник не открывал). Это итог слабого спроса и избытка предложения, то есть индикатор, а не самостоятельная причина. Спот в августе 2002: среднемесячная цена Newcastle (WB) $22,3, что подтверждает «$20–22».",
+  "sources": [
+   "https://www.miningmonthly.com/international-coal-news/news/1302541/market-conditions-tough-2002",
+   "https://db.nomics.world/IMF/WEOAGG:2021-04/1.PCOALAU.us_dollars"
+  ],
+  "confidence": "low"
+ },
+ {
+  "date": "2003-06",
+  "label": "Китай: бум спроса и сокращение экспорта",
+  "type": "demand",
+  "expected_direction": 1,
+  "series": [
+   "thermal_au",
+   "met_us"
+  ],
+  "linked_turn": "2004-07",
+  "note": "Дефицит электроэнергии в большинстве провинций Китая и ограничение его экспорта угля (второй экспортёр мира) вывели рынок в дефицит; японские контракты 2004/05 выросли на 68%, а коксующийся — с $45 до около $80.",
+  "sources": [
+   "https://www.petromindo.com/news/article/regional-coal-australia-thermal-coal-price-soars",
+   "https://www.petromindo.com/news/article/regional-coal-australian-coal-prices-soar-as-asian-supplies-shortage-report"
+  ],
+  "confidence": "high"
+ },
+ {
+  "date": "2005-02",
+  "label": "Ралли 2004 выдохлось",
+  "type": "supply",
+  "expected_direction": -1,
+  "series": [
+   "thermal_au"
+  ],
+  "linked_turn": "2005-11",
+  "note": "Среднемесячный Newcastle (WB): $61,4 в июле 2004 → $49,9 в феврале 2005 → $38,1 в ноябре 2005 (−38% от пика). Утверждение оригинала «около +30% за январь–февраль 2005» рядом WB не подтверждается (январь $53,0, февраль $49,9); страница worldcoal не содержит данных. Причины (рост выпуска поставщиков, слабый спрос) не проверены. Событие описывает ход цены, а не независимую причину, дно 2005-11 объяснено слабо.",
+  "sources": [
+   "https://www.petromindo.com/news/article/regional-coal-coal-prices-to-drop-as-supply-increases-in-2006"
+  ],
+  "confidence": "low"
+ },
+ {
+  "date": "2008-01",
+  "label": "Снежные бури в Китае",
+  "type": "weather",
+  "expected_direction": 1,
+  "series": [
+   "thermal_au"
+  ],
+  "linked_turn": "2008-07",
+  "note": "Снежные бури в Китае 10 января – 6 февраля 2008: подачу электроэнергии сократили в 17 из 31 провинций, запасов угля хватало на 8 дней генерации, задержано около 8 тыс. поездов (Wikipedia). Цифра «дефицит порядка 70 ГВт» не подтверждена и убрана. Среднемесячный Newcastle (WB) вырос с $49,8 в декабре 2006 до $91,0 в декабре 2007 (+83%, а не 73%) и до $180,0 в июле 2008.",
+  "sources": [
+   "https://en.wikipedia.org/wiki/January_2008_Chinese_winter_storms",
+   "https://petromindo.com/news/article/china-s-thermal-coal-prices-surge-following-snowstorm"
+  ],
+  "confidence": "medium"
+ },
+ {
+  "date": "2008-07",
+  "label": "Нефть на рекорде около $147",
+  "type": "substitute",
+  "expected_direction": 1,
+  "series": [
+   "thermal_au"
+  ],
+  "linked_turn": "2008-07",
+  "note": "Нефть достигла рекорда $147 (11.07.2008); Newcastle (WB, среднемесячный) — $180,0 в июле 2008, пик ряда. Событие объясняет подъём к пику, а не разворот вниз (разворот объясняет 2008-09). Нефть упала на ~66% к ноябрю; Newcastle потерял 49% к ноябрю ($92,3) и 56% к декабрю ($78,7), а не «56% к ноябрю», как было в оригинале.",
+  "sources": [
+   "https://en.wikipedia.org/wiki/2000s_energy_crisis",
+   "https://db.nomics.world/IMF/WEOAGG:2021-04/1.PCOALAU.us_dollars"
+  ],
+  "confidence": "medium"
+ },
+ {
+  "date": "2008-09",
+  "label": "Мировой финансовый кризис",
+  "type": "macro",
+  "expected_direction": -1,
+  "series": [
+   "thermal_au",
+   "met_us"
+  ],
+  "linked_turn": "2009-03",
+  "note": "Крах Lehman (15.09.2008), рецессия, падение спроса на сталь и электроэнергию. Newcastle (WB, среднемесячный) потерял от июльского пика $180,0 около половины: −49% к ноябрю, −56% к декабрю 2008 (в оригинале «более половины за четыре месяца»). Отскок от дна 2009-03 ($61,0) объясняется не только окончанием кризиса: см. предложение добавить китайский стимул и переход Китая в нетто-импортёры 2009.",
+  "sources": [
+   "https://en.wikipedia.org/wiki/Financial_crisis_of_2007%E2%80%932008"
+  ],
+  "confidence": "high"
+ },
+ {
+  "date": "2011-01",
+  "label": "Паводки в Квинсленде: энергетический",
+  "type": "weather",
+  "expected_direction": 1,
+  "series": [
+   "thermal_au"
+  ],
+  "linked_turn": "2011-01",
+  "note": "Паводки в Квинсленде (декабрь 2010 – январь 2011): затоплены шахты, ж/д и порты Bowen Basin, форс-мажор BHP, Rio, Anglo, Xstrata. Для энергетического угля эффект косвенный (основной удар по коксующемуся): по miningmx энергетический подорожал на $10 за ночь до годового максимума, WoodMac допускал возврат к рекорду 2008 года ($197). Среднемесячный Newcastle (WB) в январе 2011 — $132,5 (в оригинале «спот около $140; оценки WoodMac до $197» — неточно). Китай с 2009 нетто-импортёр усилил эффект.",
+  "sources": [
+   "https://www.miningmx.com/news/ferrous-metals/18496-floods-to-buoy-coking-coal-prices-by-a-third/",
+   "https://en.wikipedia.org/wiki/2010%E2%80%932011_Queensland_floods",
+   "https://www.rba.gov.au/publications/bulletin/2015/jun/3.html"
+  ],
+  "confidence": "medium"
+ },
+ {
+  "date": "2011-01",
+  "label": "Паводки в Квинсленде: коксующийся",
+  "type": "weather",
+  "expected_direction": 1,
+  "series": [
+   "met_us"
+  ],
+  "linked_turn": "2011-Q3",
+  "note": "Паводки в Квинсленде: аналитики оценивали выпадение 5% и более мирового предложения коксующегося (CBA: почти 14 млн т). Контракт BHP для Японии на I кв. 2011 — $225/т; CBA ждал $293 на II кв. (+30%), WoodMac — спот выше $400, Moody's — $300 (оригинальное «спот около $275» не подтверждено). Цены американского экспорта следуют за контрактами и достигают пика в 2011-Q3 с лагом.",
+  "sources": [
+   "https://www.miningmx.com/news/ferrous-metals/18496-floods-to-buoy-coking-coal-prices-by-a-third/",
+   "https://en.wikipedia.org/wiki/2010%E2%80%932011_Queensland_floods"
+  ],
+  "confidence": "medium"
+ },
+ {
+  "date": "2011-03",
+  "label": "Авария на АЭС Фукусима",
+  "type": "demand",
+  "expected_direction": 1,
+  "series": [
+   "thermal_au",
+   "met_us"
+  ],
+  "linked_turn": "2011-Q3",
+  "note": "Остановка АЭС Японии подняла топливный счёт на 25% в 2011, импорт СПГ и угля (из США +143%) вырос; поддержал цены после январского пика. Влияние именно на американский коксующийся косвенное.",
+  "sources": [
+   "https://world-nuclear-news.org/articles/trade-figures-reveal-cost-of-japan-s-nuclear-shutd",
+   "https://en.wikipedia.org/wiki/Fukushima_nuclear_accident"
+  ],
+  "confidence": "low"
+ },
+ {
+  "date": "2012-01",
+  "label": "Сланцевый газ вытесняет уголь в США",
+  "type": "substitute",
+  "expected_direction": -1,
+  "series": [
+   "thermal_au",
+   "met_us"
+  ],
+  "linked_turn": "2011-01",
+  "note": "Выработка на угле в США в I кв. 2012 упала почти на 20% к I кв. 2011 (доля угля 44,6% → 36,0%, cleantechnica); в 2012 выведено около 10 ГВт угольных мощностей (RBA). Дешёвый сланцевый газ вытеснил уголь, освободившийся уголь пошёл на экспорт и давил на мировые цены. Показатели «Henry Hub $2–2,6» и «рекорд 12,5 млн т в апреле 2012» в открытых источниках не подтверждены. Привязка перенесена с 2016-01 (48 мес, вне окна) на пик 2011-01 (+12 мес): событие — драйвер спада 2011–2016.",
+  "sources": [
+   "https://cleantechnica.com/2012/05/15/coal-generation-drops-19-in-1-year-in-us/",
+   "https://www.rba.gov.au/publications/bulletin/2015/jun/3.html"
+  ],
+  "confidence": "high"
+ },
+ {
+  "date": "2013-01",
+  "label": "Замедление спроса Китая",
+  "type": "demand",
+  "expected_direction": -1,
+  "series": [
+   "thermal_au"
+  ],
+  "linked_turn": "2016-01",
+  "note": "Рост выработки электроэнергии и тяжёлой промышленности в Китае замедлился, антисмоговая политика сдвигала генерацию к неугольным источникам.",
+  "sources": [
+   "https://www.rba.gov.au/publications/bulletin/2015/jun/3.html"
+  ],
+  "confidence": "high"
+ },
+ {
+  "date": "2013-06",
+  "label": "Инвестиции в шахты опередили спрос",
+  "type": "supply",
+  "expected_direction": -1,
+  "series": [
+   "thermal_au"
+  ],
+  "linked_turn": "2016-01",
+  "note": "Инвестиции в шахты и порты Австралии и Индонезии (бум 2005–2011) расширили предложение быстрее спроса (RBA: рост предложения опережает спрос). Фраза оригинала «низкая нефть удешевила добычу и перевозку» к 2013 неверна: нефть была выше $100, дешеветь она начала с конца 2014. Месяц условный (RBA дат не даёт). Привязка к 2016-01 вне окна (31 мес): драйвер плеча 2011–2016.",
+  "sources": [
+   "https://www.rba.gov.au/publications/bulletin/2015/jun/3.html"
+  ],
+  "confidence": "medium"
+ },
+ {
+  "date": "2014-10",
+  "label": "Китай вводит пошлину на импорт угля",
+  "type": "geopolitics",
+  "expected_direction": -1,
+  "series": [
+   "thermal_au"
+  ],
+  "linked_turn": "2016-01",
+  "note": "Директивы по сокращению импорта в 2014 и пошлина 6% с октября 2014 уменьшили закупки Китая — крупнейшего импортёра.",
+  "sources": [
+   "https://www.rba.gov.au/publications/bulletin/2015/jun/3.html"
+  ],
+  "confidence": "high"
+ },
+ {
+  "date": "2015-08",
+  "label": "Банкротства американских угольщиков",
+  "type": "supply",
+  "expected_direction": 1,
+  "series": [
+   "met_us"
+  ],
+  "linked_turn": "2016-Q1",
+  "note": "Банкротства американских угольщиков: Patriot (второй раз, май 2015), Walter (июль 2015), Alpha (03.08.2015), Arch (11.01.2016), Peabody (апрель 2016). В оригинале Patriot стоял в 10.2015, это неверно. Эффект на предложение запаздывает: шахты в Chapter 11 часто продолжают работу, так что событие — индикатор капитуляции отрасли у дна 2016-Q1, а не быстрый сдвиг предложения.",
+  "sources": [
+   "https://www.mining.com/us-coal-giant-peabody-energy-files-bankruptcy/",
+   "https://www.miningweekly.com/article/walter-energy-strikes-chapter-11-restructuring-deal-with-senior-lenders-2015-07-15",
+   "https://www.financierworldwide.com/patriot-coal-files-for-chapter-11-again",
+   "https://fortune.com/2016/01/11/arch-coal-bankruptcy"
+  ],
+  "confidence": "medium"
+ },
+ {
+  "date": "2015-12",
+  "label": "Парижское соглашение",
+  "type": "climate",
+  "expected_direction": -1,
+  "series": [
+   "thermal_au"
+  ],
+  "linked_turn": null,
+  "note": "[УБРАТЬ: знак −1 противоположен развороту вверх 2016-01; сам текст признаёт, что прямое влияние на цену 2016 ограничено. Как климатический фон допустимо, как драйвер разворота нет.] Долгосрочный сигнал на сокращение угля, рост стоимости капитала для угольных проектов; прямое влияние на цену 2016 года ограничено.",
+  "sources": [
+   "https://en.wikipedia.org/wiki/Paris_Agreement"
+  ],
+  "confidence": "low"
+ },
+ {
+  "date": "2016-04",
+  "label": "Китай: 276 рабочих дней в году",
+  "type": "supply",
+  "expected_direction": 1,
+  "series": [
+   "thermal_au",
+   "met_us"
+  ],
+  "linked_turn": "2016-01",
+  "note": "С апреля 2016 Китай сократил рабочий год шахт с 330 до 276 дней в рамках сокращения мощностей в угле и стали (CRU: политика действует с апреля; цены выросли до +30% за период). Смягчение до 330 дней — в ноябре 2016 (Caixin, 18.11.2016), а не в октябре. Исходные ссылки: Bloomberg 403, chinadaily 404, заменены. Объясняет отскок после дна 2016-01 (+3 мес).",
+  "sources": [
+   "https://www.crugroup.com/knowledge-and-insights/insights/the-chinese-coal-industry-how-to-solve-the-problem-of-oversupply/",
+   "https://www.woodmac.com/reports/coal-chinas-276-working-days-policy-a-short-term-boost-for-the-coal-market-40348069/",
+   "https://www.caixinglobal.com/2016-11-18/mining-restrictions-eased-to-prevent-winter-coal-price-surge-101009092.html"
+  ],
+  "confidence": "high"
+ },
+ {
+  "date": "2017-03",
+  "label": "Циклон Debbie",
+  "type": "weather",
+  "expected_direction": 1,
+  "series": [
+   "met_us"
+  ],
+  "linked_turn": "2017-Q1",
+  "note": "Повреждена ж/д Goonyella, под угрозой 15–21 млн т коксующегося, спот +15% за день. Но цена уже упала с $310 (ноябрь 2016) до $151,5 перед циклоном: пик американского экспорта 2017-Q1 отражает контракты конца 2016, а не Debbie.",
+  "sources": [
+   "https://www.mining.com/?p=881178",
+   "https://en.wikipedia.org/wiki/Cyclone_Debbie",
+   "https://www.spglobal.com/commodity-insights/en/news-research/blog/coal/033117-situation-room-cyclone-debbie-hits-worlds-metallurgical-coal-capital"
+  ],
+  "confidence": "medium"
+ },
+ {
+  "date": "2018-06",
+  "label": "Жара в Северном полушарии",
+  "type": "weather",
+  "expected_direction": 1,
+  "series": [
+   "thermal_au"
+  ],
+  "linked_turn": "2018-07",
+  "note": "Жара и сильный спрос Китая подняли Newcastle до $120–125/т (максимум с 2012); добавила затянувшаяся годовая договорённость с Японией и ограничения предложения.",
+  "sources": [
+   "https://www.miningweekly.com/article/coal-rallies-to-six-year-high-as-heatwave-fires-up-china-demand-2018-06-08",
+   "https://www.spglobal.com/energy/en/news-research/blog/coal/123118-newcastle-coal-rally-eases-but-supply-could-stay-tight-in-2019"
+  ],
+  "confidence": "high"
+ },
+ {
+  "date": "2020-04",
+  "label": "COVID-19: энергетический уголь",
+  "type": "macro",
+  "expected_direction": -1,
+  "series": [
+   "thermal_au"
+  ],
+  "linked_turn": "2020-08",
+  "note": "Локдауны: IEA оценивала падение мирового спроса на уголь в 2020 около −5% (на странице prices-and-costs не найдено, цифра не подтверждена). Энергетический уголь дешевел ещё до COVID: около $100/т в начале 2019 → $65 в начале 2020 → около $50 к концу 2020 (IEA); в апреле 2020 цены вернулись к уровню начала 2016. Среднемесячный Newcastle (WB) $50,1 в августе 2020 — дно. Дешёвый газ усилил падение. COVID — частичный драйвер, спад начался в 2019.",
+  "sources": [
+   "https://www.iea.org/reports/coal-2020/prices-and-costs",
+   "https://en.wikipedia.org/wiki/COVID-19_pandemic"
+  ],
+  "confidence": "high"
+ },
+ {
+  "date": "2020-04",
+  "label": "COVID-19: коксующийся уголь",
+  "type": "macro",
+  "expected_direction": -1,
+  "series": [
+   "met_us"
+  ],
+  "linked_turn": "2020-Q3",
+  "note": "Остановки сталелитейных заводов и слабая сталь: коксующийся подешевел с ~$200/т (начало 2019) до ~$110 в апреле 2020 и ~$100 позднее (IEA); падение началось до COVID. Ограничения Китая на австралийский уголь не дали цене отскочить (IEA).",
+  "sources": [
+   "https://www.iea.org/reports/coal-2020/prices-and-costs",
+   "https://en.wikipedia.org/wiki/COVID-19_pandemic"
+  ],
+  "confidence": "medium"
+ },
+ {
+  "date": "2020-10",
+  "label": "Китай: запрет австралийского угля",
+  "type": "geopolitics",
+  "expected_direction": -1,
+  "series": [
+   "thermal_au"
+  ],
+  "linked_turn": null,
+  "note": "Неформальный запрет Китая на австралийский уголь: ограничения начались в IV кв. 2019, расширены во II кв. 2020, усилены в октябре 2020 (IEA); таможенные задержки. Нулевые отгрузки Newcastle в Китай в декабре 2020 — по Argus, не проверено. Знак −1 по природе (потеря крупнейшего рынка, дисконт австралийскому углю), но контртрендовый к отскоку от дна 2020-08: Newcastle вырос с $50 (август) до $83 (декабрь, WB), эффект запрета виден в спредах к индонезийскому и российскому углю, а не в уровне. linked_turn обнулён.",
+  "sources": [
+   "https://www.iea.org/reports/coal-2020/prices-and-costs",
+   "https://www.argusmedia.com/en/news-and-insights/latest-market-news/2174418-newcastle-coal-exports-rebound-despite-china-ban",
+   "https://www.spglobal.com/commodityinsights/en/market-insights/latest-news/coal/022223-china-starts-buying-australian-coal-as-unofficial-ena-ends"
+  ],
+  "confidence": "medium"
+ },
+ {
+  "date": "2020-12",
+  "label": "Холодная зима, Китай открывает импорт",
+  "type": "demand",
+  "expected_direction": 1,
+  "series": [
+   "thermal_au"
+  ],
+  "linked_turn": "2020-08",
+  "note": "Импорт Китая в декабре 2020 — 39 млн т против 2,8 млн т годом ранее (смягчение квот на фоне нехватки угля в мороз); Newcastle вырос с $46 (4 сентября) до $81/т (31 декабря).",
+  "sources": [
+   "https://www.argusmedia.com/en/news-and-insights/latest-market-news/2174418-newcastle-coal-exports-rebound-despite-china-ban",
+   "https://www.iea.org/reports/coal-2020/prices-and-costs",
+   "https://www.stats.gov.cn/english/PressRelease/202101/t20210119_1812521.html"
+  ],
+  "confidence": "high"
+ },
+ {
+  "date": "2021-10",
+  "label": "Энергокризис в Китае",
+  "type": "demand",
+  "expected_direction": 1,
+  "series": [
+   "thermal_au"
+  ],
+  "linked_turn": "2022-09",
+  "note": "Нехватка угля и отключения; рекорд Newcastle около $250–270/т в октябре 2021; Пекин приказал нарастить добычу.",
+  "sources": [
+   "https://www.spglobal.com/energy/en/news-research/latest-news/coal/101221-easing-of-chinas-power-crisis-hinges-on-retreat-in-coal-gas-prices",
+   "https://en.wikipedia.org/wiki/2021%E2%80%932023_global_energy_crisis"
+  ],
+  "confidence": "high"
+ },
+ {
+  "date": "2022-01",
+  "label": "Индонезия запрещает экспорт угля",
+  "type": "supply",
+  "expected_direction": 1,
+  "series": [
+   "thermal_au"
+  ],
+  "linked_turn": "2022-09",
+  "note": "Запрет на январь 2022 из-за нехватки угля у PLN (обязательная поставка 25% добычи по $70/т); затронул крупнейшего экспортёра энергетического угля.",
+  "sources": [
+   "https://www.newcastleherald.com.au/story/7568035/indonesia-bans-coal-export-on-supply-fears/",
+   "https://www.bnnbloomberg.ca/coal-prices-forecast-to-surge-again-if-indonesia-halts-exports-1.1702656"
+  ],
+  "confidence": "high"
+ },
+ {
+  "date": "2022-02",
+  "label": "Вторжение России в Украину и санкции",
+  "type": "geopolitics",
+  "expected_direction": 1,
+  "series": [
+   "thermal_au"
+  ],
+  "linked_turn": "2022-09",
+  "note": "Вторжение России в Украину (24.02.2022) и санкции: покупатели уходят от российских поставок, рынок разорван. Newcastle (WB, среднемесячный): $219,8 в феврале → $314,0 в марте → $430,8 в сентябре (WoodMac: пик выше $440). Утверждение «Newcastle и ARA впервые подошли к $400 в начале марта» не проверено. Для коксующегося тот же шок учтён в событии 2022-03, поэтому met_us из series убран.",
+  "sources": [
+   "https://en.wikipedia.org/wiki/Russian_invasion_of_Ukraine",
+   "https://woodmac.com/reports/coal-global-thermal-coal-2022-in-review-150088997",
+   "https://www.iea.org/reports/coal-market-update-july-2023/prices"
+  ],
+  "confidence": "high"
+ },
+ {
+  "date": "2022-03",
+  "label": "Коксующийся: рекорд и дожди в Австралии",
+  "type": "geopolitics",
+  "expected_direction": 1,
+  "series": [
+   "met_us"
+  ],
+  "linked_turn": "2022-Q2",
+  "note": "Спот Premium HCC FOB Австралия — исторический рекорд: $664/т 15 марта 2022 (Argus), по отчёту Coronado — $670/т за март (оригинальное «$670,5» ближе к цифре компании, не бенчмарка). Главный драйвер — паника после начала войны 24 февраля и ограничения российских потоков; дожди в Квинсленде и НЮВ ограничивали добычу (Coronado, Curragh), но как отдельный ценовой драйвер не доказаны. Тип изменён с weather на geopolitics. Цены американского экспорта (контракты) достигли пика в 2022-Q2 с лагом.",
+  "sources": [
+   "https://www.treasury.qld.gov.au/files/qlds-coal-industry-and-long-term-global-demand-nov-2022.pdf",
+   "https://www.argusmedia.com/en/news-and-insights/market-insight-papers/seaborne-coking-coal-market-in-first-half-2022",
+   "https://inqld.com.au/business/2022/04/27/black-gold-queensland-coal-producers-reveals-historic-price-hikes"
+  ],
+  "confidence": "high"
+ },
+ {
+  "date": "2022-06",
+  "label": "Газовый кризис в Европе",
+  "type": "substitute",
+  "expected_direction": 1,
+  "series": [
+   "thermal_au"
+  ],
+  "linked_turn": "2022-09",
+  "note": "Нехватка газа (сокращение прокачки по Nord Stream 1 с июня 2022) загнала европейские станции на уголь, спрос на энергетический уголь вырос. Newcastle превысил $440/т в сентябре 2022 (WoodMac; WB среднемесячный сентябрь $430,8); цифра оригинала «Argus дал максимум $444,6 9 сентября» не подтверждена.",
+  "sources": [
+   "https://en.wikipedia.org/wiki/2021%E2%80%932023_global_energy_crisis",
+   "https://woodmac.com/reports/coal-global-thermal-coal-2022-in-review-150088997"
+  ],
+  "confidence": "medium"
+ },
+ {
+  "date": "2022-08",
+  "label": "Эмбарго ЕС на российский уголь",
+  "type": "geopolitics",
+  "expected_direction": 1,
+  "series": [
+   "thermal_au",
+   "met_us"
+  ],
+  "linked_turn": "2022-09",
+  "note": "Эмбарго ЕС на российский уголь принято в апреле 2022 (5-й пакет санкций), вступило в силу 11 августа 2022 после 120-дневного переходного периода. Доля России в импорте угля ЕС: около 45% (Еврокомиссия), 55,6% по каменному углю в 2020 (Eurostat); оригинальное «19,3%» не подтверждено. Часть потоков не удалось перенаправить на восток из-за ж/д-ограничений. Знак +1 для Newcastle условный: спрос ЕС растёт, но российский уголь, ушедший в Азию, давит на цены там.",
+  "sources": [
+   "https://www.iea.org/reports/coal-market-update-july-2023/prices",
+   "https://www.treasury.qld.gov.au/files/qlds-coal-industry-and-long-term-global-demand-nov-2022.pdf",
+   "https://www.asianmetal.com/news/1841908/EU-embargo-on-Russian-coal-goes-into-effect-since-Aug-11/14"
+  ],
+  "confidence": "high"
+ },
+ {
+  "date": "2023-01",
+  "label": "Китай снимает запрет на австралийский уголь",
+  "type": "geopolitics",
+  "expected_direction": 1,
+  "series": [
+   "thermal_au"
+  ],
+  "linked_turn": null,
+  "note": "Первые австралийские партии с конца запрета вошли в Китай в феврале 2023 (запрет снят до января–марта). Ожидаемый плюс для Newcastle потонул в общем падении после пика.",
+  "sources": [
+   "https://www.kitco.com/news/off-the-wire/2023-01-30/first-australian-coal-cargoes-end-ban-enter-china-feb",
+   "https://www.mining.com/web/china-removes-all-remaining-curbs-on-australian-coal-imports/",
+   "https://www.spglobal.com/commodityinsights/en/market-insights/latest-news/coal/022223-china-starts-buying-australian-coal-as-unofficial-ena-ends"
+  ],
+  "confidence": "high"
+ },
+ {
+  "date": "2023-01",
+  "label": "Нормализация: газ в Европе дешевеет",
+  "type": "substitute",
+  "expected_direction": -1,
+  "series": [
+   "thermal_au"
+  ],
+  "linked_turn": "2022-09",
+  "note": "Газ в Европе дешевеет (тёплая зима, спрос на газ ниже), спрос на уголь падает. Среднемесячный Newcastle (WB): $318,0 в январе → $187,2 в марте → $139,4 в июне 2023 (−63% к июню 2022, $374,1). Спотовые значения оригинала ($393 → $173 → $139) не проверены; ссылка Всемирного банка на дешёвый газ и цену углерода не проверена. Привязка перенесена с 2025-04 (27 мес, вне окна) на пик 2022-09 (+4 мес): событие объясняет откат от пика.",
+  "sources": [
+   "https://databoks.katadata.co.id/en/mining/statistics/0e508e820dcb9c6/coal-prices-plummeted-in-the-first-half-of-2023-cheaper-than-before-the-war",
+   "https://www.mining.com/web/global-thermal-coal-prices-settling-into-200-per-tonne-range-after-volatile-2022/",
+   "https://www.iea.org/reports/coal-market-update-july-2023/prices"
+  ],
+  "confidence": "medium"
+ },
+ {
+  "date": "2024-01",
+  "label": "Рекордная добыча Китая",
+  "type": "supply",
+  "expected_direction": -1,
+  "series": [
+   "thermal_au"
+  ],
+  "linked_turn": "2025-04",
+  "note": "Добыча угля в Китае в 2023 — 4,66 млрд т (+2,9%), рекорд (NBS, Caixin). Одновременно импорт Китая вырос рекордно: около 474 млн т, +62%, из-за роста цен и падения качества местного угля, плюс нулевые пошлины (декабрьский рекорд 47,3 млн т перед возвратом части пошлин). Фраза оригинала «держало внутренние цены ниже импортных» неверна и убрана. Для Newcastle знак неоднозначен: рекордная добыча копит запасы и давит на цены в 2024–25 (IEA: устойчивая добыча и запасы урезали импорт Южного Китая), но сам 2023 год был рекордным по импорту.",
+  "sources": [
+   "https://www.caixinglobal.com/2024-01-18/chart-of-the-day-chinas-coal-production-hit-record-in-2023-102158042.html",
+   "https://www.spglobal.com/market-intelligence/en/news-insights/articles/2023/8/spike-in-chinese-coal-imports-lifts-global-trade-despite-weaker-demand-elsewhere-76749913",
+   "https://caixinchinawatch.substack.com/p/energy-insider-beijing-names-new"
+  ],
+  "confidence": "medium"
+ },
+ {
+  "date": "2025-01",
+  "label": "Китай: запасы и добыча режут импорт",
+  "type": "supply",
+  "expected_direction": -1,
+  "series": [
+   "thermal_au"
+  ],
+  "linked_turn": "2025-04",
+  "note": "IEA: Newcastle в 2025 в среднем $104 (−22%), Южный Китай CFR $83 (−20%) из-за устойчивой добычи и запасов; торговля углём в 2025 сокращается впервые с 2020.",
+  "sources": [
+   "https://www.iea.org/reports/coal-2025/prices-and-costs",
+   "https://www.iea.org/reports/coal-mid-year-update-2025"
+  ],
+  "confidence": "high"
+ },
+ {
+  "date": "2025-01",
+  "label": "Коксующийся: избыток, издержки упали",
+  "type": "supply",
+  "expected_direction": -1,
+  "series": [
+   "met_us"
+  ],
+  "linked_turn": "2025-Q3",
+  "note": "Цены снижались весь 2025 (январь–август в среднем $186/т); предельные издержки упали с $182 до $149/т на дешёвом транспорте, поставки из Западной Вирджинии выросли около 60%.",
+  "sources": [
+   "https://www.iea.org/reports/coal-2025/prices-and-costs"
+  ],
+  "confidence": "high"
+ },
+ {
+  "date": "2025-02",
+  "label": "Китай: пошлины на уголь из США",
+  "type": "geopolitics",
+  "expected_direction": -1,
+  "series": [
+   "met_us"
+  ],
+  "linked_turn": "2025-Q3",
+  "note": "Пошлина 15% в феврале 2025 подняла эффективную ставку до 18%, в апреле суммарно до 52% на американский коксующийся; поставки США в Китай за январь–апрель 465 тыс. т против 2,59 млн т годом ранее.",
+  "sources": [
+   "https://www.spglobal.com/energy/en/news-research/latest-news/metals/053025-ferrous-series-us-coal-suppliers-adapt-to-new-landscape-as-trade-tensions-reshape-market-dynamics",
+   "https://www.spglobal.com/energy/en/news-research/latest-news/metals/040825-us-china-tariff-spat-clouds-met-coal-market-outlook",
+   "https://www.hellenicshippingnews.com/?p=1084470"
+  ],
+  "confidence": "high"
+ },
+ {
+  "date": "2025-07",
+  "label": "Китай: проверки перепроизводства угля",
+  "type": "supply",
+  "expected_direction": 1,
+  "series": [
+   "thermal_au",
+   "met_us"
+  ],
+  "linked_turn": "2025-04",
+  "note": "Нацэнергоуправление (NEA) начало проверки превышения лицензированных мощностей в 8 угольных регионах (Шаньси, Внутренняя Монголия, Аньхой, Хэнань, Гуйчжоу, Шэньси, Нинся, Синьцзян). Фьючерс на коксующийся в Даляне 21–23 июля трижды подряд упирался в дневной лимит (+8%, затем +11%). Правило «превышение более 10% — остановка» относится к Mysteel; в сентябре приостановлены 15 шахт Ордоса (Reuters/Mysteel). Цифры оригинала «+25% за 17–25 июля» и «добыча в июле — минимум за год» не подтверждены; прежний URL creamermedia не открывается.",
+  "sources": [
+   "https://newsletter.en.creamermedia.com/article/chinas-coking-coal-prices-hit-daily-limit-again-on-chatter-about-government-mine-inspections-2025-07-22",
+   "https://newsletter.en.creamermedia.com/article/coking-coal-hits-five-month-high-on-government-mine-inspections-2025-07-23",
+   "https://www.alcircle.com/news/mysteel-top-10-news-events-in-china-s-coal-market-in-2025-116817",
+   "https://www.spglobal.com/energy/en/news-research/latest-news/metals/072525-china-coal-inspections-offer-price-hope-as-australian-miners-await-rebound"
+  ],
+  "confidence": "high"
+ },
+ {
+  "date": "2026-01",
+  "label": "Индонезия режет квоты добычи",
+  "type": "supply",
+  "expected_direction": 1,
+  "series": [
+   "thermal_au"
+  ],
+  "linked_turn": "2025-04",
+  "note": "Индонезия сокращает квоты RKAB на 2026: S&P от 30.01.2026 сообщает о сокращении для большинства добытчиков (диапазон 40–70% взят из оригинала). Итоговые утверждения: 580 млн т (конец марта 2026) и свыше 600 млн т (25.06.2026, Mysteel). База 2025 (~790 млн т) в источнике обрезана, «−24%» не подтверждено; «спотовый экспорт приостановлен» не подтверждено.",
+  "sources": [
+   "https://www.spglobal.com/energy/en/news-research/latest-news/coal/013026-indonesias-government-informs-of-production-quota-cuts-for-most-miners-in-2026-sources",
+   "https://www.mysteel.net/news/5129631-esdm-indonesia-approves-600-mln-t-coal-production-quota-for-2026"
+  ],
+  "confidence": "medium"
+ },
+ {
+  "date": "2026-03",
+  "label": "Ближний Восток: удары по Рас-Лаффану",
+  "type": "geopolitics",
+  "expected_direction": 1,
+  "series": [
+   "thermal_au"
+  ],
+  "linked_turn": "2025-04",
+  "note": "Ближневосточный конфликт и закрытие Ормузского пролива; удары 19 марта 2026 по Рас-Лаффану (Катар, около пятой части мирового СПГ) убрали с рынка до 19 млн т СПГ (Kpler, оценка предварительная), JKM выше $21/MMBtu против ~$10,5 до конфликта. Газ→уголь в Японии и Корее: Newcastle вырос с ~$115 в конце февраля до ~$135 (WB, среднемесячный март — $138,6); выработка на угле в Японии +11%, на газе −13% (Rystad). Оригинальное «Япония сняла лимит 50% загрузки неэффективных ТЭС» не подтверждено; страница Rystad не содержит дат и цен, которые ей приписывались.",
+  "sources": [
+   "https://www.rystadenergy.com/news/asias-coal-demand-to-rise",
+   "https://tradingeconomics.com/commodity/coal/news/529875",
+   "https://www.petromindo.com/news/article/asia-turns-to-coal-as-lng-crisis-deepens-amid-middle-east-conflict",
+   "https://kpler.com/blog/ras-laffan-under-fire-what-the-strikes-on-the-worlds-largest-lng-hub-mean-for-global-gas-markets",
+   "https://oilprice.com/Energy/Coal/Coal-Is-Back-and-Japan-Is-Driving-the-Rally.amp.html"
+  ],
+  "confidence": "high"
+ }
 ]
