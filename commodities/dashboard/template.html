@@ -721,7 +721,7 @@ const DATA = /*__DATA__*/null;
     const auPre = Math.max(...L.au.filter((r) => r[0] < 2000).map((r) => r[1])), auPreY = L.au.find((r) => r[1] === auPre)[0];
     const usPre = Math.max(...L.us_bit.filter((r) => r[0] < 2000).map((r) => r[2])), usPreY = L.us_bit.find((r) => r[2] === usPre)[0];
     const fx = (x) => nf(1).format(x);
-    document.getElementById('long-note').textContent = 'Источник: D. Jacks, «From Boom to Bust» (NBER w18874), данные 1850–' + ly + '. До 2010 года индекс — цена угля на шахтах США, после — морской рынок. После ' + ly +
+    document.getElementById('long-note').textContent = 'Источник: D. Jacks, «From Boom to Bust» (NBER w18874), данные 1850–' + ly + '. По 2009 год индекс — цена угля на шахтах США (EIA), с 2010 года он ближе к морскому рынку; источник этого отрезка автор не уточняет. После ' + ly +
       ' года он продлён по Newcastle через среднее соотношение ' + L.jacks_link_years.join('–') + ' годов; ' + L.jacks[L.jacks.length - 1][0] + ' — неполный год. Уровни до и после 2010 года напрямую не сравнимы: 2022 год в ценах Newcastle в ' + fx(au[2022] / auPre) + ' раза выше ' + auPreY +
       ' года, а по цене на шахтах США — ' + fx(us[2022] / usPre) + ' от уровня ' + usPreY + ' года. Даты пиков и спадов надёжнее уровней.';
   }
