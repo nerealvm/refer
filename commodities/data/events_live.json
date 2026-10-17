@@ -1,0 +1,38 @@
+[
+ {
+  "date": "2026-09",
+  "label": "Импорт угля Китаем в сентябре −6%",
+  "type": "demand",
+  "expected_direction": -1,
+  "series": [
+   "thermal_au"
+  ],
+  "note": "Китайский импорт угля в сентябре упал на 6% из-за высоких запасов и ограничений поставок из Индонезии. Слабее спрос крупнейшего покупателя давит на seaborne-рынок, хотя цены у многолетнего максимума.",
+  "sources": [
+   "https://news.google.com/rss/articles/CBMivgFBVV95cUxNMk1UZlVmWjJQMVU0SHNvcmxIcF9pdXhSaEZWaWNOODY1M29OWGJCRk1MUzNvQXhJYzRNVUhicnhTNXBhZkRCQXFJMDVfWThiLW1LbmRWX1hkSG5tczJwQ0kwWUZ1aTFfZFN4X2t4NXUwOXVDdEtGRGJnMHFhWVdCbzlsb3pOWnM5dXJJWHVjYVEtdzlFQUxwTWpkOWZtdXIzdVZSZU9rV2xIM1h4RkpuREwxay1sRDN1MWFVN2hB?oc=5",
+   "https://news.google.com/rss/articles/CBMiuwFBVV95cUxQX1lMbDJCVzc0SkZlTnV2bFBQdVM4bkU5X3ZFaHlFVzRQaVY0ZU9CTUh6SDlOWU5TbVduYVF4WkhSRFF6WWdUMTNDUlZZRHFtd0VETk4zTTFJMGtkVWVrQXI4VUJsQVJ3Z3JHbllRb1Y3cEhRNDJMdmlMWGZhTEswUVdMLW82THhQdW5XNXdYRnZhNkdEQWtGcTU3M2NTN1ctUE5FanV0RlFpV21POW1ZRVI4LVlEYlM0SWFz0gG7AUFVX3lxTFBfWUxsMkJXNzRKRmVOdXZsUFB1UzhuRTlfdkVoeUVXNFBpVjRlT0JNSHpIOU5ZTlNtV25hUXhaSFJEUXpZZ1QxM0NSVllEcW13RUROTjNNMUkwa2RVZWtBcjhVQmxBUndnckduWVFvVjdwSFE0Mkx2aUxYZmFMSzBRV0wtbzZMeFB1blc1d1hGdmE2R0RBa0ZxNTczY1M3Vy1QTkVqdXRGUWlXbU85bVlFUjgtWURiUzRJYXM?oc=5",
+   "https://news.google.com/rss/articles/CBMiigFBVV95cUxPSFdXTXBpYkM0STZ1TFY3REh6NGIxVUZVN2JPTlJmZTlmMXVMVG5vRkdiY1lfaW96ZUZSYnVrMTFzcU9nNzlQSHNaUFJudU5RUVR2V3JqeW1rSGp5WVNBdjViRHBLODdveHotLVp0RGp0alFqUE16d1l6Rks1d0FxZHM1QzF5QU1OekE?oc=5"
+  ],
+  "confidence": "high",
+  "linked_turn": null,
+  "added": "2026-10-17"
+ },
+ {
+  "date": "2026-10",
+  "label": "Индонезия: квота 2027 и правила экспорта",
+  "type": "geopolitics",
+  "expected_direction": 1,
+  "series": [
+   "thermal_au"
+  ],
+  "note": "Индонезия начала процесс установки квоты добычи на 2027 год; производители откладывают годовые контракты из-за неопределённости по квоте и экспортным правилам. В прессе звучат призывы ограничить экспорт высококалорийного угля — риск сокращения предложения.",
+  "sources": [
+   "https://news.google.com/rss/articles/CBMinwFBVV95cUxOd2xsdUE4WFF2TUo5bm5halQ0cndyQ29QR01kekJwZW9sOWlhWVlIc05SelFSeFMzWWhEWFdkUk1WZm5UdW42aWtZajdXc0k2X2otekhPT19XZ0ZXbkFQT2RBMzB1VS1GckpCQ2hQcnNtZzBoeVA0UF9qNExuNlhCUXRiNzVhNGszMDUwbEx3Q2Q5S09Jb2dhYXJCZVhObUk?oc=5",
+   "https://news.google.com/rss/articles/CBMipAFBVV95cUxNMHRZNnBjemJYN29jNlZlS2FTdFp3S1RJbVJuOU83azVfWE9FN1o3ZUx0NXNpRUlreEg1bm0ySXNuNGo5TG45eXdNVmx0S0MzZFhDNzdpUXBWUWlFbUpZdUFOZEJxVFRrSXdiWWdjVW1zMXY1ektlRWp6X0JKOEhWcURKQ3JnaWZSalFxUm1lUXFoZm9oV0lXSTZFTWpxejg0bl9aUw?oc=5",
+   "https://news.google.com/rss/articles/CBMirAFBVV95cUxNN2JXMS1QemhXMThmdmV4bVlEN05vejFMNVlhM3ZqRDNDRzRFYkI2ekRSRTlBdHhSNXY0S2pucEdqYlFYTFRuNzkyYVZWMEd2a1NDZk02MkFIZzBJN2VNYUVSUWVVMHJhZkJ3eGE3R2N3X0QybVNBTWZDTXdZTGt0QXk0Z1FNN1F0X2lQUVN0Ui11RVd4cGFpeGVXT3JjSWdxRlJNNXJ3Y1hkODBH?oc=5"
+  ],
+  "confidence": "medium",
+  "linked_turn": null,
+  "added": "2026-10-17"
+ }
+]
