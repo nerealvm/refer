@@ -431,6 +431,37 @@ def turns_from(key, c):
     return out
 
 
+def check_links(events, turns, coal):
+    """Правило привязки события к развороту, проверяется кодом:
+    - «драйвер движения»: событие лежит внутри фазы, ведущей к развороту, и его знак совпадает с направлением этой фазы;
+    - «драйвер разворота»: событие в окне от 6 месяцев до разворота до 12 месяцев после него, знак совпадает с направлением следующей фазы.
+    Иначе привязка снимается, событие становится фоновым (linked_turn_rejected хранит исходную привязку)."""
+    tmap = {(t['series'], t['id']): t for t in turns}
+    for ev in events:
+        lt = ev.get('linked_turn')
+        if not lt:
+            ev['link_role'] = {}
+            continue
+        roles = {}
+        for k in ev.get('turn_series', []):
+            t = tmap[(k, lt)]
+            m = months_ym(ev['date'], t['date'])  # > 0: событие раньше разворота
+            up = ev['expected_direction'] > 0
+            pin, pout = t.get('phase_in'), t.get('phase_out')
+            role = None
+            if pin and 0 <= m <= pin['months'] and (pin['kind'] == 'up') == up:
+                role = 'to_turn'
+            elif pout and -12 <= m <= 6 and (pout['kind'] == 'up') == up:
+                role = 'turn'
+            roles[k] = role
+        ev['link_role'] = roles
+        if not any(roles.values()):
+            print(f"  событие {ev['date']} «{ev['label']}» не согласуется с разворотом {lt} по правилу привязки: переведено в фоновые")
+            ev['linked_turn_rejected'] = lt
+            ev['linked_turn'] = None
+            ev['turn_series'] = []
+
+
 def event_impact(ev, series_real):
     """Фактический сдвиг реальной цены после события: лог-изменение через 3, 6 и 12 месяцев
     (для квартального ряда — 1, 2 и 4 квартала). Считается по данным, не задаётся руками."""
@@ -455,24 +486,38 @@ def event_impact(ev, series_real):
 
 
 def event_type_stats(events, real_series, key='thermal_au'):
-    """Рейтинг типов событий: медианный сдвиг реальной цены через 3/6/12 месяцев, взятый в ожидаемую сторону
-    (сдвиг × ожидаемое направление), доля совпадений знака через 12 месяцев, и базовая изменчивость ряда без событий."""
+    """Рейтинг типов событий по ряду key. Для каждого события берётся лог-изменение реальной цены через 3/6/12 месяцев,
+    из него вычитается медианный дрейф ряда за тот же горизонт (фон без привязки к событиям), результат умножается на
+    ожидаемое направление («в ожидаемую сторону»). По типу считаются медиана этого знакового сдвига, медиана модуля сдвига
+    и доля совпадений знака через 12 месяцев. События одного типа в одном месяце считаются один раз."""
+    s = real_series.dropna()
+    lg = np.log(s)
+    drift = {h: float(lg.diff(n).dropna().median()) for h, n in (('m3', 3), ('m6', 6), ('m12', 12))}
+    base = {('med_abs' + h[1:]): rnd(float(lg.diff(n).abs().dropna().median()), 3) for h, n in (('m3', 3), ('m6', 6), ('m12', 12))}
+    base.update({('drift' + h[1:]): rnd(v, 3) for h, v in drift.items()})
     rows = {}
+    seen = set()
     all_hit, all_n = 0, 0
     for ev in events:
         im = (ev.get('impact') or {}).get(key)
         if not im:
             continue
+        dk = (ev['date'], ev['type'])
+        if dk in seen:
+            continue
+        seen.add(dk)
         d = ev['expected_direction']
-        r = rows.setdefault(ev['type'], dict(type=ev['type'], n=0, ids=[], m3=[], m6=[], m12=[], hit12=0, n12=0))
+        r = rows.setdefault(ev['type'], dict(type=ev['type'], n=0, ids=[], m3=[], m6=[], m12=[], a3=[], a6=[], a12=[], hit12=0, n12=0))
         r['n'] += 1
         r['ids'].append(ev['n'])
         for h in ('m3', 'm6', 'm12'):
             if im.get(h) is not None:
-                r[h].append(im[h] * d)
+                adj = im[h] - drift[h]
+                r[h].append(adj * d)
+                r['a' + h[1:]].append(abs(adj))
         if im.get('m12') is not None:
             r['n12'] += 1
-            ok = int(np.sign(im['m12']) == d)
+            ok = int(np.sign(im['m12'] - drift['m12']) == d)
             r['hit12'] += ok
             all_hit += ok
             all_n += 1
@@ -480,11 +525,9 @@ def event_type_stats(events, real_series, key='thermal_au'):
     for r in rows.values():
         med = lambda v: rnd(float(np.median(v)), 3) if v else None
         out.append(dict(type=r['type'], n=r['n'], ids=r['ids'], n12=r['n12'], med_m3=med(r['m3']), med_m6=med(r['m6']), med_m12=med(r['m12']),
+                        med_abs3=med(r['a3']), med_abs6=med(r['a6']), med_abs12=med(r['a12']),
                         hit12=rnd(r['hit12'] / r['n12'], 2) if r['n12'] else None))
     out.sort(key=lambda r: -(r['med_m12'] if r['med_m12'] is not None else -9))
-    s = real_series.dropna()
-    lg = np.log(s)
-    base = {h: rnd(float((lg.diff(n).abs()).dropna().median()), 3) for h, n in (('med_abs3', 3), ('med_abs6', 6), ('med_abs12', 12))}
     return dict(types=out, baseline=base, all=dict(n=sum(r['n'] for r in out), hit12=rnd(all_hit / all_n, 2) if all_n else None),
                 from_=None)
 
@@ -739,6 +782,7 @@ def build():
         if lt and not ev['turn_series']:
             print(f"  событие {ev['date']} «{ev['label']}»: разворот {lt} не найден у рядов {ev.get('series')}")
         ev['impact'] = event_impact(ev, series_real)
+    check_links(events, turns, coal)
     event_types = event_type_stats(events, au_r)
     event_types['from'] = events[0]['date'][:4] if events else None
     event_types.pop('from_', None)
@@ -747,6 +791,8 @@ def build():
     signals = json.loads(sig_file.read_text(encoding='utf-8')) if sig_file.exists() else []
     capex_file = ROOT / 'data' / 'capex.json'
     capex = json.loads(capex_file.read_text(encoding='utf-8')) if capex_file.exists() else []
+    for c in capex:
+        c.pop('note', None)  # служебные оговорки сборщиков остаются в data/capex.json
     print('сигналы:', len(signals), '· компании с капзатратами:', len(capex))
 
     payload = dict(

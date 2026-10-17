@@ -68,6 +68,7 @@ h1 { font-family: var(--font-display); font-weight: 600; font-size: clamp(30px, 
 .lede { max-width: 66ch; color: var(--ink-2); margin: 0; font-size: 16px; }
 nav.tabs { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--bg); border-bottom: 1px solid var(--hair); }
 nav.tabs .wrap { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+@media (max-width: 560px) { nav.tabs .wrap { flex-wrap: wrap; } nav.tabs button { padding: 10px 10px 8px; font-size: 13px; } .seg button { padding: 6px 8px; font-size: 12.5px; } }
 nav.tabs button { font: 500 14px var(--font-body); color: var(--ink-2); background: none; border: 0; padding: 14px 12px 12px; border-bottom: 2px solid transparent; cursor: pointer; white-space: nowrap; }
 nav.tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--ink); }
 nav.tabs button:hover { color: var(--ink); }
@@ -107,7 +108,7 @@ h3 { font-size: 15px; font-weight: 600; margin: 0 0 6px; }
 
 /* элементы управления */
 .controls { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin-bottom: 10px; }
-.seg { display: inline-flex; border: 1px solid var(--hair); border-radius: 8px; overflow: hidden; }
+.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--hair); border-radius: 8px; overflow: hidden; }
 .seg button { font: 500 13px var(--font-body); background: transparent; color: var(--ink-2); border: 0; padding: 6px 10px; cursor: pointer; }
 .seg button + button { border-left: 1px solid var(--hair); }
 .seg button[aria-pressed="true"] { background: var(--ink); color: var(--surface); }
@@ -345,7 +346,7 @@ footer { color: var(--muted); font-size: 12.5px; padding-block: 0 40px; }
     </div>
     <div class="panel">
       <h2>Карта баланса на 3–5 лет: предложение и спрос</h2>
-      <p class="sub" id="sd-sub">Слепок не по цене, а по тому, что строится и что меняется в потреблении. По горизонтали — ожидаемое изменение предложения (новые проекты, мощности, политика экспортёров), по вертикали — ожидаемое изменение спроса. Левый верх — дефицит впереди, правый низ — профицит. Нажмите на точку, чтобы увидеть факты и источники.</p>
+      <p class="sub" id="sd-sub">Цвет точки — давление на цену (зелёный вверх, красный вниз, серый боковик), не ценовой сигнал. Слепок не по цене, а по тому, что строится и что меняется в потреблении. По горизонтали — ожидаемое изменение предложения (новые проекты, мощности, политика экспортёров), по вертикали — ожидаемое изменение спроса. Левый верх — дефицит впереди, правый низ — профицит. Нажмите на точку, чтобы увидеть факты и источники.</p>
       <div class="chart" id="sd-chart"></div>
       <div id="sd-detail" style="margin-top:10px"></div>
       <p class="note" id="sd-note">Оценки −2…+2 выставлены вручную по публичным прогнозам отраслевых агентств и проектным пайплайнам; у каждой — факты с датой и источником. Это направление давления, не прогноз цены и не сроки: рынок может отыграть ожидания заранее.</p>
@@ -982,8 +983,9 @@ const DATA = /*__DATA__*/null;
     });
     const peaks = ph.filter((p) => p.kind === 'up' && p.complete).map((p) => p.end);
     const big = peaks.filter((y) => [1920, 1948, 1979, 2010].includes(y));
+    const extra = peaks.filter((y) => y > ly);
     const gaps = big.slice(1).map((y, i) => y - big[i]);
-    byId('long-sub').textContent = 'Реальный индекс цены угля, 1900 = 100, лог. шкала. Пики: ' + peaks.join(', ') + '. Между крупными пиками 1920–2010 годов — ' + Math.min(...gaps) + '–' + Math.max(...gaps) + ' лет.';
+    byId('long-sub').textContent = 'Реальный индекс цены угля, 1900 = 100, лог. шкала. Большие пики: ' + big.join(', ') + ', между ними ' + Math.min(...gaps) + '–' + Math.max(...gaps) + ' лет.' + (extra.length ? ' На продлении по Newcastle алгоритм видит ещё ' + extra.join(' и ') + ': всплеск 2021–2022 годов, подтверждать его как большой пик рано.' : '');
     const lg = byId('long-legend'); lg.textContent = '';
     let sp = el('span', null, lg); el('i', { class: 'key', style: 'background:var(--s-usbit)' }, sp); sp.appendChild(document.createTextNode('Индекс Д. Джекса, 1850–' + ly));
     sp = el('span', null, lg); el('i', { class: 'key', style: 'background:repeating-linear-gradient(90deg,var(--s-usbit) 0 4px,transparent 4px 7px)' }, sp); sp.appendChild(document.createTextNode('продление по Newcastle, ' + (ly + 1) + '–' + L.jacks[L.jacks.length - 1][0]));
@@ -1004,7 +1006,7 @@ const DATA = /*__DATA__*/null;
     const rows = (DATA.links || []).slice().sort((a, b) => b.corr_all - a.corr_all);
     if (!rows.length) return;
     const W = Math.max(280, host.clientWidth), narrow = W < 560, rh = 24;
-    const m = { l: narrow ? 104 : 150, r: narrow ? 70 : 230, t: 24, b: 6 };
+    const m = { l: narrow ? 104 : 150, r: narrow ? 84 : 290, t: 24, b: 6 };
     const H = m.t + rows.length * rh + m.b, iw = W - m.l - m.r;
     const svg = s('svg', { viewBox: `0 0 ${W} ${H}`, height: H, role: 'img', 'aria-label': 'Корреляция рядов с углём Newcastle' }, host);
     const xv = (c) => m.l + (Math.max(-1, Math.min(1, c)) + 1) / 2 * iw;
@@ -1079,7 +1081,11 @@ const DATA = /*__DATA__*/null;
       if (sg.change_pct != null) {
         const c = el('span', { class: 'chg', style: 'margin-left:8px;color:' + (sg.direction_for_price > 0 ? 'var(--up)' : sg.direction_for_price < 0 ? 'var(--down)' : 'var(--ink-2)') }, d, fmtPct(sg.change_pct / 100, 1) + (sg.prev_label ? ' к ' + sg.prev_label.replace(/ \(.*\)$/, '') : ''));
       }
-      const dir = sg.direction_for_price > 0 ? '▲ для цены вверх' : sg.direction_for_price < 0 ? '▼ для цены вниз' : '→ нейтрально';
+      const ageDays = sg.date && /^\d{4}-\d{2}/.test(sg.date) ? Math.round((new Date(M.built) - new Date(sg.date.slice(0, 10).length === 7 ? sg.date.slice(0, 7) + '-28' : sg.date.slice(0, 10))) / 86400000) : null;
+      const stale = ageDays != null && ageDays > 45;
+      if (stale) { card.classList.add('low'); el('span', { class: 'chg', style: 'margin-left:8px;color:var(--muted)' }, d, '· данные устарели (' + ageDays + ' дн.)'); }
+      const dirv = stale ? 0 : sg.direction_for_price;
+      const dir = dirv > 0 ? '▲ для цены вверх' : dirv < 0 ? '▼ для цены вниз' : '→ нейтрально';
       el('div', { class: 'smean' }, card, dir + '. ' + (sg.meaning || ''));
       const src = el('div', { class: 'ssrc' }, card);
       if (sg.source) el('a', { href: sg.source, target: '_blank', rel: 'noopener' }, src, sg.source_name || 'источник'); else src.textContent = sg.source_name || '';
@@ -1094,7 +1100,8 @@ const DATA = /*__DATA__*/null;
   function drawCapex() {
     const host = document.getElementById('capex-chart'); if (!host) return;
     host.textContent = '';
-    const CO = (DATA.capex || []).filter((c) => c.years && c.years.some((y) => y.capex != null && y.da));
+    const hidden = (DATA.capex || []).filter((c) => c.exclude_from_median).map((c) => c.company.replace(/ \(.*\)| \/.*$/, ''));
+    const CO = (DATA.capex || []).filter((c) => !c.exclude_from_median && c.years && c.years.some((y) => y.capex != null && y.da));
     const note = document.getElementById('capex-note'), lg = document.getElementById('capex-legend'); lg.textContent = '';
     if (!CO.length) { note.textContent = 'Данные по компаниям ещё не собраны.'; return; }
     const years = [...new Set(CO.flatMap((c) => c.years.filter((y) => y.capex != null && y.da).map((y) => y.year)))].sort();
@@ -1113,14 +1120,14 @@ const DATA = /*__DATA__*/null;
       extra: (t) => { const m = med.find((x) => Math.floor(x.t) === Math.floor(t)); return m ? 'компаний в выборке: ' + m.n : null; } });
     let sp = el('span', null, lg); el('i', { class: 'key', style: 'background:var(--s-au)' }, sp); sp.appendChild(document.createTextNode('медиана по всем компаниям (' + CO.filter((c) => !c.exclude_from_median).length + ')'));
     sp = el('span', null, lg); el('i', { class: 'key', style: 'background:repeating-linear-gradient(90deg,var(--s-met) 0 6px,transparent 6px 10px)' }, sp); sp.appendChild(document.createTextNode('медиана, компании США (' + CO.filter((c) => c.country === 'США').length + ')'));
-    sp = el('span', null, lg); el('i', { class: 'key', style: 'background:var(--muted);height:1px' }, sp); sp.appendChild(document.createTextNode('отдельные компании: ' + CO.map((c) => c.company.replace(/ \(.*\)| \/.*$/, '') + (c.exclude_from_median ? ' (вне медианы)' : '')).join(', ')));
+    sp = el('span', null, lg); el('i', { class: 'key', style: 'background:var(--muted);height:1px' }, sp); sp.appendChild(document.createTextNode('отдельные компании: ' + CO.map((c) => c.company.replace(/ \(.*\)| \/.*$/, '')).join(', ')));
     const solid = med.filter((m) => m.v != null && m.n >= 5), last = (solid.length ? solid : med.filter((m) => m.v != null)).slice(-1)[0];
     const lo = med.filter((m) => m.v != null).reduce((a, b) => (b.v < a.v ? b : a));
     note.textContent = last ? 'Медиана в ' + Math.floor(last.t) + ' году — ' + nf(2).format(last.v) + '× (' + last.n + ' компаний). Минимум — ' + nf(2).format(lo.v) + '× в ' + Math.floor(lo.t) + ' году. ' +
       (last.v < 1 ? 'Отрасль инвестирует меньше, чем амортизирует: при прочих равных предложение будет сжиматься.' : last.v > 1.5 ? 'Капитал вернулся в отрасль: через несколько лет предложение вырастет.' : 'Инвестиции примерно на уровне воспроизводства.') +
       (() => { const us = medUS.filter((m) => m.v != null); const lo = us.length ? us.reduce((a, b) => (b.v < a.v ? b : a)) : null; const lastUS = us.slice(-1)[0]; return lo ? ' У компаний США минимум ' + nf(2).format(lo.v) + '× пришёлся на ' + Math.floor(lo.t) + ' год, в ' + Math.floor(lastUS.t) + ' году — ' + nf(2).format(lastUS.v) + '×: недоинвестирование 2014–2021 годов и есть тот самый «капитальный цикл», который дал сверхприбыли 2021–2022.' : ''; })() +
       ' Состав выборки меняется: до 2021 года в ней почти только США, с 2021 добавились Азия и Африка.' +
-      ' Соотношение считается в валюте отчётности каждой компании, поэтому сравнимы траектории, а не абсолютные суммы. Выбросы выше 6× обрезаны. Источники: отчётность SEC (США), stockanalysis, screener.in, Eastmoney; у азиатских и африканских компаний история в основном с 2021 года.' : '';
+      ' Соотношение считается в валюте отчётности каждой компании, поэтому сравнимы траектории, а не абсолютные суммы. Выбросы выше 6× обрезаны.' + (hidden.length ? ' Не показаны до сверки с годовыми отчётами: ' + hidden.join(', ') + ' (амортизация по агрегатору не сходится с выручкой).' : '') + ' Источники: отчётность SEC (США), stockanalysis, screener.in, Eastmoney; у азиатских и африканских компаний история в основном с 2021 года.' : '';
   }
 
   // ---------- рейтинг типов событий ----------
@@ -1132,7 +1139,7 @@ const DATA = /*__DATA__*/null;
     const rows = (ET.types || []).slice();
     if (!rows.length) return;
     const W = Math.max(280, host.clientWidth), narrow = W < 560, rh = 30;
-    const m = { l: narrow ? 120 : 200, r: narrow ? 70 : 170, t: 24, b: 6 };
+    const m = { l: narrow ? 120 : 200, r: narrow ? 64 : 300, t: 24, b: 6 };
     const H = m.t + rows.length * rh + m.b, iw = W - m.l - m.r;
     const vals = rows.flatMap((r) => [r.med_m12, r.med_m6, r.med_m3]).filter((v) => v != null).map((v) => Math.exp(v) - 1);
     const lo = Math.min(-0.1, ...vals) - 0.05, hi = Math.max(0.3, ...vals) + 0.05;
@@ -1155,14 +1162,15 @@ const DATA = /*__DATA__*/null;
       }
       if (r.med_m6 != null) s('circle', { cx: xv(Math.exp(r.med_m6) - 1), cy: y, r: 4.5, fill: 'var(--surface)', stroke: 'var(--ink)', 'stroke-width': 1.6 }, g);
       if (r.med_m3 != null) s('circle', { cx: xv(Math.exp(r.med_m3) - 1), cy: y, r: 3, fill: 'var(--ink)' }, g);
-      const hit = r.hit12 == null ? '' : ' · со знаком совпало ' + Math.round(r.hit12 * 100) + '%';
-      s('text', { x: m.l + iw + 8, y: y + 4, class: 'lbl' }, g, 'n = ' + r.n + (narrow ? '' : hit) + (weak ? ' · мало данных' : ''));
+      const hit = r.hit12 == null ? '' : ' · знак совпал ' + Math.round(r.hit12 * 100) + '%';
+      const absTxt = r.med_abs12 == null ? '' : ' · размах ' + fmtPct(Math.exp(r.med_abs12) - 1);
+      s('text', { x: m.l + iw + 8, y: y + 4, class: 'lbl' }, g, 'n = ' + r.n + (narrow ? '' : hit + absTxt + (weak ? ' · мало данных' : '')));
       const toggle = () => { typeOpen = typeOpen === r.type ? null : r.type; drawTypes(); };
       g.addEventListener('click', toggle);
       g.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
     });
     const B = ET.baseline || {};
-    document.getElementById('types-sub').textContent = 'По каталогу событий с ' + (ET.from || '1970') + ' года: медианное изменение реальной цены Newcastle через 3, 6 и 12 месяцев после события, взятое в ожидаемую сторону. Для сравнения, без всяких событий цена за 12 месяцев меняется в медиане на ' + (B.med_abs12 != null ? fmtPct(Math.exp(B.med_abs12) - 1) : '—') + ' в любую сторону. Нажмите на тип, чтобы увидеть события.';
+    document.getElementById('types-sub').textContent = 'По каталогу событий с ' + (ET.from || '1970') + ' года: медианное изменение реальной цены Newcastle через 3, 6 и 12 месяцев после события за вычетом обычного дрейфа ряда, взятое в ожидаемую сторону: плюс — цена ушла туда, куда событие должно было её двинуть. «Размах» — медиана модуля сдвига за 12 месяцев; без привязки к событиям он равен ' + (B.med_abs12 != null ? fmtPct(Math.exp(B.med_abs12) - 1) : '—') + '. Нажмите на тип, чтобы увидеть события.';
     const det = document.getElementById('types-detail'); det.textContent = '';
     if (typeOpen) {
       const r = rows.find((x) => x.type === typeOpen);
@@ -1179,7 +1187,13 @@ const DATA = /*__DATA__*/null;
       });
     }
     const all = ET.all || {};
-    document.getElementById('types-note').textContent = 'Это ориентир, не статистика: ' + (all.n || 0) + ' событий за полвека, в самых частых типах по ' + Math.max(...rows.map((r) => r.n)) + ' случаев. «Со знаком совпало» — доля событий, после которых цена через 12 месяцев ушла в ожидаемую сторону; по всем событиям — ' + (all.hit12 != null ? Math.round(all.hit12 * 100) + '%' : '—') + '. Типы с меньше чем 4 событиями показаны бледно. Тип события назначен вручную по источнику, ход цены посчитан из данных. Важная оговорка: каталог собран вокруг разворотов, поэтому события у пиков по построению сменяются спадом. Отрицательная медиана у геополитики — это в основном 2022 год: война и эмбарго пришлись на пик, рынок уже всё отыграл. Погодные шоки дают короткий всплеск, через год цена ниже.';
+    const solid = rows.filter((r) => r.n >= 4 && r.med_m12 != null);
+    const strong = solid.filter((r) => r.med_m12 > (B.med_abs12 || 0)).map((r) => TYPE_RU[r.type] + ' (' + pct(r.med_m12) + ')');
+    const reliable = solid.slice().sort((a, b) => (b.hit12 || 0) - (a.hit12 || 0))[0];
+    const negative = solid.filter((r) => r.med_m12 < 0).map((r) => TYPE_RU[r.type] + ' (' + pct(r.med_m12) + ')');
+    document.getElementById('types-note').textContent = 'Что видно по данным. Сильнее обычной годовой изменчивости двигают только: ' + (strong.length ? strong.join(', ') : 'ни один тип') + '. Надёжнее всего знак у типа «' + (reliable ? TYPE_RU[reliable.type] + '»: совпал в ' + Math.round(reliable.hit12 * 100) + '% случаев при сдвиге ' + pct(reliable.med_m12) : '—') + '. ' +
+      (negative.length ? 'После событий типов ' + negative.join(', ') + ' цена через год в медиане ниже ожидаемой стороны: они приходятся на пики, и рынок разворачивается. ' : '') +
+      'Это ориентир, не статистика: ' + (all.n || 0) + ' событий за полвека, в самых частых типах по ' + Math.max(...rows.map((r) => r.n)) + ' случаев, окна 12 месяцев у соседних событий перекрываются, а каталог собран вокруг разворотов, поэтому события у пиков по построению сменяются спадом. Типы с меньше чем 4 событиями показаны бледно. Тип и знак событию присваивает языковая модель по тексту источника, затем их проверяет второй проход и человек; ход цены посчитан из данных.';
   }
 
   // ---------- фазы: длительность × амплитуда ----------
@@ -1308,7 +1322,7 @@ const DATA = /*__DATA__*/null;
       const g = s('g', { tabindex: 0, 'aria-label': p.c.name + ': ' + Math.round(p.c.pct_all) + '-й перцентиль, ' + fmtPct(p.c.chg12) + ' за 12 мес., ' + p.c.stance_label }, svg);
       const coal = p.c.group === 'Уголь';
       s('circle', { cx: p.x, cy: p.y, r: coal ? 6.5 : 5, fill: `var(${stanceVar[p.c.stance]})`, stroke: coal ? 'var(--ink)' : 'var(--surface)', 'stroke-width': coal ? 2 : 2 }, g);
-      if (mapLayer === 'arrows' && p.c.sd) {
+      if (mapLayer === 'arrows' && p.c.sd && !(p.c.sd.confidence === 'low' && p.c.sd.net === 0)) {
         const net = p.c.sd.net, len = Math.abs(net) * 9;
         if (net === 0) s('line', { x1: p.x - 7, x2: p.x + 7, y1: p.y - 11, y2: p.y - 11, stroke: 'var(--muted)', 'stroke-width': 2 }, g);
         else {
@@ -1334,7 +1348,7 @@ const DATA = /*__DATA__*/null;
         r = el('div', { class: 't-row' }, tip); el('b', null, r, Math.round(p.c.pct_all) + '-й'); el('span', null, r, 'перцентиль с ' + p.c.hist_from.slice(0, 4));
         r = el('div', { class: 't-row' }, tip); el('b', null, r, fmtPct(p.c.chg12)); el('span', null, r, 'за 12 месяцев');
         el('div', { class: 't-extra' }, tip, p.c.stage_label + ' · ' + p.c.stance_label);
-        if (p.c.sd) el('div', { class: 't-extra' }, tip, 'На ' + p.c.sd.horizon + ': ' + sdLabel(p.c.sd.net) + '. Предложение ' + sdWord(p.c.sd.supply) + ', спрос ' + sdWord(p.c.sd.demand) + '.');
+        if (p.c.sd) el('div', { class: 't-extra' }, tip, 'На ' + p.c.sd.horizon + ': ' + sdLabel(p.c.sd.net, p.c.sd.confidence) + '. Предложение ' + sdWord(p.c.sd.supply) + ', спрос ' + sdWord(p.c.sd.demand) + '. Это давление на 3–5 лет, а сигнал выше — положение в ценовом цикле сегодня: они могут расходиться.');
         tip.hidden = false;
         const hw = host.clientWidth, tw = tip.offsetWidth;
         let left = p.x * hw / W + 14; if (left + tw > hw) left = p.x * hw / W - tw - 14;
@@ -1347,7 +1361,7 @@ const DATA = /*__DATA__*/null;
 
   let mapLayer = 'arrows';
   const sdWord = (v) => ({ '-2': 'сильно сжимается', '-1': 'сжимается', '0': 'без изменений', '1': 'растёт', '2': 'сильно растёт' })[String(v)] || '—';
-  const sdLabel = (net) => net >= 3 ? 'давление на цену сильно вверх' : net > 0 ? 'давление на цену вверх' : net === 0 ? 'боковик, силы уравновешены' : net > -3 ? 'давление на цену вниз' : 'давление на цену сильно вниз';
+  const sdLabel = (net, conf) => conf === 'low' && net === 0 ? 'давление не определено: мало данных' : net >= 3 ? 'давление на цену сильно вверх' : net > 0 ? 'давление на цену вверх' : net === 0 ? 'боковик, силы уравновешены' : net > -3 ? 'давление на цену вниз' : 'давление на цену сильно вниз';
   const sdChip = (parent, net) => el('span', { class: 'sd-chip ' + (net > 0 ? 'up' : net < 0 ? 'down' : '') }, parent, net > 0 ? '↑'.repeat(Math.min(2, net)) + ' вверх' : net < 0 ? '↓'.repeat(Math.min(2, -net)) + ' вниз' : '→ боковик');
   document.getElementById('layer-arrows').addEventListener('click', () => { mapLayer = 'arrows'; document.getElementById('layer-arrows').setAttribute('aria-pressed', 'true'); document.getElementById('layer-plain').setAttribute('aria-pressed', 'false'); drawMap(); });
   document.getElementById('layer-plain').addEventListener('click', () => { mapLayer = 'plain'; document.getElementById('layer-plain').setAttribute('aria-pressed', 'true'); document.getElementById('layer-arrows').setAttribute('aria-pressed', 'false'); drawMap(); });
@@ -1357,7 +1371,7 @@ const DATA = /*__DATA__*/null;
     host.textContent = '';
     const rows = C.filter((c) => c.sd);
     const missing = C.filter((c) => !c.sd).map((c) => shortName(c.name));
-    document.getElementById('sd-sub').textContent = 'Слепок не по цене, а по тому, что строится и что меняется в потреблении. По горизонтали — ожидаемое изменение предложения (проекты, мощности, политика экспортёров), по вертикали — ожидаемое изменение спроса. Левый верх — дефицит впереди, правый низ — профицит. Нажмите на точку, чтобы увидеть факты и источники.' + (missing.length ? ' Без оценки: ' + missing.join(', ') + '.' : '');
+    document.getElementById('sd-sub').textContent = 'Цвет точки — давление на цену (зелёный вверх, красный вниз, серый боковик, пустая точка — мало данных), не ценовой сигнал. На узком экране подписаны только угольные ряды, остальные — по касанию. Слепок не по цене, а по тому, что строится и что меняется в потреблении. По горизонтали — ожидаемое изменение предложения (проекты, мощности, политика экспортёров), по вертикали — ожидаемое изменение спроса. Левый верх — дефицит впереди, правый низ — профицит. Нажмите на точку, чтобы увидеть факты и источники.' + (missing.length ? ' Без оценки: ' + missing.join(', ') + '.' : '');
     if (!rows.length) return;
     const W = Math.max(280, host.clientWidth), H = W < 520 ? 380 : 440;
     const m = { l: 44, r: 16, t: 26, b: 40 }, iw = W - m.l - m.r, ih = H - m.t - m.b;
@@ -1375,24 +1389,25 @@ const DATA = /*__DATA__*/null;
     s('text', { x: m.l + 6, y: m.t - 9, class: 'lbl' }, svg, 'спрос растёт ↑');
     s('text', { x: xv(-1.25), y: yv(1.25) - 2, 'text-anchor': 'middle', class: 'lbl' }, svg, 'дефицит впереди');
     s('text', { x: xv(1.25), y: yv(-1.25) + 14, 'text-anchor': 'middle', class: 'lbl' }, svg, 'профицит впереди');
+    const placed = [{ x0: xv(-1.25) - 52, x1: xv(-1.25) + 52, y0: yv(1.25) - 14, y1: yv(1.25) + 2 }, { x0: xv(1.25) - 56, x1: xv(1.25) + 56, y0: yv(-1.25) + 2, y1: yv(-1.25) + 16 }];
     // точки с разводкой совпадающих координат
     const groups = {};
     rows.forEach((c) => { const k = c.sd.supply + ',' + c.sd.demand; (groups[k] = groups[k] || []).push(c); });
-    const placed = [];
     const fits = (b) => b.x0 >= m.l && b.x1 <= m.l + iw && b.y0 >= m.t && b.y1 <= m.t + ih && !placed.some((o) => b.x0 < o.x1 && b.x1 > o.x0 && b.y0 < o.y1 && b.y1 > o.y0);
     const tip = el('div', { class: 'tip', hidden: '' }, host);
     for (const k in groups) {
       const arr = groups[k], n = arr.length;
       arr.forEach((c, i) => {
-        const ang = (i / n) * 2 * Math.PI, rad = n > 1 ? 14 : 0;
+        const ang = (i / n) * 2 * Math.PI - Math.PI / 2, rad = n > 1 ? 10 + 3.5 * n : 0;
         const x = xv(c.sd.supply) + Math.cos(ang) * rad, y = yv(c.sd.demand) + Math.sin(ang) * rad;
         const coal = c.group === 'Уголь';
         const g = s('g', { tabindex: 0, role: 'button', 'aria-label': c.name + ': предложение ' + c.sd.supply + ', спрос ' + c.sd.demand, style: 'cursor:pointer' }, svg);
-        s('circle', { cx: x, cy: y, r: coal ? 6.5 : 5, fill: `var(${stanceVar[c.stance]})`, stroke: coal || sdOpen === c.key ? 'var(--ink)' : 'var(--surface)', 'stroke-width': 2, 'stroke-dasharray': c.sd.confidence === 'low' ? '2 2' : null }, g);
-        s('circle', { cx: x, cy: y, r: 13, fill: 'transparent' }, g);
+        const undef = c.sd.confidence === 'low' && c.sd.net === 0;
+        s('circle', { cx: x, cy: y, r: coal ? 6.5 : 5, fill: undef ? 'var(--surface)' : c.sd.net > 0 ? 'var(--up)' : c.sd.net < 0 ? 'var(--down)' : 'var(--muted)', stroke: coal || sdOpen === c.key ? 'var(--ink)' : 'var(--surface)', 'stroke-width': 2, 'stroke-dasharray': c.sd.confidence === 'low' ? '2 2' : null }, g);
+        s('circle', { cx: x, cy: y, r: 9, fill: 'transparent' }, g);
         placed.push({ x0: x - 6, x1: x + 6, y0: y - 6, y1: y + 6 });
         const label = shortName(c.name), w = label.length * 6.4 + 4;
-        const cands = [[x + 9, y + 4, 'start'], [x - 9, y + 4, 'end'], [x, y - 10, 'middle'], [x, y + 17, 'middle'], [x + 9, y - 8, 'start'], [x + 9, y + 16, 'start'], [x - 9, y - 8, 'end'], [x - 9, y + 16, 'end']];
+        const cands = (W < 520 && !coal) ? [] : [[x + 9, y + 4, 'start'], [x - 9, y + 4, 'end'], [x, y - 10, 'middle'], [x, y + 17, 'middle'], [x + 9, y - 8, 'start'], [x + 9, y + 16, 'start'], [x - 9, y - 8, 'end'], [x - 9, y + 16, 'end']];
         for (const [lx, ly, anc] of cands) {
           const x0 = anc === 'start' ? lx : anc === 'end' ? lx - w : lx - w / 2;
           const b = { x0, x1: x0 + w, y0: ly - 11, y1: ly + 3 };
@@ -1401,7 +1416,7 @@ const DATA = /*__DATA__*/null;
         const on = () => {
           tip.textContent = '';
           el('div', { class: 't-date' }, tip, c.group + ' · оценка ' + (c.sd.as_of || '') + ' · ' + (c.sd.horizon || ''));
-          el('div', { style: 'font-weight:600;margin-bottom:3px' }, tip, c.name + ': ' + sdLabel(c.sd.net));
+          el('div', { style: 'font-weight:600;margin-bottom:3px' }, tip, c.name + ': ' + sdLabel(c.sd.net, c.sd.confidence));
           el('div', null, tip, 'Предложение ' + sdWord(c.sd.supply) + '. ' + c.sd.supply_summary);
           el('div', { class: 't-extra' }, tip, 'Спрос ' + sdWord(c.sd.demand) + '. ' + c.sd.demand_summary);
           tip.hidden = false;
@@ -1418,7 +1433,7 @@ const DATA = /*__DATA__*/null;
     const det = document.getElementById('sd-detail'); det.textContent = '';
     const c = rows.find((x) => x.key === sdOpen);
     if (c) {
-      const h = el('h3', null, det, c.name + ': ' + sdLabel(c.sd.net) + ' на ' + c.sd.horizon);
+      const h = el('h3', null, det, c.name + ': ' + sdLabel(c.sd.net, c.sd.confidence) + ' на ' + c.sd.horizon);
       const block = (title, score, summary, facts) => {
         const d = el('div', { style: 'margin-top:8px' }, det);
         const hh = el('div', { style: 'font-weight:600' }, d, title + ': ' + sdWord(score) + ' (' + (score > 0 ? '+' : '') + score + '). ');
@@ -1484,7 +1499,7 @@ const DATA = /*__DATA__*/null;
       el('div', { class: 'tgroup' }, td, (ph.kind === 'up' ? 'рост ' : 'спад ') + mo(ph.months) + ', ' + fmtPct(ph.change) + (ph.extreme_date ? '; от ' + (ph.kind === 'down' ? 'дна ' : 'пика ') + fmtPct(ph.since_extreme) : ''));
       td = el('td', null, tr); stanceChip(td, c.stance === 'buy' ? 'buy' : c.stance === 'sell' ? 'sell' : '', c.stance_label);
       td = el('td', null, tr);
-      if (c.sd) { sdChip(td, c.sd.net); el('div', { class: 'tgroup' }, td, 'предл. ' + (c.sd.supply > 0 ? '+' : '') + c.sd.supply + ' · спрос ' + (c.sd.demand > 0 ? '+' : '') + c.sd.demand); } else el('span', { class: 'tgroup' }, td, 'нет оценки');
+      if (c.sd && !(c.sd.confidence === 'low' && c.sd.net === 0)) { sdChip(td, c.sd.net); el('div', { class: 'tgroup' }, td, 'предл. ' + (c.sd.supply > 0 ? '+' : '') + c.sd.supply + ' · спрос ' + (c.sd.demand > 0 ? '+' : '') + c.sd.demand + (c.sd.confidence === 'low' ? ' · низкая уверенность' : '')); } else el('span', { class: 'tgroup' }, td, c.sd ? 'не определено: мало данных' : 'нет оценки');
       td = el('td', null, tr); spark(td, c);
     }
   }
