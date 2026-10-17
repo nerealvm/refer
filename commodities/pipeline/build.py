@@ -715,6 +715,16 @@ def build():
     events = json.loads((ROOT / 'data' / 'events.json').read_text(encoding='utf-8'))
     for ev in events:
         ev.pop('review', None)  # след проверки остаётся в events.json, в дашборд не идёт
+    # события еженедельного мониторинга trend-watch: без привязки к развороту, помечены live
+    live_file = ROOT / 'data' / 'events_live.json'
+    if live_file.exists():
+        live = json.loads(live_file.read_text(encoding='utf-8'))
+        for ev in live:
+            ev.setdefault('linked_turn', None)
+            ev['live'] = True
+        events.extend(live)
+        events.sort(key=lambda e: e['date'])
+        print('события мониторинга:', len(live))
     deals = json.loads((ROOT / 'data' / 'deals.json').read_text(encoding='utf-8'))
     # ---- развороты и события ----
     turns = []

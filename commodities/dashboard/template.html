@@ -270,7 +270,7 @@ footer { color: var(--muted); font-size: 12.5px; padding-block: 0 40px; }
       </div>
       <div class="grid2" style="margin-top:16px;gap:6px 24px">
         <div><h3>Сделки и банкротства</h3><ol class="events deals" id="deals" style="margin-top:6px;grid-template-columns:1fr"></ol></div>
-        <div><h3>Фоновые события</h3><p class="sub" style="margin-top:2px">Не привязаны к конкретному развороту: действовали против него или на длинном плече.</p><ol class="events" id="events-ctx" style="margin-top:6px;grid-template-columns:1fr"></ol></div>
+        <div><h3>Фоновые события и мониторинг</h3><p class="sub" style="margin-top:2px">Не привязаны к конкретному развороту: действовали против него, на длинном плече, или пришли из еженедельного мониторинга новостей (помечены «мониторинг») и ждут ревизии.</p><ol class="events" id="events-ctx" style="margin-top:6px;grid-template-columns:1fr"></ol></div>
       </div>
     </div>
 
@@ -821,7 +821,7 @@ const DATA = /*__DATA__*/null;
       const tx = el('span', null, li);
       el('b', { style: 'font-weight:500;color:var(--ink)' }, tx, e.label + '. ');
       tx.appendChild(document.createTextNode(e.note + ' '));
-      el('i', { style: 'color:var(--muted);font-style:normal;font-size:12px' }, tx, TYPE_RU[e.type] || e.type);
+      el('i', { style: 'color:var(--muted);font-style:normal;font-size:12px' }, tx, (TYPE_RU[e.type] || e.type) + (e.live ? ' · мониторинг' : ''));
       if (e.sources && e.sources.length) el('a', { href: e.sources[0], target: '_blank', rel: 'noopener' }, tx, 'источник');
     };
     for (const tn of TURNS) {
