@@ -1082,7 +1082,7 @@ const DATA = /*__DATA__*/null;
         const c = el('span', { class: 'chg', style: 'margin-left:8px;color:' + (sg.direction_for_price > 0 ? 'var(--up)' : sg.direction_for_price < 0 ? 'var(--down)' : 'var(--ink-2)') }, d, fmtPct(sg.change_pct / 100, 1) + (sg.prev_label ? ' к ' + sg.prev_label.replace(/ \(.*\)$/, '') : ''));
       }
       const ageDays = sg.date && /^\d{4}-\d{2}/.test(sg.date) ? Math.round((new Date(M.built) - new Date(sg.date.slice(0, 10).length === 7 ? sg.date.slice(0, 7) + '-28' : sg.date.slice(0, 10))) / 86400000) : null;
-      const stale = ageDays != null && ageDays > 45;
+      const stale = ageDays != null && ageDays > (sg.date && sg.date.length === 7 ? 75 : 45);  // месячная статистика выходит с лагом, ей даём 75 дней
       if (stale) { card.classList.add('low'); el('span', { class: 'chg', style: 'margin-left:8px;color:var(--muted)' }, d, '· данные устарели (' + ageDays + ' дн.)'); }
       const dirv = stale ? 0 : sg.direction_for_price;
       const dir = dirv > 0 ? '▲ для цены вверх' : dirv < 0 ? '▼ для цены вниз' : '→ нейтрально';
