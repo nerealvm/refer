@@ -796,11 +796,24 @@ def build():
     print('сигналы:', len(signals), '· компании с капзатратами:', len(capex))
     # хроника недель: записи пишет рутина trend-watch, цену на дату прогона добавляет сборка
     story_file = ROOT / 'data' / 'story.json'
-    story = json.loads(story_file.read_text(encoding='utf-8')) if story_file.exists() else []
+    story = []
+    if story_file.exists():
+        try:
+            story = json.loads(story_file.read_text(encoding='utf-8'))
+            assert isinstance(story, list)
+        except Exception as exc:
+            print('хроника: файл не читается, пропущена:', exc)
+            story = []
+    clean = []
     for st in story:
+        if not isinstance(st, dict) or not st.get('run'):
+            print('хроника: запись без run пропущена:', str(st)[:80])
+            continue
         st.pop('note', None)  # служебная пометка остаётся в data/story.json
         st['price'] = None
-        done = au_n[au_n.index <= pd.Timestamp(st['run'])]
+        # цена на дату прогона: последний ЗАВЕРШЁННЫЙ месяц до месяца прогона (индекс ряда стоит на 1-м числе),
+        # чтобы выход нового Pink Sheet не менял цену в старых записях
+        done = au_n[au_n.index < pd.Timestamp(st['run']).replace(day=1)]
         if len(done):
             d0, v = done.index[-1], float(done.iloc[-1])
             def _at(months):
@@ -810,6 +823,8 @@ def build():
             st['price'] = dict(date=d0.strftime('%Y-%m'), value=round(v, 1),
                                chg_1m=round(v / v1 - 1, 3) if v1 else None,
                                chg_12m=round(v / v12 - 1, 3) if v12 else None)
+        clean.append(st)
+    story = clean
     story.sort(key=lambda x: x['run'], reverse=True)
     print('хроника:', len(story), 'недель')
 

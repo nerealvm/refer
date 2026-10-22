@@ -71,6 +71,7 @@ nav.tabs .wrap { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: non
 nav.tabs button { font: 500 14px var(--font-body); color: var(--ink-2); background: none; border: 0; padding: 14px 12px 12px; border-bottom: 2px solid transparent; cursor: pointer; white-space: nowrap; }
 @media (max-width: 560px) { nav.tabs .wrap { flex-wrap: wrap; } nav.tabs button { padding: 10px 10px 8px; font-size: 13px; } .seg button { padding: 6px 8px; font-size: 12.5px; } }
 section.tab { scroll-margin-top: 54px; }
+@media (max-width: 560px) { section.tab { scroll-margin-top: 80px; } }
 nav.tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--ink); }
 nav.tabs button:hover { color: var(--ink); }
 button:focus-visible, [tabindex]:focus-visible, a:focus-visible, select:focus-visible { outline: 2px solid var(--s-au); outline-offset: 2px; }
@@ -1121,11 +1122,12 @@ const DATA = /*__DATA__*/null;
       const chips = el('div', { class: 'chips story-chips' }, main);
       for (const e of w.events || []) {
         const q = e.status === 'queue';
-        const attrs = { class: 'chip' + (q ? ' plain story-q' : ''), title: (e.source_name ? e.source_name + ' · ' : '') + (TYPE_RU[e.type] || e.type) + ' · ' + (e.date || '') };
-        if (e.url) { attrs.href = e.url; attrs.target = '_blank'; attrs.rel = 'noopener'; }
-        const c = el(e.url ? 'a' : 'span', attrs, chips);
+        const attrs = { class: 'chip' + (q ? ' plain story-q' : ''), title: (e.source_name ? e.source_name + ' · ' : '') + (e.type ? (TYPE_RU[e.type] || e.type) : 'тип не определён') + ' · ' + (e.date || '') };
+        const link = typeof e.url === 'string' && /^https?:\/\//i.test(e.url);
+        if (link) { attrs.href = e.url; attrs.target = '_blank'; attrs.rel = 'noopener'; }
+        const c = el(link ? 'a' : 'span', attrs, chips);
         el('span', { class: 'dot', style: 'background:' + (TYPE_COL[e.type] || 'var(--neutral)') }, c);
-        el('span', { style: 'color:' + (e.expected_direction > 0 ? 'var(--up)' : 'var(--down)'), 'aria-label': 'ожидаемое влияние ' + (e.expected_direction > 0 ? 'вверх' : 'вниз') }, c, e.expected_direction > 0 ? '▲' : '▼');
+        if (e.expected_direction > 0 || e.expected_direction < 0) el('span', { style: 'color:' + (e.expected_direction > 0 ? 'var(--up)' : 'var(--down)'), 'aria-label': 'ожидаемое влияние ' + (e.expected_direction > 0 ? 'вверх' : 'вниз') }, c, e.expected_direction > 0 ? '▲' : '▼');
         c.appendChild(document.createTextNode(' ' + e.label));
         el('small', null, c, q ? 'на проверке' : 'каталог');
       }
