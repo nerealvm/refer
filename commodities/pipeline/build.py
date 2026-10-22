@@ -794,6 +794,24 @@ def build():
     for c in capex:
         c.pop('note', None)  # служебные оговорки сборщиков остаются в data/capex.json
     print('сигналы:', len(signals), '· компании с капзатратами:', len(capex))
+    # хроника недель: записи пишет рутина trend-watch, цену на дату прогона добавляет сборка
+    story_file = ROOT / 'data' / 'story.json'
+    story = json.loads(story_file.read_text(encoding='utf-8')) if story_file.exists() else []
+    for st in story:
+        st.pop('note', None)  # служебная пометка остаётся в data/story.json
+        st['price'] = None
+        done = au_n[au_n.index <= pd.Timestamp(st['run'])]
+        if len(done):
+            d0, v = done.index[-1], float(done.iloc[-1])
+            def _at(months):
+                x = au_n.get(d0 - pd.DateOffset(months=months))
+                return None if x is None or pd.isna(x) else float(x)
+            v1, v12 = _at(1), _at(12)
+            st['price'] = dict(date=d0.strftime('%Y-%m'), value=round(v, 1),
+                               chg_1m=round(v / v1 - 1, 3) if v1 else None,
+                               chg_12m=round(v / v12 - 1, 3) if v12 else None)
+    story.sort(key=lambda x: x['run'], reverse=True)
+    print('хроника:', len(story), 'недель')
 
     payload = dict(
         meta=dict(
@@ -819,6 +837,7 @@ def build():
         capex=capex,
         events=events,
         deals=deals,
+        story=story,
     )
 
     # ---- выгрузки ----
@@ -845,7 +864,7 @@ def build():
     tpl = (DASH / 'template.html').read_text(encoding='utf-8')
     blob = json.dumps(payload, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
     html = tpl.replace('/*__DATA__*/null', blob)
-    for name in ('research', 'method'):
+    for name in ('research', 'method', 'story'):
         frag = DASH / f'{name}.html'
         if frag.exists():
             html = html.replace(f'<!--__{name.upper()}__-->', frag.read_text(encoding='utf-8'))

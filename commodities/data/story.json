@@ -1,0 +1,76 @@
+[
+ {
+  "run": "2026-10-17",
+  "period": {
+   "from": "2026-10-09",
+   "to": "2026-10-17"
+  },
+  "headline": "Китай сократил импорт, Индонезия готовит квоту",
+  "story": "Потребители: по данным Reuters, импорт угля Китаем в сентябре снизился на 6% из-за высоких запасов и ограничений поставок из Индонезии, цены при этом у многолетнего максимума. Производители и политика: Индонезия начала процесс установки квоты добычи на 2027 год (Petromindo), производители откладывают годовые контракты из-за неопределённости по квоте и экспортным правилам (IndexBox), в Jakarta Globe звучат призывы ограничить экспорт высококалорийного угля. Первое событие давит на цену вниз через спрос крупнейшего покупателя, второе давит вверх через возможное сокращение предложения, поэтому вектор недели смешанный. Ещё четыре сообщения ушли в очередь на проверку: повышение цен BCCL на коксующийся уголь, комментарии о спросе Азии на фоне дорогого СПГ, рост экспорта Монголии в Китай и решение Высокого суда по шахте в Австралии.",
+  "vector": "mixed",
+  "events": [
+   {
+    "date": "2026-09",
+    "label": "Импорт угля Китаем в сентябре −6%",
+    "type": "demand",
+    "expected_direction": -1,
+    "status": "catalogue",
+    "source_name": "Reuters",
+    "url": "https://news.google.com/rss/articles/CBMivgFBVV95cUxNMk1UZlVmWjJQMVU0SHNvcmxIcF9pdXhSaEZWaWNOODY1M29OWGJCRk1MUzNvQXhJYzRNVUhicnhTNXBhZkRCQXFJMDVfWThiLW1LbmRWX1hkSG5tczJwQ0kwWUZ1aTFfZFN4X2t4NXUwOXVDdEtGRGJnMHFhWVdCbzlsb3pOWnM5dXJJWHVjYVEtdzlFQUxwTWpkOWZtdXIzdVZSZU9rV2xIM1h4RkpuREwxay1sRDN1MWFVN2hB?oc=5"
+   },
+   {
+    "date": "2026-10",
+    "label": "Индонезия: квота 2027 и правила экспорта",
+    "type": "geopolitics",
+    "expected_direction": 1,
+    "status": "catalogue",
+    "source_name": "Petromindo",
+    "url": "https://news.google.com/rss/articles/CBMinwFBVV95cUxOd2xsdUE4WFF2TUo5bm5halQ0cndyQ29QR01kekJwZW9sOWlhWVlIc05SelFSeFMzWWhEWFdkUk1WZm5UdW42aWtZajdXc0k2X2otekhPT19XZ0ZXbkFQT2RBMzB1VS1GckpCQ2hQcnNtZzBoeVA0UF9qNExuNlhCUXRiNzVhNGszMDUwbEx3Q2Q5S09Jb2dhYXJCZVhObUk?oc=5"
+   }
+  ],
+  "candidates": 37,
+  "sources": [
+   "Google News, 12 запросов",
+   "IEEFA",
+   "EIA"
+  ],
+  "note": "восстановлено 22.10.2026 из runs/2026-10-17; четыре позиции очереди (в review_queue.json у них нет type и направления) в events не вынесены"
+ },
+ {
+  "run": "2026-10-19",
+  "period": {
+   "from": "2026-10-11",
+   "to": "2026-10-19"
+  },
+  "headline": "События недели ушли на проверку",
+  "story": "Два события недели, отобранных рутиной, при ревизии 20.10 переведены из каталога в очередь на проверку. Первое: решение Высокого суда Австралии по угольной шахте и вмешательство премьера штата, который пытается сохранить рабочие места (SMH, Grattan Institute); в очередь оно ушло, потому что в материалах не названа шахта. Второе: война с Ираном ограничивает поставки СПГ, и крупные азиатские рынки замещают газ углём (EnergyNow, Nikkei Asia); это продолжение ситуации марта 2026, уже учтённой в каталоге. Ещё в очереди кратковременный сбой железной дороги в ЮАР (BigMint) и падение добычи угля в Китае в сентябре на 6,8% к прошлому году (marketscreener.com, Energy Connects). Рутина оценила вектор недели как «вверх», но на графике цен ни одно из событий недели не стоит.",
+  "vector": "up",
+  "events": [
+   {
+    "date": "2026-10",
+    "label": "Высокий суд Австралии: шахта, вмешательство премьера",
+    "type": "geopolitics",
+    "expected_direction": 1,
+    "status": "queue",
+    "source_name": "SMH.com.au",
+    "url": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxQdWNpNHZfQ0k0SDBENWlyNmd2NFF4NW4xMUt6d1MzaHZrV0RRbFloZ3lZcTJ4S2pJbkotMDdRaWw3X1pJdER5SFcxbkZUeHUxY2xPWGlocFZiNXNJcWJsUzEtQ3RBdmpKZ2h3bndWQjBTOWJLYUZVQzZmVHNzTlFnWUZhbURKTkRVLVE2bDdoMHEyYVVOSFNBSFhoOTRSQTAxelRQbXhzOXJSYVprWnZscjlfNXhqNlVHdVNjdF92WEVVVjgzYTYydDQ4eFYwZWRtYW9vbg?oc=5"
+   },
+   {
+    "date": "2026-10",
+    "label": "Война с Ираном ограничивает СПГ в Азии",
+    "type": "substitute",
+    "expected_direction": 1,
+    "status": "queue",
+    "source_name": "EnergyNow",
+    "url": "https://news.google.com/rss/articles/CBMilwFBVV95cUxOMHhFaHFjaU1XODZmSUNsTWI4WUY3bWVBTVBLbHBBVFBWWnptMDFKdUNmalNlcG5jOXJWTERvem4wckZIcXY1LWk2bXdfQWNnTDZOSXZTVE5xZXRRNGwtZkcwalc5Q1Ywc0ZjVXFEWi12dkZDV1NKNHRCN093czBFQkJBTDVrLWFSRjg1cVU4djZkdWdwWHZJ?oc=5"
+   }
+  ],
+  "candidates": 32,
+  "sources": [
+   "Google News, 12 запросов",
+   "IEEFA",
+   "EIA"
+  ],
+  "note": "восстановлено 22.10.2026 из runs/2026-10-19"
+ }
+]

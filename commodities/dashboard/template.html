@@ -68,8 +68,9 @@ h1 { font-family: var(--font-display); font-weight: 600; font-size: clamp(30px, 
 .lede { max-width: 66ch; color: var(--ink-2); margin: 0; font-size: 16px; }
 nav.tabs { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--bg); border-bottom: 1px solid var(--hair); }
 nav.tabs .wrap { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
-@media (max-width: 560px) { nav.tabs .wrap { flex-wrap: wrap; } nav.tabs button { padding: 10px 10px 8px; font-size: 13px; } .seg button { padding: 6px 8px; font-size: 12.5px; } }
 nav.tabs button { font: 500 14px var(--font-body); color: var(--ink-2); background: none; border: 0; padding: 14px 12px 12px; border-bottom: 2px solid transparent; cursor: pointer; white-space: nowrap; }
+@media (max-width: 560px) { nav.tabs .wrap { flex-wrap: wrap; } nav.tabs button { padding: 10px 10px 8px; font-size: 13px; } .seg button { padding: 6px 8px; font-size: 12.5px; } }
+section.tab { scroll-margin-top: 54px; }
 nav.tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--ink); }
 nav.tabs button:hover { color: var(--ink); }
 button:focus-visible, [tabindex]:focus-visible, a:focus-visible, select:focus-visible { outline: 2px solid var(--s-au); outline-offset: 2px; }
@@ -154,6 +155,22 @@ h3 { font-size: 15px; font-weight: 600; margin: 0 0 6px; }
 .sig .ssrc { font-size: 11px; color: var(--muted); margin-top: auto; }
 .sig .ssrc a { color: var(--muted); }
 .sig.low { border-style: dashed; }
+.story-item { display: grid; grid-template-columns: 130px 1fr; gap: 12px 16px; padding: 14px 0; border-top: 1px solid var(--hair); }
+.story-item:first-child { border-top: 0; }
+.story-side { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.story-when { font-family: var(--font-data); font-size: 12px; color: var(--muted); line-height: 1.35; }
+.story-vec { font-size: 26px; line-height: 1; }
+.story-vec small { display: block; font-size: 11.5px; color: var(--muted); margin-top: 4px; }
+.story-main { min-width: 0; }
+.story-main .story-title { font-weight: 600; font-size: 15px; margin: 0 0 4px; }
+.story-main .story-text { margin: 0 0 8px; font-size: 14.5px; line-height: 1.5; }
+.story-main .story-price { font-family: var(--font-data); font-size: 12px; color: var(--ink-2); margin: 0 0 8px; }
+.prose .story-chips .chip { white-space: normal; align-items: flex-start; border-radius: 10px; line-height: 1.3; padding: 4px 9px 4px 7px; color: var(--ink); text-decoration: none; }
+.story-chips .chip .dot { flex: none; margin-top: 4px; }
+.story-chips .chip.plain.story-q { border-style: dashed; }
+.story-chips .chip small { font-size: 11px; color: var(--muted); font-weight: 400; margin-left: 2px; white-space: nowrap; }
+.prose a.chip:hover { text-decoration: underline; }
+@media (max-width: 560px) { .story-item { grid-template-columns: 1fr; gap: 8px; } .story-side { flex-direction: row; align-items: baseline; gap: 12px; } .story-vec small { display: inline; margin: 0 0 0 6px; } }
 .sig .chg { font-family: var(--font-data); font-size: 12px; }
 select.pick { font: inherit; font-size: 13px; padding: 5px 8px; border-radius: 8px; border: 1px solid var(--hair); background: var(--surface); color: var(--ink); max-width: 100%; }
 ol.events { list-style: none; margin: 14px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 6px 18px; font-size: 13px; }
@@ -218,6 +235,7 @@ footer { color: var(--muted); font-size: 12.5px; padding-block: 0 40px; }
     <button role="tab" id="tab-coal" aria-controls="coal" aria-selected="true">Уголь</button>
     <button role="tab" id="tab-map" aria-controls="map" aria-selected="false">Выбор коммодити</button>
     <button role="tab" id="tab-research" aria-controls="research" aria-selected="false">Что смотрят профи</button>
+    <button role="tab" id="tab-story" aria-controls="story" aria-selected="false">Хроника</button>
     <button role="tab" id="tab-method" aria-controls="method" aria-selected="false">Методология</button>
   </div>
 </nav>
@@ -271,7 +289,7 @@ footer { color: var(--muted); font-size: 12.5px; padding-block: 0 40px; }
       </div>
       <div class="grid2" style="margin-top:16px;gap:6px 24px">
         <div><h3>Сделки и банкротства</h3><ol class="events deals" id="deals" style="margin-top:6px;grid-template-columns:1fr"></ol></div>
-        <div><h3>Фоновые события и мониторинг</h3><p class="sub" style="margin-top:2px">Не привязаны к конкретному развороту: действовали против него, на длинном плече, или пришли из еженедельного мониторинга новостей (помечены «мониторинг») и ждут ревизии.</p><ol class="events" id="events-ctx" style="margin-top:6px;grid-template-columns:1fr"></ol></div>
+        <div><h3>Фоновые события и мониторинг</h3><p class="sub" style="margin-top:2px">Не привязаны к конкретному развороту: действовали против него, на длинном плече, или пришли из еженедельного мониторинга новостей (помечены «мониторинг») и ждут ревизии. <a href="#story" class="to-story">Хроника недель →</a></p><ol class="events" id="events-ctx" style="margin-top:6px;grid-template-columns:1fr"></ol></div>
       </div>
     </div>
 
@@ -363,6 +381,13 @@ footer { color: var(--muted); font-size: 12.5px; padding-block: 0 40px; }
   <section class="tab" id="research" role="tabpanel" aria-labelledby="tab-research" hidden>
     <div class="panel prose" id="research-body">
 <!--__RESEARCH__-->
+    </div>
+  </section>
+
+  <!-- ============ ХРОНИКА ============ -->
+  <section class="tab" id="story" role="tabpanel" aria-labelledby="tab-story" hidden>
+    <div class="panel prose" id="story-body">
+<!--__STORY__-->
     </div>
   </section>
 
@@ -1062,6 +1087,50 @@ const DATA = /*__DATA__*/null;
   const fmtCorr = (c) => (c > 0 ? '+' : c < 0 ? '−' : '') + nf(2).format(Math.abs(c));
 
   // ---------- табло сигналов ----------
+  // ---------- хроника недель ----------
+  // цвет точки типа события: переменные палитры, у типов нет собственных цветов
+  const TYPE_COL = { demand: 'var(--s-au)', supply: 'var(--s-met)', geopolitics: 'var(--s-phcc)', macro: 'var(--neutral)', substitute: 'var(--s-usst)', weather: 'var(--s-za)', climate: 'var(--s-usbit)' };
+  const STORY_VEC = { up: ['▲', 'вверх', 'var(--up)'], down: ['▼', 'вниз', 'var(--down)'], mixed: ['↔', 'смешанный', 'var(--ink-2)'], none: ['—', 'без событий', 'var(--muted)'] };
+  const ruPlural = (n, f) => { const a = Math.abs(n) % 100, b = a % 10; return a > 10 && a < 20 ? f[2] : b > 1 && b < 5 ? f[1] : b === 1 ? f[0] : f[2]; };
+  const dmy = (iso) => (iso || '').split('-').reverse().join('.');
+  function drawStory() {
+    const list = document.getElementById('story-list'), head = document.getElementById('story-head');
+    if (!list || !head) return;
+    list.textContent = ''; head.textContent = '';
+    const S = (DATA.story || []).slice().sort((a, b) => b.run.localeCompare(a.run));
+    if (!S.length) { el('p', { class: 'sub' }, list, 'Хроника начнётся с первого прогона рутины'); return; }
+    const evs = S.flatMap((x) => x.events || []);
+    const nCat = evs.filter((e) => e.status === 'catalogue').length, nQ = evs.filter((e) => e.status === 'queue').length;
+    const lastVec = STORY_VEC[S[0].vector] || STORY_VEC.none;
+    el('span', { class: 'chip' }, head, S.length + ' ' + ruPlural(S.length, ['неделя', 'недели', 'недель']) + ' с ' + dmy(S[S.length - 1].run));
+    el('span', { class: 'chip' }, head, nCat + ' ' + ruPlural(nCat, ['событие', 'события', 'событий']) + ' в каталоге');
+    el('span', { class: 'chip plain' }, head, nQ + ' на проверке');
+    el('span', { class: 'chip' }, head, 'последняя неделя: ' + lastVec[0] + ' ' + lastVec[1]);
+    for (const w of S) {
+      const vec = STORY_VEC[w.vector] || STORY_VEC.none;
+      const item = el('article', { class: 'story-item' }, list);
+      const side = el('div', { class: 'story-side' }, item);
+      el('div', { class: 'story-when' }, side, 'неделя до ' + dmy(w.run));
+      const v = el('div', { class: 'story-vec', style: 'color:' + vec[2], title: 'вектор недели: ' + vec[1] }, side, vec[0]);
+      el('small', null, v, vec[1]);
+      const main = el('div', { class: 'story-main' }, item);
+      el('p', { class: 'story-title' }, main, w.headline);
+      el('p', { class: 'story-text' }, main, w.story);
+      const pr = w.price;
+      el('p', { class: 'story-price' }, main, pr ? 'Newcastle ' + pr.date + ': ' + fmtP(pr.value) + ' $/т' + (pr.chg_1m != null ? ' · ' + fmtPct(pr.chg_1m) + ' за месяц' : '') + (pr.chg_12m != null ? ' · ' + fmtPct(pr.chg_12m) + ' за год' : '') : 'цена: нет данных');
+      const chips = el('div', { class: 'chips story-chips' }, main);
+      for (const e of w.events || []) {
+        const q = e.status === 'queue';
+        const attrs = { class: 'chip' + (q ? ' plain story-q' : ''), title: (e.source_name ? e.source_name + ' · ' : '') + (TYPE_RU[e.type] || e.type) + ' · ' + (e.date || '') };
+        if (e.url) { attrs.href = e.url; attrs.target = '_blank'; attrs.rel = 'noopener'; }
+        const c = el(e.url ? 'a' : 'span', attrs, chips);
+        el('span', { class: 'dot', style: 'background:' + (TYPE_COL[e.type] || 'var(--neutral)') }, c);
+        el('span', { style: 'color:' + (e.expected_direction > 0 ? 'var(--up)' : 'var(--down)'), 'aria-label': 'ожидаемое влияние ' + (e.expected_direction > 0 ? 'вверх' : 'вниз') }, c, e.expected_direction > 0 ? '▲' : '▼');
+        c.appendChild(document.createTextNode(' ' + e.label));
+        el('small', null, c, q ? 'на проверке' : 'каталог');
+      }
+    }
+  }
   function drawSignals() {
     const grid = document.getElementById('signals-grid'); if (!grid) return;
     grid.textContent = '';
@@ -1510,12 +1579,13 @@ const DATA = /*__DATA__*/null;
   });
 
   // ---------- вкладки ----------
-  const TABS = ['coal', 'map', 'research', 'method'];
+  const TABS = ['coal', 'map', 'research', 'story', 'method'];
   const drawn = {};
   function drawTab(id) {
     if (id === 'coal') { drawMain(); drawLinks(); drawTypes(); drawLong(); drawPhases(); if (!drawn.ct) { drawCycleTable(); drawn.ct = 1; } }
     if (id === 'map') { drawMap(); drawSD(); if (!drawn.mt) { drawTable(); drawn.mt = 1; } }
     if (id === 'research') { drawSignals(); drawCapex(); drawLong('-r'); }
+    if (id === 'story') drawStory();
   }
   let active = 'coal';
   function openTab(id, push) {
@@ -1529,6 +1599,7 @@ const DATA = /*__DATA__*/null;
     if (push) { try { history.replaceState(null, '', '#' + id); } catch (e) { /* песочница */ } }
   }
   TABS.forEach((t) => document.getElementById('tab-' + t).addEventListener('click', () => openTab(t, true)));
+  document.querySelectorAll('a.to-story').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); openTab('story', true); window.scrollTo(0, 0); }));
   document.querySelector('[role="tablist"]').addEventListener('keydown', (e) => {
     if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
     const i = (TABS.indexOf(active) + (e.key === 'ArrowRight' ? 1 : TABS.length - 1)) % TABS.length;
